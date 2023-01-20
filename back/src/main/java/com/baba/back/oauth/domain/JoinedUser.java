@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class JoinedUser {
 
     @Id
-    private String userId;
+    private String id;
     private Boolean isSigned;
 
 }
