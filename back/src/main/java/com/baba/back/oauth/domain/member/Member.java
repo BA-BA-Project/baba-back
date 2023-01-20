@@ -1,4 +1,4 @@
-package com.baba.back.oauth.domain.user;
+package com.baba.back.oauth.domain.member;
 
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class User {
+public class Member {
 
     @Id
     private String id;
@@ -26,7 +26,7 @@ public class User {
     private Icon icon;
 
     @Builder
-    public User(String id, String name, String introduction, String iconColor, String iconName) {
+    public Member(String id, String name, String introduction, String iconColor, String iconName) {
         this.id = id;
         this.name = new Name(name);
         this.introduction = new Introduction(introduction);

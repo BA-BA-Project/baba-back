@@ -10,10 +10,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class JoinedUser {
+public class JoinedMember {
 
     @Id
     private String id;
-    private Boolean isSigned;
-
+    private boolean isSigned;
 }

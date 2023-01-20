@@ -10,7 +10,7 @@ public class FakeOAuthClient implements OAuthClient {
     }
 
     @Override
-    public String getUserId(final String accessToken) {
+    public String getMemberId(final String accessToken) {
         return "KAKAO" + accessToken;
     }
 }

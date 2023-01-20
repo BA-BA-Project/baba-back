@@ -1,4 +1,4 @@
-package com.baba.back.oauth.domain.user;
+package com.baba.back.oauth.domain.member;
 
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Embedded;

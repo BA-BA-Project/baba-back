@@ -1,4 +1,4 @@
-package com.baba.back.oauth.domain.user;
+package com.baba.back.oauth.domain.member;
 
 import com.baba.back.oauth.exception.IconColorBadRequestException;
 import jakarta.persistence.Embeddable;
