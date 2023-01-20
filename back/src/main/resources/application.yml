@@ -1,0 +1,18 @@
+security:
+  oauth:
+    kakao:
+      grant-type: ${KAKAO_GRANT_TYPE}
+      client-id: ${KAKAO_CLIENT_ID}
+      redirect-uri: ${KAKAO_REDIRECT_URI}
+
+  jwt:
+    token:
+      secret-key: ${JWT_SECRET_KEY}
+      expire-length: ${JWT_EXPIRE_LENGTH}
+
+spring:
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
