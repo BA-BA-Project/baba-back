@@ -1,6 +1,6 @@
-package com.baba.back.oauth.domain.baby;
+package com.baba.back.baby.domain;
 
-import com.baba.back.oauth.domain.baby.exception.BirthdayBadRequestException;
+import com.baba.back.baby.exception.BirthdayBadRequestException;
 import jakarta.persistence.Embeddable;
 import java.time.LocalDate;
 import lombok.Getter;

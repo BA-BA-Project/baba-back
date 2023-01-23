@@ -2,7 +2,8 @@ package com.baba.back.oauth.domain.baby;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 
-import com.baba.back.oauth.domain.baby.exception.BirthdayBadRequestException;
+import com.baba.back.baby.domain.Birthday;
+import com.baba.back.baby.exception.BirthdayBadRequestException;
 import java.time.LocalDate;
 import java.util.stream.Stream;
 import org.assertj.core.api.Assertions;

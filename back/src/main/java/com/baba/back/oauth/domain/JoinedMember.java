@@ -15,4 +15,8 @@ public class JoinedMember {
     @Id
     private String id;
     private boolean isSigned;
+
+    public void signUp() {
+        this.isSigned = true;
+    }
 }

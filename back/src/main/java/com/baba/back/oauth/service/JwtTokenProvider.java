@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class JwtTokenProvider implements TokenProvider{
+public class JwtTokenProvider implements TokenProvider {
     private final SecretKey key;
     private final Long validityInMilliseconds;
 

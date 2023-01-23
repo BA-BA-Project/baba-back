@@ -4,7 +4,7 @@ import com.baba.back.oauth.OAuthClient;
 import com.baba.back.oauth.domain.JoinedMember;
 import com.baba.back.oauth.dto.OAuthAccessTokenResponse;
 import com.baba.back.oauth.dto.TokenResponse;
-import com.baba.back.oauth.repository.JoinedUserRepository;
+import com.baba.back.oauth.repository.JoinedMemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,13 +18,13 @@ public class OAuthService {
 
     private final OAuthClient oAuthClient;
     private final TokenProvider tokenProvider;
-    private final JoinedUserRepository joinedUserRepository;
+    private final JoinedMemberRepository joinedMemberRepository;
 
     public TokenResponse signInKakao(final String code) {
         final OAuthAccessTokenResponse accessTokenResponse = oAuthClient.getOAuthAccessToken(code);
         final String memberId = oAuthClient.getMemberId(accessTokenResponse.getAccessToken());
-        final JoinedMember joinedMember = joinedUserRepository.findById(memberId)
-                .orElseGet(() -> joinedUserRepository.save(new JoinedMember(memberId, false)));
+        final JoinedMember joinedMember = joinedMemberRepository.findById(memberId)
+                .orElseGet(() -> joinedMemberRepository.save(new JoinedMember(memberId, false)));
         final String token = tokenProvider.createToken(memberId);
 
         if (joinedMember.isSigned()) {

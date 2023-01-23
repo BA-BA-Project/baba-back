@@ -1,19 +1,22 @@
 package com.baba.back.oauth.domain.member;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import com.baba.back.oauth.exception.IconColorBadRequestException;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.ValueSource;
+import com.baba.back.oauth.domain.ColorPicker;
+import java.util.List;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 class IconColorTest {
 
-    @ParameterizedTest
-    @ValueSource(strings = {" ", "123", "aaaaaa"})
-    @NullAndEmptySource
-    void 존재하지않는_색을_선택하면_예외를_던진다(String color) {
-        assertThatThrownBy(() -> new IconColor(color))
-                .isInstanceOf(IconColorBadRequestException.class);
+    @Test
+    void 아이콘_색을_선택한다() {
+        // given
+        final String color = "FFAEBA";
+        ColorPicker<String> colorPicker = (List<String> colors) -> color;
+
+        // when
+        final IconColor iconColor = IconColor.from(colorPicker);
+
+        // then
+        Assertions.assertThat(iconColor.getIconColor()).isEqualTo(color);
     }
 }

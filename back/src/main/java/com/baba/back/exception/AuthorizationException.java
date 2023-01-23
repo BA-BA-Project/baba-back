@@ -1,4 +1,4 @@
 package com.baba.back.exception;
 
-public class AuthorizationException extends RuntimeException{
+public class AuthorizationException extends RuntimeException {
 }
