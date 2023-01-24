@@ -5,9 +5,12 @@ import com.baba.back.exception.AuthenticationException;
 import com.baba.back.exception.AuthorizationException;
 import com.baba.back.exception.BadRequestException;
 import com.baba.back.exception.NotFoundException;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -37,6 +40,19 @@ public class ControllerAdvice {
     public ResponseEntity<ExceptionResponse> handleNotFoundException(NotFoundException exception) {
         log.warn(exception.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ExceptionResponse("요청한 리소스를 찾을 수 없습니다."));
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ExceptionResponse> handleValidationExceptions(MethodArgumentNotValidException exception) {
+        final String message = exception.getBindingResult()
+                .getAllErrors()
+                .stream()
+                .map(error -> String.format("%s: %s", ((FieldError) error).getField(), error.getDefaultMessage()))
+                .collect(Collectors.joining(", "));
+
+        log.warn(message);
+
+        return ResponseEntity.badRequest().body(new ExceptionResponse("잘못된 요청입니다."));
     }
 
     @ExceptionHandler(RuntimeException.class)
