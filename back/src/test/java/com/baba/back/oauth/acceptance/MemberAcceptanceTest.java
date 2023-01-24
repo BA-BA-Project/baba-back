@@ -76,7 +76,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     @Test
     void body에_잘못된_값이_존재하면_400을_던진다() {
         // given
-        final MemberJoinRequest INVALID_MEMBER_JOIN_REQUEST = new MemberJoinRequest(null, "icon1", "엄마",
+        final MemberJoinRequest INVALID_MEMBER_JOIN_REQUEST = new MemberJoinRequest(null, null, "엄마",
                 List.of(new BabyRequest("아기1", LocalDate.of(2022, 1, 1)),
                         new BabyRequest("아기2", LocalDate.of(2023, 1, 1)))
         );
