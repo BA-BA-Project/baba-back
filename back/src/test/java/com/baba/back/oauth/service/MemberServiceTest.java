@@ -12,6 +12,7 @@ import com.baba.back.oauth.exception.JoinedMemberBadRequestException;
 import com.baba.back.oauth.exception.JoinedMemberNotFoundException;
 import com.baba.back.oauth.repository.JoinedMemberRepository;
 import com.baba.back.oauth.repository.MemberRepository;
+import com.baba.back.relation.domain.DefaultRelation;
 import com.baba.back.relation.domain.Relation;
 import com.baba.back.relation.repository.RelationRepository;
 import jakarta.transaction.Transactional;
@@ -76,14 +77,15 @@ class MemberServiceTest {
         // when
         final MemberJoinResponse response = memberService.join(request, memberId);
 
-        // then
         final Member member = memberRepository.findById(memberId).orElseThrow();
         final List<Relation> relations = relationRepository.findAllByMember(member);
 
+        // then
         assertAll(
                 () -> assertThat(response.getSignedUp()).isTrue(),
                 () -> assertThat(response.getMessage()).isNotBlank(),
-                () -> assertThat(relations).hasSize(2)
+                () -> assertThat(relations.get(0).getDefaultRelation()).isEqualTo(DefaultRelation.DEFAULT),
+                () -> assertThat(relations.get(1).getDefaultRelation()).isEqualTo(DefaultRelation.NOT_DEFAULT)
         );
     }
 }

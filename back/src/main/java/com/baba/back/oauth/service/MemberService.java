@@ -11,12 +11,14 @@ import com.baba.back.oauth.exception.JoinedMemberBadRequestException;
 import com.baba.back.oauth.exception.JoinedMemberNotFoundException;
 import com.baba.back.oauth.repository.JoinedMemberRepository;
 import com.baba.back.oauth.repository.MemberRepository;
+import com.baba.back.relation.domain.DefaultRelation;
 import com.baba.back.relation.domain.Relation;
 import com.baba.back.relation.domain.RelationGroup;
 import com.baba.back.relation.repository.RelationRepository;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -70,12 +72,25 @@ public class MemberService {
     }
 
     private void saveRelations(List<Baby> babies, Member member, String relationName) {
-        babies.stream()
+        Relation defaultRelation = Relation.builder()
+                .member(member)
+                .baby(babies.get(0))
+                .relationName(relationName)
+                .relationGroup(RelationGroup.FAMILY)
+                .defaultRelation(DefaultRelation.DEFAULT)
+                .build();
+
+        relationRepository.save(defaultRelation);
+
+        IntStream
+                .range(1, babies.size())
+                .mapToObj(babies::get)
                 .map(baby -> Relation.builder()
                         .member(member)
                         .baby(baby)
                         .relationName(relationName)
                         .relationGroup(RelationGroup.FAMILY)
+                        .defaultRelation(DefaultRelation.NOT_DEFAULT)
                         .build())
                 .forEach(relationRepository::save);
     }
