@@ -40,12 +40,17 @@ public class Relation {
     @Enumerated(EnumType.STRING)
     private RelationGroup relationGroup;
 
+    @Enumerated(EnumType.STRING)
+    private DefaultRelation defaultRelation;
+
     @Builder
-    public Relation(Long id, Member member, Baby baby, String relationName, RelationGroup relationGroup) {
+    public Relation(Long id, Member member, Baby baby, String relationName, RelationGroup relationGroup,
+                    DefaultRelation defaultRelation) {
         this.id = id;
         this.member = member;
         this.baby = baby;
         this.relationName = new Name(relationName);
         this.relationGroup = relationGroup;
+        this.defaultRelation = defaultRelation;
     }
 }
