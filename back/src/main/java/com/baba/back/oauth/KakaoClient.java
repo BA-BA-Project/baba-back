@@ -49,7 +49,7 @@ public class KakaoClient implements OAuthClient {
     }
 
     @Override
-    public String getUserId(final String accessToken) {
+    public String getMemberId(final String accessToken) {
         HttpHeaders headers2 = new HttpHeaders();
         headers2.setBearerAuth(accessToken);
         HttpEntity<Void> request = new HttpEntity<>(headers2);

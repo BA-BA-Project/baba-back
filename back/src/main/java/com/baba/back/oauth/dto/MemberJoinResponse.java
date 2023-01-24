@@ -6,10 +6,9 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class TokenResponse {
+public class MemberJoinResponse {
 
     @JsonProperty("isSignedUp")
     private final Boolean signedUp;
     private final String message;
-    private final String token;
 }

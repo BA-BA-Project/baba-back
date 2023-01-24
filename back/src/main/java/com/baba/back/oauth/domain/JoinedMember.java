@@ -10,10 +10,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class JoinedUser {
+public class JoinedMember {
 
     @Id
-    private String userId;
-    private Boolean isSigned;
+    private String id;
+    private boolean isSigned;
 
+    public void signUp() {
+        this.isSigned = true;
+    }
 }

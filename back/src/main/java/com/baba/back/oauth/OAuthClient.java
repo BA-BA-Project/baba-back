@@ -6,5 +6,5 @@ public interface OAuthClient {
 
     OAuthAccessTokenResponse getOAuthAccessToken(String code);
 
-    String getUserId(String accessToken);
+    String getMemberId(String accessToken);
 }
