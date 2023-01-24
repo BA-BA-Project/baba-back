@@ -14,8 +14,7 @@ import lombok.NoArgsConstructor;
 public class IconColor {
     private static final List<String> COLORS
             = List.of("FFAEBA", "FF8698", "FFE3C8", "FFD2A7", "FFD400", "9ED883", "30BE9B", "81E0D5", "5BD2FF",
-            "97BEFF",
-            "98A2FF", "BFA1FF");
+            "97BEFF", "98A2FF", "BFA1FF");
 
     private String iconColor;
 

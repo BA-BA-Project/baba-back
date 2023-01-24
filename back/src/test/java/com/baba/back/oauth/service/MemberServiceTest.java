@@ -81,7 +81,7 @@ class MemberServiceTest {
         final List<Relation> relations = relationRepository.findAllByMember(member);
 
         assertAll(
-                () -> assertThat(response.isSignedUp()).isTrue(),
+                () -> assertThat(response.getSignedUp()).isTrue(),
                 () -> assertThat(response.getMessage()).isNotBlank(),
                 () -> assertThat(relations).hasSize(2)
         );

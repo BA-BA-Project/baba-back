@@ -27,7 +27,7 @@ class OAuthServiceTest {
 
         // then
         assertAll(
-                () -> assertThat(tokenResponse.isSigned()).isFalse(),
+                () -> assertThat(tokenResponse.getSignedUp()).isFalse(),
                 () -> assertThat(tokenResponse.getMessage()).isNotBlank(),
                 () -> assertThat(tokenResponse.getToken()).isNotBlank()
         );

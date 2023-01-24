@@ -33,10 +33,9 @@ public class MemberService {
 
     private final LocalDate now = LocalDate.now();
 
-
     public MemberJoinResponse join(MemberJoinRequest request, String memberId) {
         final JoinedMember joinedMember = joinedMemberRepository.findById(memberId)
-                .orElseThrow(() -> new JoinedMemberNotFoundException(memberId + "는 로그인 하지않은 memberId 입니하."));
+                .orElseThrow(() -> new JoinedMemberNotFoundException(memberId + "는 로그인하지 않은 memberId 입니다."));
         validateJoinedMember(joinedMember);
         final Member member = saveMember(memberId, request);
         joinedMember.signUp();
