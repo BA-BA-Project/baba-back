@@ -111,7 +111,9 @@ public class BabyAcceptanceTest extends AcceptanceTest {
 
         // then
         assertAll(
-                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value())
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(response.response().jsonPath().getString("babyId")).isEqualTo(BABY_ID)
         );
+
     }
 }
