@@ -41,7 +41,7 @@ class BabyServiceTest {
     private RelationRepository relationRepository;
 
     @Test
-    void 멤버가_관계_테이블에_없다면_예외를_던진다() {
+    void 기본_설정된_아기가_없다면_예외를_던진다() {
         assertThatThrownBy(() -> babyService.searchDefaultBaby(MEMBER_ID))
                 .isInstanceOf(RelationNotFoundException.class);
     }

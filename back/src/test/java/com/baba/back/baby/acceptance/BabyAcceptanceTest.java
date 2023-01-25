@@ -50,7 +50,7 @@ public class BabyAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    void 관계가_없으면_404를_던진다() {
+    void 기본_설정된_아기가_없으면_404를_던진다() {
         // given
         final String token = tokenProvider.createToken(MEMBER_ID);
 
