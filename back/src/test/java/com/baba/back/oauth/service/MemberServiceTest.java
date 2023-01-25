@@ -12,7 +12,6 @@ import com.baba.back.oauth.exception.JoinedMemberBadRequestException;
 import com.baba.back.oauth.exception.JoinedMemberNotFoundException;
 import com.baba.back.oauth.repository.JoinedMemberRepository;
 import com.baba.back.oauth.repository.MemberRepository;
-import com.baba.back.relation.domain.DefaultRelation;
 import com.baba.back.relation.domain.Relation;
 import com.baba.back.relation.repository.RelationRepository;
 import jakarta.transaction.Transactional;
@@ -84,8 +83,8 @@ class MemberServiceTest {
         assertAll(
                 () -> assertThat(response.getSignedUp()).isTrue(),
                 () -> assertThat(response.getMessage()).isNotBlank(),
-                () -> assertThat(relations.get(0).getDefaultRelation()).isEqualTo(DefaultRelation.DEFAULT),
-                () -> assertThat(relations.get(1).getDefaultRelation()).isEqualTo(DefaultRelation.NOT_DEFAULT)
+                () -> assertThat(relations.get(0).isDefaultRelation()).isEqualTo(true),
+                () -> assertThat(relations.get(1).isDefaultRelation()).isEqualTo(false)
         );
     }
 }

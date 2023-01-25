@@ -12,7 +12,6 @@ import com.baba.back.oauth.exception.JoinedMemberBadRequestException;
 import com.baba.back.oauth.exception.JoinedMemberNotFoundException;
 import com.baba.back.oauth.repository.JoinedMemberRepository;
 import com.baba.back.oauth.repository.MemberRepository;
-import com.baba.back.relation.domain.DefaultRelation;
 import com.baba.back.relation.domain.Relation;
 import com.baba.back.relation.domain.RelationGroup;
 import com.baba.back.relation.repository.RelationRepository;
@@ -80,7 +79,7 @@ public class MemberService {
                 .baby(babies.get(0))
                 .relationName(relationName)
                 .relationGroup(RelationGroup.FAMILY)
-                .defaultRelation(DefaultRelation.DEFAULT)
+                .defaultRelation(true)
                 .build();
 
         relationRepository.save(defaultRelation);
@@ -93,7 +92,7 @@ public class MemberService {
                         .baby(baby)
                         .relationName(relationName)
                         .relationGroup(RelationGroup.FAMILY)
-                        .defaultRelation(DefaultRelation.NOT_DEFAULT)
+                        .defaultRelation(false)
                         .build())
                 .forEach(relationRepository::save);
     }

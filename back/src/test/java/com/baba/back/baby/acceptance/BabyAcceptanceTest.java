@@ -10,7 +10,6 @@ import com.baba.back.oauth.domain.ColorPicker;
 import com.baba.back.oauth.domain.member.Member;
 import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.oauth.service.TokenProvider;
-import com.baba.back.relation.domain.DefaultRelation;
 import com.baba.back.relation.domain.Relation;
 import com.baba.back.relation.domain.RelationGroup;
 import com.baba.back.relation.repository.RelationRepository;
@@ -97,7 +96,7 @@ public class BabyAcceptanceTest extends AcceptanceTest {
                 .baby(baby)
                 .relationName("엄마")
                 .relationGroup(RelationGroup.FAMILY)
-                .defaultRelation(DefaultRelation.DEFAULT)
+                .defaultRelation(true)
                 .build());
 
         // when
