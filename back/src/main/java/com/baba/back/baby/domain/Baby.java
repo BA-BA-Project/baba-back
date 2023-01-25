@@ -25,7 +25,8 @@ public class Baby {
     private Birthday birthday;
 
     @Builder
-    public Baby(String name, LocalDate birthday, LocalDate now) {
+    public Baby(String id, String name, LocalDate birthday, LocalDate now) {
+        this.id = id;
         this.id = UUID.randomUUID().toString();
         this.name = new Name(name);
         this.birthday = Birthday.of(birthday, now);

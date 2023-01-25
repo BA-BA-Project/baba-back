@@ -1,6 +1,7 @@
 package com.baba.back.oauth.service;
 
 import com.baba.back.baby.domain.Baby;
+import com.baba.back.baby.domain.IdConstructor;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.oauth.domain.ColorPicker;
 import com.baba.back.oauth.domain.JoinedMember;
@@ -32,6 +33,7 @@ public class MemberService {
     private final BabyRepository babyRepository;
     private final RelationRepository relationRepository;
     private final ColorPicker<String> colorPicker;
+    private final IdConstructor idConstructor;
 
     private final LocalDate now = LocalDate.now();
 
@@ -65,8 +67,9 @@ public class MemberService {
     }
 
     private List<Baby> saveBabies(MemberJoinRequest request) {
+        String babyId = idConstructor.createId();
         return request.getBabies().stream()
-                .map(babyRequest -> babyRequest.toEntity(now))
+                .map(babyRequest -> babyRequest.toEntity(babyId, now))
                 .map(babyRepository::save)
                 .toList();
     }

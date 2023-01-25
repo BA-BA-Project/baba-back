@@ -20,8 +20,9 @@ public class BabyRequest {
     @NotNull
     private LocalDate birthday;
 
-    public Baby toEntity(LocalDate now) {
+    public Baby toEntity(String id, LocalDate now) {
         return Baby.builder()
+                .id(id)
                 .name(babyName)
                 .birthday(birthday)
                 .now(now)
