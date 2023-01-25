@@ -64,9 +64,7 @@ public class BabyAcceptanceTest extends AcceptanceTest {
                 .extract();
 
         // then
-        assertAll(
-                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value())
-        );
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
     @Test
