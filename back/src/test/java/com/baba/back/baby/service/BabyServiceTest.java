@@ -15,7 +15,6 @@ import com.baba.back.relation.domain.RelationGroup;
 import com.baba.back.relation.exception.RelationNotFoundException;
 import com.baba.back.relation.repository.RelationRepository;
 import java.time.LocalDate;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -43,11 +42,6 @@ class BabyServiceTest {
 
     @Test
     void 멤버가_관계_테이블에_없다면_예외를_던진다() {
-        // given크
-
-        // when
-
-        // then
         assertThatThrownBy(() -> babyService.searchDefaultBaby(MEMBER_ID))
                 .isInstanceOf(RelationNotFoundException.class);
     }
@@ -58,7 +52,7 @@ class BabyServiceTest {
         LocalDate birthday = LocalDate.of(2024, 1, 25);
         LocalDate now = LocalDate.of(2023, 1, 25);
         final String color = "FFAEBA";
-        ColorPicker<String> colorPicker = (List<String> colors) -> color;
+        ColorPicker<String> colorPicker = (colors) -> color;
 
         Member member = memberRepository.save(Member.builder()
                 .id(MEMBER_ID)
