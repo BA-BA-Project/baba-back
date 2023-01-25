@@ -52,4 +52,8 @@ public class Relation {
         this.relationGroup = relationGroup;
         this.defaultRelation = defaultRelation;
     }
+
+    public String getBabyId() {
+        return baby.getId();
+    }
 }
