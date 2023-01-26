@@ -1,6 +1,6 @@
 package com.baba.back.oauth.service;
 
-import com.baba.back.baby.domain.Baby;
+import com.baba.back.baby.domain.Babies;
 import com.baba.back.baby.domain.IdConstructor;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.oauth.domain.ColorPicker;
@@ -17,8 +17,6 @@ import com.baba.back.relation.domain.RelationGroup;
 import com.baba.back.relation.repository.RelationRepository;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -43,7 +41,7 @@ public class MemberService {
         final Member member = saveMember(memberId, request);
         joinedMember.signUp();
 
-        final List<Baby> babies = saveBabies(request);
+        Babies babies = saveBabies(request);
         saveRelations(babies, member, request.getRelationName());
 
         return new MemberJoinResponse(true, "회원가입이 완료되었습니다.");
@@ -65,28 +63,25 @@ public class MemberService {
                 .build());
     }
 
-    private List<Baby> saveBabies(MemberJoinRequest request) {
+    private Babies saveBabies(MemberJoinRequest request) {
         String babyId = idConstructor.createId();
-        return request.getBabies().stream()
+        return new Babies(request.getBabies().stream()
                 .map(babyRequest -> babyRequest.toEntity(babyId, now))
                 .map(babyRepository::save)
-                .toList();
+                .toList());
     }
 
-    private void saveRelations(List<Baby> babies, Member member, String relationName) {
-        Relation defaultRelation = Relation.builder()
+    private void saveRelations(Babies babies, Member member, String relationName) {
+        relationRepository.save(Relation.builder()
                 .member(member)
-                .baby(babies.get(0))
+                .baby(babies.getDefaultBaby())
                 .relationName(relationName)
                 .relationGroup(RelationGroup.FAMILY)
                 .defaultRelation(true)
-                .build();
+                .build());
 
-        relationRepository.save(defaultRelation);
-
-        IntStream
-                .range(1, babies.size())
-                .mapToObj(babies::get)
+        babies.getNotDefaultBabies()
+                .stream()
                 .map(baby -> Relation.builder()
                         .member(member)
                         .baby(baby)
