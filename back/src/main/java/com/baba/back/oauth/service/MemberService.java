@@ -72,6 +72,11 @@ public class MemberService {
     }
 
     private void saveRelations(Babies babies, Member member, String relationName) {
+        saveDefaultRelation(babies, member, relationName);
+        saveNotDefaultRelations(babies, member, relationName);
+    }
+
+    private void saveDefaultRelation(Babies babies, Member member, String relationName) {
         relationRepository.save(Relation.builder()
                 .member(member)
                 .baby(babies.getDefaultBaby())
@@ -79,7 +84,9 @@ public class MemberService {
                 .relationGroup(RelationGroup.FAMILY)
                 .defaultRelation(true)
                 .build());
+    }
 
+    private void saveNotDefaultRelations(Babies babies, Member member, String relationName) {
         babies.getNotDefaultBabies()
                 .stream()
                 .map(baby -> Relation.builder()
