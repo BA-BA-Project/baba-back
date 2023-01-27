@@ -83,8 +83,8 @@ class MemberServiceTest {
         assertAll(
                 () -> assertThat(response.getSignedUp()).isTrue(),
                 () -> assertThat(response.getMessage()).isNotBlank(),
-                () -> assertThat(relations.get(0).isDefaultRelation()).isEqualTo(true),
-                () -> assertThat(relations.get(1).isDefaultRelation()).isEqualTo(false)
+                () -> assertThat(relations.get(0).isDefaultRelation()).isTrue(),
+                () -> assertThat(relations.get(1).isDefaultRelation()).isFalse()
         );
     }
 }
