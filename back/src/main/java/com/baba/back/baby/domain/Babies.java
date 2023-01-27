@@ -13,7 +13,7 @@ public class Babies {
         this.babies = new ArrayList<>(babies);
     }
 
-    private static void validateEmpty(List<Baby> babies) {
+    private void validateEmpty(List<Baby> babies) {
         if (babies.isEmpty()) {
             throw new BabiesBadRequestException("babies의 길이는 0일 수 없습니다.");
         }
