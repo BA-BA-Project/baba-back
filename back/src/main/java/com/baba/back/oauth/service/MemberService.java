@@ -1,6 +1,7 @@
 package com.baba.back.oauth.service;
 
-import com.baba.back.baby.domain.Baby;
+import com.baba.back.baby.domain.Babies;
+import com.baba.back.baby.domain.IdConstructor;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.oauth.domain.ColorPicker;
 import com.baba.back.oauth.domain.JoinedMember;
@@ -16,7 +17,6 @@ import com.baba.back.relation.domain.RelationGroup;
 import com.baba.back.relation.repository.RelationRepository;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +30,7 @@ public class MemberService {
     private final BabyRepository babyRepository;
     private final RelationRepository relationRepository;
     private final ColorPicker<String> colorPicker;
+    private final IdConstructor idConstructor;
 
     private final LocalDate now = LocalDate.now();
 
@@ -40,7 +41,7 @@ public class MemberService {
         final Member member = saveMember(memberId, request);
         joinedMember.signUp();
 
-        final List<Baby> babies = saveBabies(request);
+        Babies babies = saveBabies(request);
         saveRelations(babies, member, request.getRelationName());
 
         return new MemberJoinResponse(true, "회원가입이 완료되었습니다.");
@@ -62,20 +63,38 @@ public class MemberService {
                 .build());
     }
 
-    private List<Baby> saveBabies(MemberJoinRequest request) {
-        return request.getBabies().stream()
-                .map(babyRequest -> babyRequest.toEntity(now))
+    private Babies saveBabies(MemberJoinRequest request) {
+        String babyId = idConstructor.createId();
+        return new Babies(request.getBabies().stream()
+                .map(babyRequest -> babyRequest.toEntity(babyId, now))
                 .map(babyRepository::save)
-                .toList();
+                .toList());
     }
 
-    private void saveRelations(List<Baby> babies, Member member, String relationName) {
-        babies.stream()
+    private void saveRelations(Babies babies, Member member, String relationName) {
+        saveDefaultRelation(babies, member, relationName);
+        saveNotDefaultRelations(babies, member, relationName);
+    }
+
+    private void saveDefaultRelation(Babies babies, Member member, String relationName) {
+        relationRepository.save(Relation.builder()
+                .member(member)
+                .baby(babies.getDefaultBaby())
+                .relationName(relationName)
+                .relationGroup(RelationGroup.FAMILY)
+                .defaultRelation(true)
+                .build());
+    }
+
+    private void saveNotDefaultRelations(Babies babies, Member member, String relationName) {
+        babies.getNotDefaultBabies()
+                .stream()
                 .map(baby -> Relation.builder()
                         .member(member)
                         .baby(baby)
                         .relationName(relationName)
                         .relationGroup(RelationGroup.FAMILY)
+                        .defaultRelation(false)
                         .build())
                 .forEach(relationRepository::save);
     }

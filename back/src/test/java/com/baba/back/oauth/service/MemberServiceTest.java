@@ -76,14 +76,15 @@ class MemberServiceTest {
         // when
         final MemberJoinResponse response = memberService.join(request, memberId);
 
-        // then
         final Member member = memberRepository.findById(memberId).orElseThrow();
         final List<Relation> relations = relationRepository.findAllByMember(member);
 
+        // then
         assertAll(
                 () -> assertThat(response.getSignedUp()).isTrue(),
                 () -> assertThat(response.getMessage()).isNotBlank(),
-                () -> assertThat(relations).hasSize(2)
+                () -> assertThat(relations.get(0).isDefaultRelation()).isTrue(),
+                () -> assertThat(relations.get(1).isDefaultRelation()).isFalse()
         );
     }
 }
