@@ -24,7 +24,7 @@ import org.springframework.http.MediaType;
 
 public class MemberAcceptanceTest extends AcceptanceTest {
 
-    private static final String MEMBER_BASE_PATH = "/members";
+    private static final String MEMBER_BASE_PATH = "/api/members";
     private static final MemberJoinRequest MEMBER_JOIN_REQUEST = new MemberJoinRequest("박재희", "icon1", "엄마",
             List.of(new BabyRequest("아기1", LocalDate.of(2022, 1, 1)),
                     new BabyRequest("아기2", LocalDate.of(2023, 1, 1)))
@@ -40,6 +40,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
         // given
         final ExtractableResponse<Response> response = RestAssured.given()
                 .body(MEMBER_JOIN_REQUEST)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post(MEMBER_BASE_PATH)
                 .then()
@@ -60,6 +61,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
         final ExtractableResponse<Response> response = RestAssured.given()
                 .headers(Map.of("Authorization", "Bearer " + invalidToken))
                 .body(MEMBER_JOIN_REQUEST)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post(MEMBER_BASE_PATH)
                 .then()

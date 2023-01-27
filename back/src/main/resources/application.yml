@@ -1,3 +1,7 @@
+server:
+  servlet:
+    context-path: "/api"
+
 security:
   oauth:
     kakao:
