@@ -28,4 +28,8 @@ public class Birthday {
             throw new BirthdayBadRequestException(birthday + "는 " + now + "와 " + VALIDITY_TIME + "이상 차이납니다.");
         }
     }
+
+    public LocalDate minusYears(int year) {
+        return birthday.minusYears(year);
+    }
 }

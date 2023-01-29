@@ -33,7 +33,6 @@ class ContentTest {
                 .title(TITLE)
                 .contentDate(CONTENT_DATE)
                 .now(NOW)
-                .birthday(BIRTHDAY)
                 .cardStyle(CARD_STYLE)
                 .imageSource(IMAGE_SOURCE)
                 .baby(baby)

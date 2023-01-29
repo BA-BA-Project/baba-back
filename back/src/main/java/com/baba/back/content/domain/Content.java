@@ -37,10 +37,10 @@ public class Content {
     private Baby baby;
 
     @Builder
-    public Content(String title, LocalDate contentDate, LocalDate now, LocalDate birthday, String cardStyle,
+    public Content(String title, LocalDate contentDate, LocalDate now, String cardStyle,
                    String imageSource, Baby baby) {
         this.title = new Title(title);
-        this.contentDate = ContentDate.of(contentDate, now, birthday);
+        this.contentDate = ContentDate.of(contentDate, now, baby.getBirthday());
         this.cardStyle = new CardStyle(cardStyle);
         this.imageSource = new ImageSource(imageSource);
         this.baby = baby;
