@@ -13,7 +13,8 @@ class ImageFileTest {
     @Test
     void 이미지가_아닌_파일을_받으면_예외를_던진다() {
         // given
-        MultipartFile mockFile = new MockMultipartFile("photo", "file.png", "text/plain", "Spring Framework".getBytes());
+        MultipartFile mockFile = new MockMultipartFile("photo", "file.png", "text/plain",
+                "Spring Framework".getBytes());
 
         // when & then
         assertThatThrownBy(() -> new ImageFile(mockFile))

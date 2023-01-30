@@ -13,7 +13,7 @@ public class ImageFile {
     }
 
     private void validateImage(MultipartFile file) {
-        if(!Objects.equals(file.getContentType(), "image/png")) {
+        if (!Objects.equals(file.getContentType(), "image/png")) {
             throw new ImageFileBadRequestException("파일이 이미지 형식이 아닙니다.");
         }
     }
