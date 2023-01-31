@@ -1,10 +1,9 @@
-package com.baba.back.content.domain;
+package com.baba.back.content.domain.content;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.baba.back.baby.domain.Birthday;
-import com.baba.back.content.domain.content.ContentDate;
 import com.baba.back.content.exception.ContentDateBadRequestException;
 import java.time.LocalDate;
 import java.util.stream.Stream;

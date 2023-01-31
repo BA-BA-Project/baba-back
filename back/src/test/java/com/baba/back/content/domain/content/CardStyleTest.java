@@ -1,6 +1,5 @@
-package com.baba.back.content.domain;
+package com.baba.back.content.domain.content;
 
-import com.baba.back.content.domain.content.CardStyle;
 import com.baba.back.content.exception.CardStyleBadRequestException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
