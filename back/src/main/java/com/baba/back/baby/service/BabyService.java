@@ -15,8 +15,7 @@ public class BabyService {
 
     public SearchDefaultBabyResponse searchDefaultBaby(String memberId) {
         Relation relation = relationRepository.findByMemberIdAndDefaultRelation(memberId, true)
-                .orElseThrow(
-                        () -> new RelationNotFoundException(memberId + " 에 해당하는 relation 이 존재하지 않습니다."));
+                .orElseThrow(() -> new RelationNotFoundException(memberId + " 에 해당하는 relation 이 존재하지 않습니다."));
 
         return new SearchDefaultBabyResponse(relation.getBabyId());
     }
