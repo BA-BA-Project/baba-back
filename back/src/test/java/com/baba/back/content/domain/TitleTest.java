@@ -2,6 +2,7 @@ package com.baba.back.content.domain;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
+import com.baba.back.content.domain.content.Title;
 import com.baba.back.content.exception.TitleLengthBadRequestException;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;

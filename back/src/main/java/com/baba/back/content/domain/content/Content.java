@@ -1,4 +1,4 @@
-package com.baba.back.content.domain;
+package com.baba.back.content.domain.content;
 
 import com.baba.back.baby.domain.Baby;
 import jakarta.persistence.Embedded;
@@ -48,5 +48,9 @@ public class Content {
 
     public Boolean hasEqualBaby(Baby baby) {
         return this.baby.getId().equals(baby.getId());
+    }
+
+    public void updateURL(String imageSource) {
+        this.imageSource = new ImageSource(imageSource);
     }
 }

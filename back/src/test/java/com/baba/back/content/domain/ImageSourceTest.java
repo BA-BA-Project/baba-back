@@ -1,5 +1,6 @@
 package com.baba.back.content.domain;
 
+import com.baba.back.content.domain.content.ImageSource;
 import com.baba.back.content.exception.ImageSourceBadRequestException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;

@@ -1,6 +1,7 @@
 package com.baba.back.content.domain;
 
 import com.baba.back.baby.domain.Baby;
+import com.baba.back.content.domain.content.Content;
 import java.time.LocalDate;
 import java.util.UUID;
 import org.assertj.core.api.Assertions;

@@ -1,4 +1,4 @@
-package com.baba.back.content.domain;
+package com.baba.back.content.domain.content;
 
 import com.baba.back.content.exception.TitleLengthBadRequestException;
 import jakarta.persistence.Embeddable;
