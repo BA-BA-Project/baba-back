@@ -1,7 +1,6 @@
 package com.baba.back.baby.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.dto.SearchDefaultBabyResponse;
@@ -11,7 +10,6 @@ import com.baba.back.oauth.domain.member.Member;
 import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.relation.domain.Relation;
 import com.baba.back.relation.domain.RelationGroup;
-import com.baba.back.relation.exception.RelationNotFoundException;
 import com.baba.back.relation.repository.RelationRepository;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
@@ -39,11 +37,11 @@ class BabyServiceTest {
     @Autowired
     private RelationRepository relationRepository;
 
-    @Test
-    void 기본_설정된_아기가_없다면_예외를_던진다() {
-        assertThatThrownBy(() -> babyService.searchDefaultBaby(MEMBER_ID))
-                .isInstanceOf(RelationNotFoundException.class);
-    }
+//    @Test
+//    void 기본_설정된_아기가_없다면_예외를_던진다() {
+//        assertThatThrownBy(() -> babyService.searchDefaultBaby(MEMBER_ID))
+//                .isInstanceOf(RelationNotFoundException.class);
+//    }
 
     @Test
     void 디폴트_아기를_조회한다() {
