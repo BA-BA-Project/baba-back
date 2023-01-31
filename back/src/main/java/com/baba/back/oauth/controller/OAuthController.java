@@ -2,8 +2,12 @@ package com.baba.back.oauth.controller;
 
 import com.baba.back.oauth.dto.TokenResponse;
 import com.baba.back.oauth.service.OAuthService;
-import com.baba.back.swagger.AllErrorResponses;
+import com.baba.back.swagger.BadRequestResponse;
+import com.baba.back.swagger.ForbiddenResponse;
+import com.baba.back.swagger.IntervalServerErrorResponse;
+import com.baba.back.swagger.NotFoundResponse;
 import com.baba.back.swagger.OkResponse;
+import com.baba.back.swagger.UnAuthorizedResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +24,11 @@ public class OAuthController {
     private final OAuthService OAuthService;
 
     @Operation(summary = "카카오 로그인 요청")
-    @AllErrorResponses
+    @BadRequestResponse
+    @UnAuthorizedResponse
+    @NotFoundResponse
+    @IntervalServerErrorResponse
+    @ForbiddenResponse
     @OkResponse
     @GetMapping("/login/oauth2/code/kakao")
     public ResponseEntity<TokenResponse> signInKakao(@RequestParam("code") String code) {

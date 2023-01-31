@@ -4,8 +4,11 @@ import com.baba.back.oauth.dto.MemberJoinRequest;
 import com.baba.back.oauth.dto.MemberJoinResponse;
 import com.baba.back.oauth.service.MemberService;
 import com.baba.back.oauth.support.Login;
-import com.baba.back.swagger.DefaultErrorResponses;
+import com.baba.back.swagger.BadRequestResponse;
+import com.baba.back.swagger.IntervalServerErrorResponse;
+import com.baba.back.swagger.NotFoundResponse;
 import com.baba.back.swagger.OkResponse;
+import com.baba.back.swagger.UnAuthorizedResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -24,7 +27,10 @@ public class MemberController {
     private final MemberService memberService;
 
     @Operation(summary = "멤버 생성 요청")
-    @DefaultErrorResponses
+    @BadRequestResponse
+    @UnAuthorizedResponse
+    @NotFoundResponse
+    @IntervalServerErrorResponse
     @OkResponse
     @PostMapping("/members")
     public ResponseEntity<MemberJoinResponse> joinMember(@RequestBody @Valid MemberJoinRequest request,
