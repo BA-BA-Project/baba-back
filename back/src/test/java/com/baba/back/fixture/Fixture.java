@@ -1,6 +1,7 @@
 package com.baba.back.fixture;
 
 import com.baba.back.baby.domain.Baby;
+import com.baba.back.oauth.domain.JoinedMember;
 import com.baba.back.oauth.domain.member.Member;
 import com.baba.back.relation.domain.Relation;
 import com.baba.back.relation.domain.RelationGroup;
@@ -31,4 +32,7 @@ public class Fixture {
             .defaultRelation(true)
             .relationGroup(RelationGroup.FAMILY)
             .build();
+
+    public static final JoinedMember 회원가입_안한_유저1 = new JoinedMember(멤버1.getId(), false);
+    public static final JoinedMember 이미_회원가입한_유저1 = new JoinedMember(멤버1.getId(), true);
 }
