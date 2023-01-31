@@ -18,10 +18,9 @@ import org.springframework.web.server.ResponseStatusException;
 @Component
 public class S3Handler {
 
+    private final AmazonS3 amazonS3;
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
-
-    private final AmazonS3 amazonS3;
 
     public String upload(MultipartFile multipartFile) {
         final String key = UUID.randomUUID().toString() + '_' + multipartFile.getOriginalFilename();

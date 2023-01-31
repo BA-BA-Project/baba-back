@@ -2,8 +2,10 @@ package com.baba.back.content.domain;
 
 import com.baba.back.content.exception.ImageFileBadRequestException;
 import java.util.Objects;
+import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
 
+@Getter
 public class ImageFile {
     private final MultipartFile file;
 

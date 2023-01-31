@@ -24,13 +24,13 @@ public class CardStyle {
     }
 
     private void validateNull(String cardStyle) {
-        if(Objects.isNull(cardStyle)) {
+        if (Objects.isNull(cardStyle)) {
             throw new CardStyleBadRequestException("cardStyle은 null일 수 없습니다.");
         }
     }
 
     private void validateStyle(String cardStyle) {
-        if(!cardStyles.contains(cardStyle)) {
+        if (!cardStyles.contains(cardStyle)) {
             throw new CardStyleBadRequestException("{" + cardStyle + "}은 잘못된 cardStyle 입니다.");
         }
     }
