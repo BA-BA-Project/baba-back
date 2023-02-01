@@ -27,11 +27,11 @@ public class MemberController {
     private final MemberService memberService;
 
     @Operation(summary = "멤버 생성 요청")
+    @OkResponse
     @BadRequestResponse
     @UnAuthorizedResponse
     @NotFoundResponse
     @IntervalServerErrorResponse
-    @OkResponse
     @PostMapping("/members")
     public ResponseEntity<MemberJoinResponse> joinMember(@RequestBody @Valid MemberJoinRequest request,
                                                          @Login String memberId) {

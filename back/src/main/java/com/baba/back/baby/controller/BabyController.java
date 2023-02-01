@@ -22,10 +22,10 @@ public class BabyController {
     private final BabyService babyService;
 
     @Operation(summary = "기본 설정된 아기의 id 요청")
+    @OkResponse
     @UnAuthorizedResponse
     @NotFoundResponse
     @IntervalServerErrorResponse
-    @OkResponse
     @GetMapping("/baby/default")
     public ResponseEntity<SearchDefaultBabyResponse> searchDefaultBaby(@Login String memberId) {
         return ResponseEntity.ok().body(babyService.searchDefaultBaby(memberId));

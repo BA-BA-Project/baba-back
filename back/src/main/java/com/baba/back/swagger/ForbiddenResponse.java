@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.METHOD, ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@ApiResponse(responseCode = "401", description = "FORBIDDEN",
+@ApiResponse(responseCode = "403", description = "FORBIDDEN",
         content = @Content(schema = @Schema(implementation = ExceptionResponse.class)))
 public @interface ForbiddenResponse {
 }

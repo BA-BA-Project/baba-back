@@ -24,12 +24,12 @@ public class OAuthController {
     private final OAuthService OAuthService;
 
     @Operation(summary = "카카오 로그인 요청")
+    @OkResponse
     @BadRequestResponse
     @UnAuthorizedResponse
+    @ForbiddenResponse
     @NotFoundResponse
     @IntervalServerErrorResponse
-    @ForbiddenResponse
-    @OkResponse
     @GetMapping("/login/oauth2/code/kakao")
     public ResponseEntity<TokenResponse> signInKakao(@RequestParam("code") String code) {
         return ResponseEntity.ok(OAuthService.signInKakao(code));
