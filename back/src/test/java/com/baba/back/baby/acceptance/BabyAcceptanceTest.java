@@ -27,7 +27,7 @@ import org.springframework.http.HttpStatus;
 public class BabyAcceptanceTest extends AcceptanceTest {
     public static final String MEMBER_ID = "1234";
     public static final String BABY_ID = "1234";
-    public static final String BABY_BASE_PATH = "/baby";
+    public static final String BABY_BASE_PATH = "/api/baby";
 
     @Autowired
     private TokenProvider tokenProvider;
