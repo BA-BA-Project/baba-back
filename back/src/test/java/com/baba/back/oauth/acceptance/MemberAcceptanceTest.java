@@ -1,5 +1,6 @@
 package com.baba.back.oauth.acceptance;
 
+import static com.baba.back.fixture.RequestFixture.멤버_가입_요청;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -25,10 +26,6 @@ import org.springframework.http.MediaType;
 public class MemberAcceptanceTest extends AcceptanceTest {
 
     private static final String MEMBER_BASE_PATH = "/api/members";
-    private static final MemberJoinRequest MEMBER_JOIN_REQUEST = new MemberJoinRequest("박재희", "icon1", "엄마",
-            List.of(new BabyRequest("아기1", LocalDate.of(2022, 1, 1)),
-                    new BabyRequest("아기2", LocalDate.of(2023, 1, 1)))
-    );
     private static final String MEMBER_ID = "memberId";
     @Autowired
     private TokenProvider tokenProvider;
@@ -39,7 +36,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     void 요청에_토큰이_존재하지않으면_400을_응답한다() {
         // given
         final ExtractableResponse<Response> response = RestAssured.given()
-                .body(MEMBER_JOIN_REQUEST)
+                .body(멤버_가입_요청)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post(MEMBER_BASE_PATH)
@@ -60,7 +57,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
         final String invalidToken = "111";
         final ExtractableResponse<Response> response = RestAssured.given()
                 .headers(Map.of("Authorization", "Bearer " + invalidToken))
-                .body(MEMBER_JOIN_REQUEST)
+                .body(멤버_가입_요청)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post(MEMBER_BASE_PATH)
@@ -107,7 +104,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
 
         RestAssured.given()
                 .headers(Map.of("Authorization", "Bearer " + validToken))
-                .body(MEMBER_JOIN_REQUEST)
+                .body(멤버_가입_요청)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post(MEMBER_BASE_PATH)
@@ -118,7 +115,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
         // when
         final ExtractableResponse<Response> response = RestAssured.given()
                 .headers(Map.of("Authorization", "Bearer " + validToken))
-                .body(MEMBER_JOIN_REQUEST)
+                .body(멤버_가입_요청)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post(MEMBER_BASE_PATH)
@@ -142,7 +139,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
         // when
         final ExtractableResponse<Response> response = RestAssured.given()
                 .headers(Map.of("Authorization", "Bearer " + token))
-                .body(MEMBER_JOIN_REQUEST)
+                .body(멤버_가입_요청)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post(MEMBER_BASE_PATH)
