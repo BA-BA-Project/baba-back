@@ -17,7 +17,7 @@ public class ImageFile {
     private void validateType(MultipartFile file) {
         final String contentType = file.getContentType();
 
-        if(Objects.isNull(contentType)) {
+        if (Objects.isNull(contentType)) {
             throw new ImageFileBadRequestException("파일 타입은 null일 수 없습니다.");
         }
         if (!contentType.startsWith("image")) {
