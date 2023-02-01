@@ -32,7 +32,6 @@ public class DomainFixture {
             .build();
 
     public static final Relation 관계1 = Relation.builder()
-            .id(1L)
             .member(멤버1)
             .baby(아기1)
             .relationName("아빠")

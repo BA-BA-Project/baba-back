@@ -32,7 +32,7 @@ class RelationRepositoryTest {
         // given
         final Member savedMember = memberRepository.save(멤버1);
         final Baby savedBaby = babyRepository.save(아기1);
-        final Relation relation = new Relation(null, savedMember, savedBaby, "삼촌", RelationGroup.FAMILY, true);
+        final Relation relation = new Relation(savedMember, savedBaby, "삼촌", RelationGroup.FAMILY, true);
 
         final Relation savedRelation = relationRepository.save(relation);
 
@@ -50,8 +50,8 @@ class RelationRepositoryTest {
         final Member savedMember = memberRepository.save(멤버1);
         final Baby savedBaby1 = babyRepository.save(아기1);
         final Baby savedBaby2 = babyRepository.save(아기2);
-        final Relation relation1 = new Relation(null, savedMember, savedBaby1, "삼촌", RelationGroup.FAMILY, false);
-        final Relation relation2 = new Relation(null, savedMember, savedBaby2, "삼촌", RelationGroup.FAMILY, true);
+        final Relation relation1 = new Relation(savedMember, savedBaby1, "삼촌", RelationGroup.FAMILY, false);
+        final Relation relation2 = new Relation(savedMember, savedBaby2, "삼촌", RelationGroup.FAMILY, true);
 
         relationRepository.save(relation1);
         final Relation savedRelation2 = relationRepository.save(relation2);
