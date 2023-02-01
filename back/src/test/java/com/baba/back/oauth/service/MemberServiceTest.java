@@ -71,7 +71,7 @@ class MemberServiceTest {
     @Test
     void 이미_회원가입한_멤버는_회원가입할_수_없다() {
         // given
-        given(joinedMemberRepository.findById(anyString())).willReturn(Optional.ofNullable(이미_회원가입한_유저1));
+        given(joinedMemberRepository.findById(anyString())).willReturn(Optional.of(이미_회원가입한_유저1));
 
         // when & then
         Assertions.assertThatThrownBy(() -> memberService.join(new MemberJoinRequest(), "memberId"))
@@ -86,7 +86,7 @@ class MemberServiceTest {
                         new BabyRequest("아기2", LocalDate.of(2023, 1, 1)))
         );
 
-        given(joinedMemberRepository.findById(anyString())).willReturn(Optional.ofNullable(회원가입_안한_유저1));
+        given(joinedMemberRepository.findById(anyString())).willReturn(Optional.of(회원가입_안한_유저1));
         given(colorPicker.pick(anyList())).willReturn("FFAEBA");
 
         final MemberJoinResponse response = memberService.join(request, "memberId");
