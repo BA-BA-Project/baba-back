@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import com.baba.back.AcceptanceTest;
 import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.repository.BabyRepository;
-import com.baba.back.oauth.domain.ColorPicker;
 import com.baba.back.oauth.domain.member.Member;
 import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.oauth.service.TokenProvider;
@@ -18,8 +17,6 @@ import com.baba.back.relation.repository.RelationRepository;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.time.LocalDate;
-import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +25,7 @@ import org.springframework.http.HttpStatus;
 
 public class BabyAcceptanceTest extends AcceptanceTest {
 
-    public static final String BABY_BASE_PATH = "/baby";
+    public static final String BABY_BASE_PATH = "/api/baby";
 
     @Autowired
     private TokenProvider tokenProvider;

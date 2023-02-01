@@ -20,22 +20,18 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class OAuthServiceTest {
 
-    @InjectMocks
-    private OAuthService oAuthService;
-
-    @Mock
-    private OAuthClient oAuthClient;
-
-    @Mock
-    private TokenProvider tokenProvider;
-
-    @Mock
-    private JoinedMemberRepository joinedMemberRepository;
-
     final String code = "code";
     final String accessToken = "accessToken";
     final String memberId = "memberId";
     final String memberToken = "member token";
+    @InjectMocks
+    private OAuthService oAuthService;
+    @Mock
+    private OAuthClient oAuthClient;
+    @Mock
+    private TokenProvider tokenProvider;
+    @Mock
+    private JoinedMemberRepository joinedMemberRepository;
 
     @Test
     void 첫_로그인_시_토큰을_발급한다() {
