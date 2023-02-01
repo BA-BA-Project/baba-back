@@ -10,6 +10,9 @@ import com.baba.back.content.dto.CreateContentRequest;
 import com.baba.back.content.dto.CreateContentResponse;
 import com.baba.back.content.exception.ContentAuthorizationException;
 import com.baba.back.content.repository.ContentRepository;
+import com.baba.back.oauth.domain.member.Member;
+import com.baba.back.oauth.exception.MemberNotFoundException;
+import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.relation.domain.Relation;
 import com.baba.back.relation.exception.RelationNotFoundException;
 import com.baba.back.relation.repository.RelationRepository;
@@ -24,17 +27,22 @@ import org.springframework.transaction.annotation.Transactional;
 public class ContentService {
 
     private final ContentRepository contentRepository;
+    private final MemberRepository memberRepository;
     private final BabyRepository babyRepository;
     private final RelationRepository relationRepository;
     private final ImageSaver imageSaver;
 
     public CreateContentResponse createContent(CreateContentRequest request, String memberId, String babyId) {
+        // TODO: 멤버를 조회한다
+        final Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberNotFoundException(memberId + "에 해당하는 멤버가 존재하지 않습니다."));
+
         // TODO: 아기를 조회한다
         final Baby baby = babyRepository.findById(babyId)
                 .orElseThrow(() -> new BabyNotFoundException(babyId + " 는 존재하지 않는 babyId 입니다."));
 
         // TODO: 관계를 조회한다
-        final Relation relation = relationRepository.findByMemberIdAndBabyId(memberId, babyId)
+        final Relation relation = relationRepository.findByMemberAndBaby(member, baby)
                 .orElseThrow(() -> new RelationNotFoundException(
                         memberId + "와 " + babyId + " 사이의 관계가 존재하지 않습니다."));
 

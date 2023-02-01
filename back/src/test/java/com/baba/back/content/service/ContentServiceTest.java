@@ -14,6 +14,9 @@ import com.baba.back.content.dto.CreateContentRequest;
 import com.baba.back.content.dto.CreateContentResponse;
 import com.baba.back.content.exception.ContentAuthorizationException;
 import com.baba.back.content.repository.ContentRepository;
+import com.baba.back.oauth.domain.member.Member;
+import com.baba.back.oauth.exception.MemberNotFoundException;
+import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.relation.domain.Relation;
 import com.baba.back.relation.exception.RelationNotFoundException;
 import com.baba.back.relation.repository.RelationRepository;
@@ -42,6 +45,9 @@ class ContentServiceTest {
     private ContentRepository contentRepository;
 
     @Mock
+    private MemberRepository memberRepository;
+
+    @Mock
     private BabyRepository babyRepository;
 
     @Mock
@@ -54,8 +60,20 @@ class ContentServiceTest {
     private ContentService contentService;
 
     @Test
+    void 멤버가_존재하지_않으면_예외를_던진다() {
+        // given
+        given(memberRepository.findById(any())).willReturn(Optional.empty());
+        final CreateContentRequest request = new CreateContentRequest(DATE, TITLE, MOCK_FILE, CARD_STYLE);
+
+        // when & then
+        Assertions.assertThatThrownBy(() -> contentService.createContent(request, MEMBER_ID, BABY_ID))
+                .isInstanceOf(MemberNotFoundException.class);
+    }
+
+    @Test
     void 아기가_존재하지_않으면_예외를_던진다() {
         // given
+        given(memberRepository.findById(any())).willReturn(Optional.of(new Member()));
         given(babyRepository.findById(any())).willReturn(Optional.empty());
         final CreateContentRequest request = new CreateContentRequest(DATE, TITLE, MOCK_FILE, CARD_STYLE);
 
@@ -67,8 +85,9 @@ class ContentServiceTest {
     @Test
     void 관계가_존재하지_않으면_예외를_던진다() {
         // given
+        given(memberRepository.findById(any())).willReturn(Optional.of(new Member()));
         given(babyRepository.findById(any())).willReturn(Optional.of(new Baby()));
-        given(relationRepository.findByMemberIdAndBabyId(any(), any())).willReturn(Optional.empty());
+        given(relationRepository.findByMemberAndBaby(any(), any())).willReturn(Optional.empty());
         final CreateContentRequest request = new CreateContentRequest(DATE, TITLE, MOCK_FILE, CARD_STYLE);
 
         // when & then
@@ -79,8 +98,9 @@ class ContentServiceTest {
     @Test
     void 아기의_컨텐츠를_생성할_권한이_없으면_예외를_던진다() {
         // given
+        given(memberRepository.findById(any())).willReturn(Optional.of(new Member()));
         given(babyRepository.findById(any())).willReturn(Optional.of(new Baby()));
-        given(relationRepository.findByMemberIdAndBabyId(any(), any())).willReturn(Optional.of(new Relation()));
+        given(relationRepository.findByMemberAndBaby(any(), any())).willReturn(Optional.of(new Relation()));
         final CreateContentRequest request = new CreateContentRequest(DATE, TITLE, MOCK_FILE, CARD_STYLE);
 
         // when & then
@@ -96,8 +116,9 @@ class ContentServiceTest {
         given(baby.getBirthday()).willReturn(Birthday.of(DATE, DATE));
         given(relation.isFamily()).willReturn(true);
 
+        given(memberRepository.findById(any())).willReturn(Optional.of(new Member()));
         given(babyRepository.findById(any())).willReturn(Optional.of(baby));
-        given(relationRepository.findByMemberIdAndBabyId(any(), any())).willReturn(Optional.of(relation));
+        given(relationRepository.findByMemberAndBaby(any(), any())).willReturn(Optional.of(relation));
         given(imageSaver.save(any())).willReturn("VALID_IMAGE_SOURCE");
 
         final CreateContentRequest request = new CreateContentRequest(DATE, TITLE, MOCK_FILE, CARD_STYLE);

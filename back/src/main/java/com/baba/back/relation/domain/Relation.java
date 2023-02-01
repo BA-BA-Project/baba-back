@@ -43,9 +43,8 @@ public class Relation {
     private boolean defaultRelation;
 
     @Builder
-    public Relation(Long id, Member member, Baby baby, String relationName, RelationGroup relationGroup,
+    public Relation(Member member, Baby baby, String relationName, RelationGroup relationGroup,
                     boolean defaultRelation) {
-        this.id = id;
         this.member = member;
         this.baby = baby;
         this.relationName = new Name(relationName);

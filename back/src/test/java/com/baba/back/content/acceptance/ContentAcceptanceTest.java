@@ -27,7 +27,7 @@ import org.springframework.http.HttpStatus;
 public class ContentAcceptanceTest extends AcceptanceTest {
 
     public static final String MEMBER_ID = "1234";
-    public static final String BASE_PATH = "album";
+    public static final String BASE_PATH = "/api/album";
     public static final String BABY_ID = "1234";
 
     @Autowired
@@ -78,7 +78,7 @@ public class ContentAcceptanceTest extends AcceptanceTest {
         final String token = tokenProvider.createToken(MEMBER_ID);
         final Member member = new Member(MEMBER_ID, "박재희", "", (colors -> "FFAEBA"), "icon1");
         final Baby baby = new Baby(BABY_ID, "앙쥬", LocalDate.of(2023, 1, 25), LocalDate.now());
-        final Relation relation = new Relation(1L, member, baby, "엄마", RelationGroup.FAMILY, true);
+        final Relation relation = new Relation(member, baby, "엄마", RelationGroup.FAMILY, true);
 
         memberRepository.save(member);
         babyRepository.save(baby);
