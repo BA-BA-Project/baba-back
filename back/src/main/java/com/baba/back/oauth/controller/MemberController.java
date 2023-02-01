@@ -5,9 +5,9 @@ import com.baba.back.oauth.dto.MemberJoinResponse;
 import com.baba.back.oauth.service.MemberService;
 import com.baba.back.oauth.support.Login;
 import com.baba.back.swagger.BadRequestResponse;
+import com.baba.back.swagger.CreatedResponse;
 import com.baba.back.swagger.IntervalServerErrorResponse;
 import com.baba.back.swagger.NotFoundResponse;
-import com.baba.back.swagger.OkResponse;
 import com.baba.back.swagger.UnAuthorizedResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,7 +27,7 @@ public class MemberController {
     private final MemberService memberService;
 
     @Operation(summary = "멤버 생성 요청")
-    @OkResponse
+    @CreatedResponse
     @BadRequestResponse
     @UnAuthorizedResponse
     @NotFoundResponse
