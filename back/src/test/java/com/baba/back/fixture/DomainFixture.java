@@ -7,7 +7,7 @@ import com.baba.back.relation.domain.Relation;
 import com.baba.back.relation.domain.RelationGroup;
 import java.time.LocalDate;
 
-public class Fixture {
+public class DomainFixture {
 
     public static final Member 멤버1 = Member.builder()
             .id("member1")
@@ -20,6 +20,13 @@ public class Fixture {
     public static final Baby 아기1 = Baby.builder()
             .id("baby1")
             .name("아기1")
+            .birthday(LocalDate.now())
+            .now(LocalDate.now())
+            .build();
+
+    public static final Baby 아기2 = Baby.builder()
+            .id("baby2")
+            .name("아기2")
             .birthday(LocalDate.now())
             .now(LocalDate.now())
             .build();

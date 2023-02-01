@@ -1,8 +1,8 @@
 package com.baba.back.baby.service;
 
-import static com.baba.back.fixture.Fixture.관계1;
-import static com.baba.back.fixture.Fixture.멤버1;
-import static com.baba.back.fixture.Fixture.아기1;
+import static com.baba.back.fixture.DomainFixture.관계1;
+import static com.baba.back.fixture.DomainFixture.멤버1;
+import static com.baba.back.fixture.DomainFixture.아기1;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -30,7 +30,6 @@ class BabyServiceTest {
 
     @Mock
     private MemberRepository memberRepository;
-
 
     @Mock
     private RelationRepository relationRepository;
