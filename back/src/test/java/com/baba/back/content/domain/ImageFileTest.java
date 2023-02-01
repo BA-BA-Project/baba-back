@@ -4,16 +4,18 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.baba.back.content.exception.ImageFileBadRequestException;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 class ImageFileTest {
 
-    @Test
-    void 이미지가_아닌_파일을_받으면_예외를_던진다() {
+    @ParameterizedTest
+    @ValueSource(strings = {"text/plain", "text/html", "application/octet-stream", "image/gif"})
+    void 이미지가_아닌_파일을_받으면_예외를_던진다(String contentType) {
         // given
-        MultipartFile mockFile = new MockMultipartFile("photo", "file.png", "text/plain",
+        MultipartFile mockFile = new MockMultipartFile("photo", "file.png", contentType,
                 "Spring Framework".getBytes());
 
         // when & then
@@ -21,10 +23,11 @@ class ImageFileTest {
                 .isInstanceOf(ImageFileBadRequestException.class);
     }
 
-    @Test
-    void 이미지_파일을_받으면_객체를_생성한다() {
+    @ParameterizedTest
+    @ValueSource(strings = {"image/png", "image/bmp", "image/jpeg"})
+    void 이미지_파일을_받으면_객체를_생성한다(String contentType) {
         // given
-        MultipartFile mockFile = new MockMultipartFile("photo", "file.png", "image/png", "Spring Framework".getBytes());
+        MultipartFile mockFile = new MockMultipartFile("photo", "file.png", contentType, "Spring Framework".getBytes());
 
         // when & then
         assertThatCode(() -> new ImageFile(mockFile))
