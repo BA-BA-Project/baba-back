@@ -32,14 +32,14 @@ class OAuthServiceTest {
     @Mock
     private JoinedMemberRepository joinedMemberRepository;
 
+    final String code = "code";
+    final String accessToken = "accessToken";
+    final String memberId = "memberId";
+    final String memberToken = "member token";
+
     @Test
     void 첫_로그인_시_토큰을_발급한다() {
         // given
-        final String code = "code";
-        final String accessToken = "accessToken";
-        final String memberId = "memberId";
-        final String memberToken = "member token";
-
         given(oAuthClient.getOAuthAccessToken(code)).willReturn(new OAuthAccessTokenResponse(accessToken));
         given(oAuthClient.getMemberId(accessToken)).willReturn(memberId);
         given(joinedMemberRepository.findById(memberId)).willReturn(Optional.empty());
@@ -60,11 +60,6 @@ class OAuthServiceTest {
     @Test
     void 첫_로그인을_했지만_가입하지않은_멤버에게_토큰을_발급한다() {
         // given
-        final String code = "code";
-        final String accessToken = "accessToken";
-        final String memberId = "memberId";
-        final String memberToken = "member token";
-
         given(oAuthClient.getOAuthAccessToken(code)).willReturn(new OAuthAccessTokenResponse(accessToken));
         given(oAuthClient.getMemberId(accessToken)).willReturn(memberId);
         given(joinedMemberRepository.findById(memberId)).willReturn(Optional.of(new JoinedMember(memberId, false)));
@@ -84,11 +79,6 @@ class OAuthServiceTest {
     @Test
     void 이미_가입한_멤버에게_토큰을_발급한다() {
         // given
-        final String code = "code";
-        final String accessToken = "accessToken";
-        final String memberId = "memberId";
-        final String memberToken = "member token";
-
         given(oAuthClient.getOAuthAccessToken(code)).willReturn(new OAuthAccessTokenResponse(accessToken));
         given(oAuthClient.getMemberId(accessToken)).willReturn(memberId);
         given(joinedMemberRepository.findById(memberId)).willReturn(Optional.of(new JoinedMember(memberId, true)));
