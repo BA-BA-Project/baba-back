@@ -8,8 +8,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
+import static org.mockito.BDDMockito.given;
 
 import com.baba.back.baby.dto.SearchDefaultBabyResponse;
 import com.baba.back.oauth.exception.MemberNotFoundException;
@@ -40,7 +39,7 @@ class BabyServiceTest {
     void 멤버가_존재하지않으면_예외를_던진다() {
         // given
         final String memberId = "memberId";
-        when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
+        given(memberRepository.findById(memberId)).willReturn(Optional.empty());
 
         // when & then
         assertThatThrownBy(() -> babyService.searchDefaultBaby(memberId))
@@ -50,8 +49,8 @@ class BabyServiceTest {
     @Test
     void 기본_설정된_아기가_없다면_예외를_던진다() {
         // given
-        when(memberRepository.findById(anyString())).thenReturn(Optional.of(멤버1));
-        when(relationRepository.findByMemberAndDefaultRelation(any(), anyBoolean())).thenReturn(Optional.empty());
+        given(memberRepository.findById(anyString())).willReturn(Optional.of(멤버1));
+        given(relationRepository.findByMemberAndDefaultRelation(any(), anyBoolean())).willReturn(Optional.empty());
 
         // when & then
         assertThatThrownBy(() -> babyService.searchDefaultBaby("멤버1"))
@@ -62,14 +61,13 @@ class BabyServiceTest {
     @Test
     void 기본_설정된_아기를_조회한다() {
         // given
-        doReturn(Optional.of(멤버1)).when(memberRepository).findById(anyString());
-        doReturn(Optional.of(관계1)).when(relationRepository).findByMemberAndDefaultRelation(any(), anyBoolean());
+        given(memberRepository.findById(anyString())).willReturn(Optional.of(멤버1));
+        given(relationRepository.findByMemberAndDefaultRelation(any(), anyBoolean())).willReturn(Optional.of(관계1));
 
         // when
         final SearchDefaultBabyResponse response = babyService.searchDefaultBaby("멤버1");
 
         // then
         assertThat(response.getBabyId()).isEqualTo(아기1.getId());
-
     }
 }

@@ -3,7 +3,7 @@ package com.baba.back.oauth.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.BDDMockito.given;
 
 import com.baba.back.oauth.OAuthClient;
 import com.baba.back.oauth.domain.JoinedMember;
@@ -40,13 +40,13 @@ class OAuthServiceTest {
         final String memberId = "memberId";
         final String memberToken = "member token";
 
-        when(oAuthClient.getOAuthAccessToken(code)).thenReturn(new OAuthAccessTokenResponse(accessToken));
-        when(oAuthClient.getMemberId(accessToken)).thenReturn(memberId);
-        when(joinedMemberRepository.findById(memberId)).thenReturn(Optional.empty());
-        when(tokenProvider.createToken(memberId)).thenReturn(memberToken);
-        when(joinedMemberRepository.save(any())).thenReturn(new JoinedMember(memberId, false));
+        given(oAuthClient.getOAuthAccessToken(code)).willReturn(new OAuthAccessTokenResponse(accessToken));
+        given(oAuthClient.getMemberId(accessToken)).willReturn(memberId);
+        given(joinedMemberRepository.findById(memberId)).willReturn(Optional.empty());
+        given(tokenProvider.createToken(memberId)).willReturn(memberToken);
+        given(joinedMemberRepository.save(any())).willReturn(new JoinedMember(memberId, false));
 
-        // when & then
+        // when
         final TokenResponse tokenResponse = oAuthService.signInKakao(code);
 
         // then
@@ -65,12 +65,12 @@ class OAuthServiceTest {
         final String memberId = "memberId";
         final String memberToken = "member token";
 
-        when(oAuthClient.getOAuthAccessToken(code)).thenReturn(new OAuthAccessTokenResponse(accessToken));
-        when(oAuthClient.getMemberId(accessToken)).thenReturn(memberId);
-        when(joinedMemberRepository.findById(memberId)).thenReturn(Optional.of(new JoinedMember(memberId, false)));
-        when(tokenProvider.createToken(memberId)).thenReturn(memberToken);
+        given(oAuthClient.getOAuthAccessToken(code)).willReturn(new OAuthAccessTokenResponse(accessToken));
+        given(oAuthClient.getMemberId(accessToken)).willReturn(memberId);
+        given(joinedMemberRepository.findById(memberId)).willReturn(Optional.of(new JoinedMember(memberId, false)));
+        given(tokenProvider.createToken(memberId)).willReturn(memberToken);
 
-        // when & then
+        // when
         final TokenResponse tokenResponse = oAuthService.signInKakao(code);
 
         // then
@@ -89,12 +89,12 @@ class OAuthServiceTest {
         final String memberId = "memberId";
         final String memberToken = "member token";
 
-        when(oAuthClient.getOAuthAccessToken(code)).thenReturn(new OAuthAccessTokenResponse(accessToken));
-        when(oAuthClient.getMemberId(accessToken)).thenReturn(memberId);
-        when(joinedMemberRepository.findById(memberId)).thenReturn(Optional.of(new JoinedMember(memberId, true)));
-        when(tokenProvider.createToken(memberId)).thenReturn(memberToken);
+        given(oAuthClient.getOAuthAccessToken(code)).willReturn(new OAuthAccessTokenResponse(accessToken));
+        given(oAuthClient.getMemberId(accessToken)).willReturn(memberId);
+        given(joinedMemberRepository.findById(memberId)).willReturn(Optional.of(new JoinedMember(memberId, true)));
+        given(tokenProvider.createToken(memberId)).willReturn(memberToken);
 
-        // when & then
+        // when
         final TokenResponse tokenResponse = oAuthService.signInKakao(code);
 
         // then

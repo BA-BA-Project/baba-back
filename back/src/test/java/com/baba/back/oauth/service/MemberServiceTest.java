@@ -7,8 +7,9 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.times;
 
 import com.baba.back.baby.domain.IdConstructor;
 import com.baba.back.baby.dto.BabyRequest;
@@ -29,7 +30,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -61,7 +61,7 @@ class MemberServiceTest {
     void 로그인을_하지_않은_멤버는_회원가입을_할_수_없다() {
         // given
         final String invalidMemberId = "memberId";
-        when(joinedMemberRepository.findById(invalidMemberId)).thenReturn(Optional.empty());
+        given(joinedMemberRepository.findById(invalidMemberId)).willReturn(Optional.empty());
 
         // when & then
         Assertions.assertThatThrownBy(() -> memberService.join(new MemberJoinRequest(), invalidMemberId))
@@ -71,7 +71,7 @@ class MemberServiceTest {
     @Test
     void 이미_회원가입한_멤버는_회원가입할_수_없다() {
         // given
-        when(joinedMemberRepository.findById(anyString())).thenReturn(Optional.ofNullable(이미_회원가입한_유저1));
+        given(joinedMemberRepository.findById(anyString())).willReturn(Optional.ofNullable(이미_회원가입한_유저1));
 
         // when & then
         Assertions.assertThatThrownBy(() -> memberService.join(new MemberJoinRequest(), "memberId"))
@@ -86,16 +86,16 @@ class MemberServiceTest {
                         new BabyRequest("아기2", LocalDate.of(2023, 1, 1)))
         );
 
-        when(joinedMemberRepository.findById(anyString())).thenReturn(Optional.ofNullable(회원가입_안한_유저1));
-        when(colorPicker.pick(anyList())).thenReturn("FFAEBA");
+        given(joinedMemberRepository.findById(anyString())).willReturn(Optional.ofNullable(회원가입_안한_유저1));
+        given(colorPicker.pick(anyList())).willReturn("FFAEBA");
 
         final MemberJoinResponse response = memberService.join(request, "memberId");
 
         //then
-        verify(memberRepository).save(any());
-        verify(idConstructor).createId();
-        verify(babyRepository, Mockito.times(2)).save(any());
-        verify(relationRepository, Mockito.times(2)).save(any());
+        then(memberRepository).should(times(1)).save(any());
+        then(idConstructor).should(times(1)).createId();
+        then(babyRepository).should(times(2)).save(any());
+        then(relationRepository).should(times(2)).save(any());
 
         assertAll(
                 () -> assertThat(response.getSignedUp()).isTrue(),
