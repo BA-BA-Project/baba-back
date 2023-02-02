@@ -5,6 +5,7 @@ import com.baba.back.exception.AuthenticationException;
 import com.baba.back.exception.AuthorizationException;
 import com.baba.back.exception.BadRequestException;
 import com.baba.back.exception.NotFoundException;
+import com.baba.back.exception.ServerException;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +44,12 @@ public class ControllerAdvice {
     public ResponseEntity<ExceptionResponse> handleNotFoundException(NotFoundException exception) {
         logger.warn(exception.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ExceptionResponse("요청한 리소스를 찾을 수 없습니다."));
+    }
+
+    @ExceptionHandler(ServerException.class)
+    public ResponseEntity<ExceptionResponse> handleServerException(ServerException exception) {
+        logger.warn(exception.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ExceptionResponse("처리할 수 없는 예외입니다."));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
