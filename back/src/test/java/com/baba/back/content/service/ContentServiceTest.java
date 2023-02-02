@@ -114,6 +114,6 @@ class ContentServiceTest {
         final CreateContentResponse response = contentService.createContent(컨텐츠_생성_요청, MEMBER_ID, BABY_ID);
 
         // then
-        assertThat(response.isSuccess()).isTrue();
+        assertThat(response.success()).isTrue();
     }
 }

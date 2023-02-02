@@ -6,7 +6,5 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class CreateContentResponse {
-    @JsonProperty("isSuccess")
-    private final boolean success;
+public record CreateContentResponse(@JsonProperty("isSuccess") boolean success) {
 }
