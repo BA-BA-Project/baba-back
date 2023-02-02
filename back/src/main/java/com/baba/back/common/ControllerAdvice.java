@@ -13,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -50,19 +49,6 @@ public class ControllerAdvice {
     public ResponseEntity<ExceptionResponse> handleServerException(ServerException exception) {
         logger.warn(exception.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ExceptionResponse("처리할 수 없는 예외입니다."));
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ExceptionResponse> handleValidationExceptions(MethodArgumentNotValidException exception) {
-        final String message = exception.getBindingResult()
-                .getAllErrors()
-                .stream()
-                .map(error -> String.format("%s: %s", ((FieldError) error).getField(), error.getDefaultMessage()))
-                .collect(Collectors.joining(", "));
-
-        logger.warn(message);
-
-        return ResponseEntity.badRequest().body(new ExceptionResponse("잘못된 요청입니다."));
     }
 
     @ExceptionHandler(BindException.class)
