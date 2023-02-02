@@ -39,6 +39,14 @@ public class DomainFixture {
             .relationGroup(RelationGroup.FAMILY)
             .build();
 
+    public static final Relation 관계2 = Relation.builder()
+            .member(멤버1)
+            .baby(아기1)
+            .relationName("아빠")
+            .defaultRelation(true)
+            .relationGroup(RelationGroup.FRIENDS)
+            .build();
+
     public static final JoinedMember 회원가입_안한_유저1 = new JoinedMember(멤버1.getId(), false);
     public static final JoinedMember 이미_회원가입한_유저1 = new JoinedMember(멤버1.getId(), true);
 }

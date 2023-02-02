@@ -57,6 +57,6 @@ public class Relation {
     }
 
     public boolean isFamily() {
-        return relationGroup == RelationGroup.FAMILY;
+        return relationGroup.isFamily();
     }
 }
