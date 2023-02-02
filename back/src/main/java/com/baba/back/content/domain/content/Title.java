@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class Title {
+    public static final int MAX_TITLE_LENGTH = 10;
     private String title;
 
     public Title(String title) {
@@ -25,7 +26,7 @@ public class Title {
     }
 
     private void validateLength(String title) {
-        if (title.isBlank() || title.length() > 10) {
+        if (title.isBlank() || title.length() > MAX_TITLE_LENGTH) {
             throw new TitleLengthBadRequestException(String.format("제목의 길이 {%s}가 올바르지 않습니다.", title.length()));
         }
     }
