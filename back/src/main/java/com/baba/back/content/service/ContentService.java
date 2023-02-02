@@ -33,11 +33,11 @@ public class ContentService {
     private final ImageSaver imageSaver;
 
     public CreateContentResponse createContent(CreateContentRequest request, String memberId, String babyId) {
-        final Member member = validateMember(memberId);
+        final Member member = findMember(memberId);
 
-        final Baby baby = validateBaby(babyId);
+        final Baby baby = findBaby(babyId);
 
-        final Relation relation = validateRelation(memberId, babyId, member, baby);
+        final Relation relation = findRelation(memberId, babyId, member, baby);
 
         checkAuthorization(memberId, babyId, relation);
 
@@ -60,17 +60,17 @@ public class ContentService {
         return new CreateContentResponse(true);
     }
 
-    private Member validateMember(String memberId) {
+    private Member findMember(String memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(memberId + "에 해당하는 멤버가 존재하지 않습니다."));
     }
 
-    private Baby validateBaby(String babyId) {
+    private Baby findBaby(String babyId) {
         return babyRepository.findById(babyId)
                 .orElseThrow(() -> new BabyNotFoundException(babyId + " 는 존재하지 않는 babyId 입니다."));
     }
 
-    private Relation validateRelation(String memberId, String babyId, Member member, Baby baby) {
+    private Relation findRelation(String memberId, String babyId, Member member, Baby baby) {
         return relationRepository.findByMemberAndBaby(member, baby)
                 .orElseThrow(() -> new RelationNotFoundException(
                         memberId + "와 " + babyId + " 사이의 관계가 존재하지 않습니다."));
