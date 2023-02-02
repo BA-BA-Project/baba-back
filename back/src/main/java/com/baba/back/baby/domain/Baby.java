@@ -29,4 +29,8 @@ public class Baby {
         this.name = new Name(name);
         this.birthday = Birthday.of(birthday, now);
     }
+
+    public LocalDate getBirthday() {
+        return birthday.getBirthday();
+    }
 }

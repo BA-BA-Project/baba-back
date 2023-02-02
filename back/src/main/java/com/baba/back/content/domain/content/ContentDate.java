@@ -1,6 +1,5 @@
 package com.baba.back.content.domain.content;
 
-import com.baba.back.baby.domain.Birthday;
 import com.baba.back.content.exception.ContentDateBadRequestException;
 import jakarta.persistence.Embeddable;
 import java.time.LocalDate;
@@ -12,21 +11,22 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class ContentDate {
+    public static final int LIMIT_YEARS = 2;
     private LocalDate contentDate;
 
     private ContentDate(LocalDate contentDate) {
         this.contentDate = contentDate;
     }
 
-    public static ContentDate of(LocalDate contentDate, LocalDate now, Birthday birthday) {
-        validateNull(contentDate, now, birthday);
+    public static ContentDate of(LocalDate contentDate, LocalDate now, LocalDate baseDate) {
+        validateNull(contentDate, now, baseDate);
         validateFuture(contentDate, now);
-        validatePast(contentDate, birthday);
+        validatePast(contentDate, baseDate);
         return new ContentDate(contentDate);
     }
 
-    private static void validateNull(LocalDate contentDate, LocalDate now, Birthday birthday) {
-        if (Objects.isNull(contentDate) || Objects.isNull(now) || Objects.isNull(birthday)) {
+    private static void validateNull(LocalDate contentDate, LocalDate now, LocalDate baseDate) {
+        if (Objects.isNull(contentDate) || Objects.isNull(now) || Objects.isNull(baseDate)) {
             throw new ContentDateBadRequestException("날짜는 null일 수 없습니다.");
         }
     }
@@ -37,9 +37,10 @@ public class ContentDate {
         }
     }
 
-    private static void validatePast(LocalDate contentDate, Birthday birthday) {
-        if (contentDate.isBefore(birthday.minusYears(2))) {
-            throw new ContentDateBadRequestException("contentDate는 birthday의 2년전까지_유효합니다.");
+    private static void validatePast(LocalDate contentDate, LocalDate baseDate) {
+        if (contentDate.isBefore(baseDate.minusYears(LIMIT_YEARS))) {
+            throw new ContentDateBadRequestException(
+                    String.format("contentDate는 baseDate의 %d년전까지_유효합니다.", LIMIT_YEARS));
         }
     }
 }
