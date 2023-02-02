@@ -7,6 +7,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 public class ImageFile {
+    public static final String VALID_START_TYPE = "image";
+    public static final String INVALID_END_TYPE = "gif";
+
     private final MultipartFile file;
 
     public ImageFile(MultipartFile file) {
@@ -17,13 +20,25 @@ public class ImageFile {
     private void validateType(MultipartFile file) {
         final String contentType = file.getContentType();
 
+        validateTypeNull(contentType);
+        validateImage(contentType);
+        validateGIF(contentType);
+    }
+
+    private void validateTypeNull(String contentType) {
         if (Objects.isNull(contentType)) {
             throw new ImageFileBadRequestException("파일 타입은 null일 수 없습니다.");
         }
-        if (!contentType.startsWith("image")) {
+    }
+
+    private void validateImage(String contentType) {
+        if (!contentType.startsWith(VALID_START_TYPE)) {
             throw new ImageFileBadRequestException("파일이 이미지 형식이 아닙니다.");
         }
-        if (contentType.endsWith("gif")) {
+    }
+
+    private void validateGIF(String contentType) {
+        if (contentType.endsWith(INVALID_END_TYPE)) {
             throw new ImageFileBadRequestException("gif 파일은 올바른 형식이 아닙니다.");
         }
     }
