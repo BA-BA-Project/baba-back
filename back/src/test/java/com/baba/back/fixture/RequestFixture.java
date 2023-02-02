@@ -1,9 +1,11 @@
 package com.baba.back.fixture;
 
 import com.baba.back.baby.dto.BabyRequest;
+import com.baba.back.content.dto.CreateContentRequest;
 import com.baba.back.oauth.dto.MemberJoinRequest;
 import java.time.LocalDate;
 import java.util.List;
+import org.springframework.mock.web.MockMultipartFile;
 
 public class RequestFixture {
 
@@ -12,4 +14,7 @@ public class RequestFixture {
     public static final MemberJoinRequest 멤버_가입_요청 = new MemberJoinRequest(
             "박재희", "icon1", "엄마", List.of(아기_생성_요청1, 아기_생성_요청2)
     );
+    public static final CreateContentRequest 컨텐츠_생성_요청 = new CreateContentRequest(LocalDate.now(), "제목",
+            new MockMultipartFile("photo", "file.png", "image/png",
+                    "Mock File".getBytes()), "card_basic_1");
 }

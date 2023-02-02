@@ -1,17 +1,16 @@
 package com.baba.back.content.acceptance;
 
+import static com.baba.back.fixture.DomainFixture.관계1;
+import static com.baba.back.fixture.DomainFixture.멤버1;
+import static com.baba.back.fixture.DomainFixture.아기1;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.baba.back.AcceptanceTest;
-import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.content.repository.ContentRepository;
-import com.baba.back.oauth.domain.member.Member;
 import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.oauth.service.TokenProvider;
-import com.baba.back.relation.domain.Relation;
-import com.baba.back.relation.domain.RelationGroup;
 import com.baba.back.relation.repository.RelationRepository;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -26,9 +25,7 @@ import org.springframework.http.HttpStatus;
 
 public class ContentAcceptanceTest extends AcceptanceTest {
 
-    public static final String MEMBER_ID = "1234";
     public static final String BASE_PATH = "/api/album";
-    public static final String BABY_ID = "1234";
 
     @Autowired
     private TokenProvider tokenProvider;
@@ -56,14 +53,14 @@ public class ContentAcceptanceTest extends AcceptanceTest {
     @Test
     void 요청_body에_잘못된_값이_있으면_400을_던진다() {
         // given
-        final String token = tokenProvider.createToken(MEMBER_ID);
+        final String token = tokenProvider.createToken(멤버1.getId());
 
         // when
         final ExtractableResponse<Response> response = RestAssured.given()
                 .headers(Map.of("Authorization", "Bearer " + token))
                 .multiPart("photo", "origin.txt", "Something".getBytes(), "multipart/form-data")
                 .when()
-                .post(Paths.get(BASE_PATH, BABY_ID).toString())
+                .post(Paths.get(BASE_PATH, 아기1.getId()).toString())
                 .then()
                 .log().all()
                 .extract();
@@ -75,14 +72,11 @@ public class ContentAcceptanceTest extends AcceptanceTest {
     @Test
     void 컨텐츠를_생성한다() {
         // given
-        final String token = tokenProvider.createToken(MEMBER_ID);
-        final Member member = new Member(MEMBER_ID, "박재희", "", (colors -> "FFAEBA"), "icon1");
-        final Baby baby = new Baby(BABY_ID, "앙쥬", LocalDate.of(2023, 1, 25), LocalDate.now());
-        final Relation relation = new Relation(member, baby, "엄마", RelationGroup.FAMILY, true);
+        final String token = tokenProvider.createToken(멤버1.getId());
 
-        memberRepository.save(member);
-        babyRepository.save(baby);
-        relationRepository.save(relation);
+        memberRepository.save(멤버1);
+        babyRepository.save(아기1);
+        relationRepository.save(관계1);
 
         // when
         final ExtractableResponse<Response> response = RestAssured.given()
@@ -92,7 +86,7 @@ public class ContentAcceptanceTest extends AcceptanceTest {
                 .multiPart("title", "제목")
                 .multiPart("cardStyle", "card_basic_1")
                 .when()
-                .post(Paths.get(BASE_PATH, BABY_ID).toString())
+                .post(Paths.get(BASE_PATH, 아기1.getId()).toString())
                 .then()
                 .log().all()
                 .extract();
