@@ -33,23 +33,13 @@ public class ContentService {
     private final ImageSaver imageSaver;
 
     public CreateContentResponse createContent(CreateContentRequest request, String memberId, String babyId) {
-        // TODO: 멤버를 조회한다
-        final Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberNotFoundException(memberId + "에 해당하는 멤버가 존재하지 않습니다."));
+        final Member member = validateMember(memberId);
 
-        // TODO: 아기를 조회한다
-        final Baby baby = babyRepository.findById(babyId)
-                .orElseThrow(() -> new BabyNotFoundException(babyId + " 는 존재하지 않는 babyId 입니다."));
+        final Baby baby = validateBaby(babyId);
 
-        // TODO: 관계를 조회한다
-        final Relation relation = relationRepository.findByMemberAndBaby(member, baby)
-                .orElseThrow(() -> new RelationNotFoundException(
-                        memberId + "와 " + babyId + " 사이의 관계가 존재하지 않습니다."));
+        final Relation relation = validateRelation(memberId, babyId, member, baby);
 
-        // TODO: 해당 아기의 컨텐츠를 생성할 수 있는 권한이 있는지 확인한다
-        if (!relation.isFamily()) {
-            throw new ContentAuthorizationException(memberId + "는 " + babyId + "와 가족 관계가 아닙니다.");
-        }
+        checkAuthorization(memberId, babyId, relation);
 
         final Content content = Content.builder()
                 .title(request.getTitle())
@@ -68,5 +58,27 @@ public class ContentService {
         contentRepository.save(content);
 
         return new CreateContentResponse(true);
+    }
+
+    private Member validateMember(String memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberNotFoundException(memberId + "에 해당하는 멤버가 존재하지 않습니다."));
+    }
+
+    private Baby validateBaby(String babyId) {
+        return babyRepository.findById(babyId)
+                .orElseThrow(() -> new BabyNotFoundException(babyId + " 는 존재하지 않는 babyId 입니다."));
+    }
+
+    private Relation validateRelation(String memberId, String babyId, Member member, Baby baby) {
+        return relationRepository.findByMemberAndBaby(member, baby)
+                .orElseThrow(() -> new RelationNotFoundException(
+                        memberId + "와 " + babyId + " 사이의 관계가 존재하지 않습니다."));
+    }
+
+    private static void checkAuthorization(String memberId, String babyId, Relation relation) {
+        if (!relation.isFamily()) {
+            throw new ContentAuthorizationException(memberId + "는 " + babyId + "와 가족 관계가 아닙니다.");
+        }
     }
 }
