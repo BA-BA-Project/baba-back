@@ -34,12 +34,10 @@ public class ContentService {
 
     public CreateContentResponse createContent(CreateContentRequest request, String memberId, String babyId) {
         final Member member = findMember(memberId);
-
         final Baby baby = findBaby(babyId);
+        final Relation relation = findRelation(member, baby);
 
-        final Relation relation = findRelation(memberId, babyId, member, baby);
-
-        checkAuthorization(memberId, babyId, relation);
+        checkAuthorization(relation);
 
         final Content content = Content.builder()
                 .title(request.getTitle())
@@ -70,15 +68,15 @@ public class ContentService {
                 .orElseThrow(() -> new BabyNotFoundException(babyId + " 는 존재하지 않는 babyId 입니다."));
     }
 
-    private Relation findRelation(String memberId, String babyId, Member member, Baby baby) {
+    private Relation findRelation(Member member, Baby baby) {
         return relationRepository.findByMemberAndBaby(member, baby)
                 .orElseThrow(() -> new RelationNotFoundException(
-                        memberId + "와 " + babyId + " 사이의 관계가 존재하지 않습니다."));
+                        member.getId() + "와 " + baby.getId() + " 사이의 관계가 존재하지 않습니다."));
     }
 
-    private static void checkAuthorization(String memberId, String babyId, Relation relation) {
+    private void checkAuthorization(Relation relation) {
         if (!relation.isFamily()) {
-            throw new ContentAuthorizationException(memberId + "는 " + babyId + "와 가족 관계가 아닙니다.");
+            throw new ContentAuthorizationException(relation.getId() + " 관계는 가족 관계가 아닙니다.");
         }
     }
 }
