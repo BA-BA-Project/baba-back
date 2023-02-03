@@ -4,7 +4,7 @@ import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.exception.BabyNotFoundException;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.content.domain.ImageFile;
-import com.baba.back.content.domain.ImageSaver;
+import com.baba.back.content.domain.FileHandler;
 import com.baba.back.content.domain.content.Content;
 import com.baba.back.content.dto.CreateContentRequest;
 import com.baba.back.content.dto.CreateContentResponse;
@@ -30,7 +30,7 @@ public class ContentService {
     private final MemberRepository memberRepository;
     private final BabyRepository babyRepository;
     private final RelationRepository relationRepository;
-    private final ImageSaver imageSaver;
+    private final FileHandler fileHandler;
 
     public CreateContentResponse createContent(CreateContentRequest request, String memberId, String babyId) {
         final Member member = findMember(memberId);
@@ -49,7 +49,7 @@ public class ContentService {
                 .build();
 
         final ImageFile imageFile = new ImageFile(request.getPhoto());
-        final String imageSource = imageSaver.save(imageFile);
+        final String imageSource = fileHandler.upload(imageFile);
 
         content.updateURL(imageSource);
 

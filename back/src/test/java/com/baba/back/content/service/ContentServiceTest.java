@@ -12,7 +12,7 @@ import static org.mockito.BDDMockito.given;
 import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.exception.BabyNotFoundException;
 import com.baba.back.baby.repository.BabyRepository;
-import com.baba.back.content.domain.ImageSaver;
+import com.baba.back.content.domain.FileHandler;
 import com.baba.back.content.dto.CreateContentResponse;
 import com.baba.back.content.exception.ContentAuthorizationException;
 import com.baba.back.content.repository.ContentRepository;
@@ -48,7 +48,7 @@ class ContentServiceTest {
     private RelationRepository relationRepository;
 
     @Mock
-    private ImageSaver imageSaver;
+    private FileHandler fileHandler;
 
     @InjectMocks
     private ContentService contentService;
@@ -104,7 +104,7 @@ class ContentServiceTest {
         given(memberRepository.findById(any())).willReturn(Optional.of(멤버1));
         given(babyRepository.findById(any())).willReturn(Optional.of(아기1));
         given(relationRepository.findByMemberAndBaby(any(), any())).willReturn(Optional.of(관계1));
-        given(imageSaver.save(any())).willReturn("VALID_IMAGE_SOURCE");
+        given(fileHandler.upload(any())).willReturn("VALID_IMAGE_SOURCE");
 
         // when
         final CreateContentResponse response = contentService.createContent(컨텐츠_생성_요청, MEMBER_ID, BABY_ID);

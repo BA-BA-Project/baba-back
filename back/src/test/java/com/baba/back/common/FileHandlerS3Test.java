@@ -6,6 +6,7 @@ import static org.mockito.BDDMockito.given;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.baba.back.content.domain.ImageFile;
 import com.baba.back.content.exception.FileHandlerServerException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -16,13 +17,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 
 @ExtendWith(MockitoExtension.class)
-class S3HandlerTest {
+class FileHandlerS3Test {
 
     @Mock
     private AmazonS3 amazonS3;
 
     @InjectMocks
-    private S3Handler s3Handler;
+    private FileHandlerS3 fileHandlerS3;
 
     @Test
     void 업로드가_실패하면_예외를_던진다() {
@@ -33,7 +34,7 @@ class S3HandlerTest {
         given(amazonS3.putObject(any(PutObjectRequest.class))).willThrow(AmazonServiceException.class);
 
         // when
-        Assertions.assertThatThrownBy(() -> s3Handler.upload(mockFile))
+        Assertions.assertThatThrownBy(() -> fileHandlerS3.upload(new ImageFile(mockFile)))
                 .isInstanceOf(FileHandlerServerException.class);
 
         // then
