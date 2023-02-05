@@ -52,7 +52,7 @@ class ContentDateTest {
 
     @ParameterizedTest
     @MethodSource("validContentDateAndNowAndBirthday")
-    void contentDate는_now보다_과거이고_birthday의_2년이내이다(LocalDate contentDate, LocalDate now, LocalDate baseDate) {
+    void contentDate는_now와_같거나_과거이고_birthday의_2년이내이다(LocalDate contentDate, LocalDate now, LocalDate baseDate) {
         assertThatCode(() -> ContentDate.of(contentDate, now, baseDate))
                 .doesNotThrowAnyException();
     }

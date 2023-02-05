@@ -26,7 +26,7 @@ class FileHandlerS3Test {
     private FileHandlerS3 fileHandlerS3;
 
     @Test
-    void 업로드가_실패하면_예외를_던진다() {
+    void AWS_자체_오류로_업로드가_실패하면_예외를_던진다() {
         // given
         final MockMultipartFile mockFile = new MockMultipartFile("photo", "test_file.png", "image/png",
                 "Spring Framework".getBytes());

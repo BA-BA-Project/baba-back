@@ -63,14 +63,16 @@ public class ContentAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    void 요청_body에_잘못된_값이_있으면_400을_던진다() {
+    void 요청_body에_null값이_있으면_400을_던진다() {
         // given
         final String token = tokenProvider.createToken(멤버1.getId());
 
         // when
         final ExtractableResponse<Response> response = RestAssured.given()
                 .headers(Map.of("Authorization", "Bearer " + token))
-                .multiPart("photo", "origin.txt", "Something".getBytes(), "multipart/form-data")
+                .multiPart("photo", "test_file.jpg", "Something".getBytes(), MediaType.IMAGE_PNG_VALUE)
+                .multiPart("date", LocalDate.of(2023, 1, 25).toString())
+                .multiPart("cardStyle", "card_basic_1")
                 .when()
                 .post(Paths.get(BASE_PATH, 아기1.getId()).toString())
                 .then()
@@ -82,15 +84,15 @@ public class ContentAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    void S3에_파일_업로드_실패시_500을_던진다() {
+    void AWS_자체_오류로_S3에_파일_업로드_실패시_500을_던진다() {
         // given
         final String token = tokenProvider.createToken(멤버1.getId());
-
-        given(amazonS3.putObject(any())).willThrow(AmazonServiceException.class);
 
         memberRepository.save(멤버1);
         babyRepository.save(아기1);
         relationRepository.save(관계1);
+
+        given(amazonS3.putObject(any())).willThrow(AmazonServiceException.class);
 
         // when
         final ExtractableResponse<Response> response = RestAssured.given()
