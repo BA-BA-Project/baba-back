@@ -36,7 +36,6 @@ public class ContentService {
         final Member member = findMember(memberId);
         final Baby baby = findBaby(babyId);
         final Relation relation = findRelation(member, baby);
-
         checkAuthorization(relation);
 
         final Content content = Content.builder()
@@ -46,12 +45,9 @@ public class ContentService {
                 .cardStyle(request.getCardStyle())
                 .baby(baby)
                 .build();
-
         final ImageFile imageFile = new ImageFile(request.getPhoto());
         final String imageSource = fileHandler.upload(imageFile);
-
         content.updateURL(imageSource);
-
         contentRepository.save(content);
 
         return new CreateContentResponse(true);
