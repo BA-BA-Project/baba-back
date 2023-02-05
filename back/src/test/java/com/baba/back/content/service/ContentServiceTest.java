@@ -56,7 +56,7 @@ class ContentServiceTest {
     private ContentService contentService;
 
     @Test
-    void 멤버가_존재하지_않으면_예가외를_던진다() {
+    void 멤버가_존재하지_않으면_예외를_던진다() {
         // given
         given(memberRepository.findById(any())).willReturn(Optional.empty());
 
