@@ -1,6 +1,7 @@
 package com.baba.back.content.domain.content;
 
 import static com.baba.back.fixture.DomainFixture.아기1;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.baba.back.baby.domain.Baby;
 import java.time.LocalDate;
@@ -56,6 +57,10 @@ class ContentTest {
         content.updateURL(IMAGE_SOURCE);
 
         // then
-        Assertions.assertThat(content.getImageSource()).isEqualTo(IMAGE_SOURCE);
+        assertThat(content)
+                .extracting(Content::getImageSource)
+                .isNotNull()
+                .extracting(ImageSource::getImageSource)
+                .isEqualTo(IMAGE_SOURCE);
     }
 }
