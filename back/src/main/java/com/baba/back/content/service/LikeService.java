@@ -5,7 +5,7 @@ import com.baba.back.baby.exception.BabyNotFoundException;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.content.domain.Like;
 import com.baba.back.content.domain.content.Content;
-import com.baba.back.content.dto.CreateLikeResponse;
+import com.baba.back.content.dto.AddLikeResponse;
 import com.baba.back.content.exception.ContentNotFountException;
 import com.baba.back.content.repository.ContentRepository;
 import com.baba.back.content.repository.LikeRepository;
@@ -29,18 +29,19 @@ public class LikeService {
     private final ContentRepository contentRepository;
     private final LikeRepository likeRepository;
 
-    public CreateLikeResponse addLike(String memberId, String babyId, Long contentId) {
+    public AddLikeResponse addLike(String memberId, String babyId, Long contentId) {
         final Member member = findMember(memberId);
         final Baby baby = findBaby(babyId);
         validateRelation(member, baby);
         final Content content = findContent(contentId);
 
-        likeRepository.save(Like.builder()
+        final Like like = Like.builder()
                 .member(member)
                 .content(content)
-                .build());
+                .build();
+        likeRepository.save(like);
 
-        return new CreateLikeResponse(true);
+        return new AddLikeResponse(true);
     }
 
     private Member findMember(String memberId) {

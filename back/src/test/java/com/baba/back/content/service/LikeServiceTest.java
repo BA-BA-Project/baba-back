@@ -13,7 +13,7 @@ import static org.mockito.Mockito.times;
 
 import com.baba.back.baby.exception.BabyNotFoundException;
 import com.baba.back.baby.repository.BabyRepository;
-import com.baba.back.content.dto.CreateLikeResponse;
+import com.baba.back.content.dto.AddLikeResponse;
 import com.baba.back.content.exception.ContentNotFountException;
 import com.baba.back.content.repository.ContentRepository;
 import com.baba.back.content.repository.LikeRepository;
@@ -104,11 +104,11 @@ class LikeServiceTest {
         given(contentRepository.findById(any())).willReturn(Optional.of(컨텐츠));
 
         // when
-        final CreateLikeResponse createLikeResponse = likeService.addLike(멤버1.getId(), 아기1.getId(), 컨텐츠.getId());
+        final AddLikeResponse addLikeResponse = likeService.addLike(멤버1.getId(), 아기1.getId(), 컨텐츠.getId());
 
         // then
         then(likeRepository).should(times(1)).save(any());
 
-        assertThat(createLikeResponse.like()).isTrue();
+        assertThat(addLikeResponse.liked()).isTrue();
     }
 }

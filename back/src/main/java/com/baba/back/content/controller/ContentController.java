@@ -1,8 +1,10 @@
 package com.baba.back.content.controller;
 
+import com.baba.back.content.dto.AddLikeResponse;
 import com.baba.back.content.dto.CreateContentRequest;
 import com.baba.back.content.dto.CreateContentResponse;
 import com.baba.back.content.service.ContentService;
+import com.baba.back.content.service.LikeService;
 import com.baba.back.oauth.support.Login;
 import com.baba.back.swagger.BadRequestResponse;
 import com.baba.back.swagger.CreatedResponse;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ContentController {
 
     private final ContentService contentService;
+    private final LikeService likeService;
 
     @Operation(summary = "컨텐츠 생성 요청")
     @CreatedResponse
@@ -40,5 +43,16 @@ public class ContentController {
                                                                @Login String memberId,
                                                                @PathVariable("babyId") String babyId) {
         return ResponseEntity.status(HttpStatus.CREATED).body(contentService.createContent(request, memberId, babyId));
+    }
+
+    @Operation(summary = "좋아요 추가 요청")
+    @CreatedResponse
+    @BadRequestResponse
+    @UnAuthorizedResponse
+    @NotFoundResponse
+    @PostMapping("/album/{babyId}/{contentId}/like")
+    public ResponseEntity<AddLikeResponse> addLike(@Login String memberId, @PathVariable("babyId") String babyId,
+                                                   @PathVariable("contentId") Long contentId) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(likeService.addLike(memberId, babyId, contentId));
     }
 }
