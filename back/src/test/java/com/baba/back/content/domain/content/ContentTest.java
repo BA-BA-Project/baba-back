@@ -13,7 +13,6 @@ class ContentTest {
     public static final LocalDate NOW = LocalDate.of(2023, 1, 27);
     public static final LocalDate BIRTHDAY = LocalDate.of(2023, 2, 28);
     public static final String CARD_STYLE = "card_basic_1";
-    public static final String IMAGE_SOURCE = "/url/";
     public static final String BABY_ID = UUID.randomUUID().toString();
     public static final String BABY_NAME = "앙쥬";
 
@@ -34,7 +33,6 @@ class ContentTest {
                 .contentDate(CONTENT_DATE)
                 .now(NOW)
                 .cardStyle(CARD_STYLE)
-                .imageSource(IMAGE_SOURCE)
                 .baby(baby)
                 .build();
 

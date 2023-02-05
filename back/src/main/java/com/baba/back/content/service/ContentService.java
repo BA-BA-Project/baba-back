@@ -44,7 +44,6 @@ public class ContentService {
                 .contentDate(request.getDate())
                 .now(LocalDate.now())
                 .cardStyle(request.getCardStyle())
-                .imageSource("")
                 .baby(baby)
                 .build();
 
