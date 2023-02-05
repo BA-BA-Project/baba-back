@@ -5,13 +5,14 @@ import com.baba.back.exception.AuthenticationException;
 import com.baba.back.exception.AuthorizationException;
 import com.baba.back.exception.BadRequestException;
 import com.baba.back.exception.NotFoundException;
+import com.baba.back.exception.ServerException;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -44,8 +45,14 @@ public class ControllerAdvice {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ExceptionResponse("요청한 리소스를 찾을 수 없습니다."));
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ExceptionResponse> handleValidationExceptions(MethodArgumentNotValidException exception) {
+    @ExceptionHandler(ServerException.class)
+    public ResponseEntity<ExceptionResponse> handleServerException(ServerException exception) {
+        logger.warn(exception.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ExceptionResponse("처리할 수 없는 예외입니다."));
+    }
+
+    @ExceptionHandler(BindException.class)
+    public ResponseEntity<ExceptionResponse> handleBindingExceptions(BindException exception) {
         final String message = exception.getBindingResult()
                 .getAllErrors()
                 .stream()

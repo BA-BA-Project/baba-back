@@ -52,7 +52,11 @@ public class Relation {
         this.defaultRelation = defaultRelation;
     }
 
-    public String getBabyId() {
+    public String searchBabyId() {
         return baby.getId();
+    }
+
+    public boolean isFamily() {
+        return relationGroup.isFamily();
     }
 }

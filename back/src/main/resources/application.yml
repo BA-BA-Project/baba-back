@@ -24,3 +24,13 @@ spring:
       hibernate:
         show_sql: true
         format_sql: true
+
+cloud:
+  aws:
+    credentials:
+      accessKey: ${AWS_ACCESS_KEY}
+      secretKey: ${AWS_SECRET_ACCESS_KEY}
+    s3:
+      bucket: ${AWS_BUCKET_NAME}
+    region:
+      static: ap-northeast-2
