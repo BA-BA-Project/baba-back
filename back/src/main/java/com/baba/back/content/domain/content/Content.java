@@ -52,4 +52,8 @@ public class Content {
     public void updateURL(String imageSource) {
         this.imageSource = new ImageSource(imageSource);
     }
+
+    public String getImageSource() {
+        return imageSource.getImageSource();
+    }
 }

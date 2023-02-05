@@ -1,5 +1,7 @@
 package com.baba.back.content.domain.content;
 
+import static com.baba.back.fixture.DomainFixture.아기1;
+
 import com.baba.back.baby.domain.Baby;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -15,6 +17,7 @@ class ContentTest {
     public static final String CARD_STYLE = "card_basic_1";
     public static final String BABY_ID = UUID.randomUUID().toString();
     public static final String BABY_NAME = "앙쥬";
+    public static final String IMAGE_SOURCE = "1234";
 
 
     @Test
@@ -38,5 +41,23 @@ class ContentTest {
 
         // then
         Assertions.assertThat(content.hasEqualBaby(baby)).isTrue();
+    }
+
+    @Test
+    void 이미지가_저장된_url을_변경한다() {
+        // given
+        Content content = Content.builder()
+                .title(TITLE)
+                .contentDate(CONTENT_DATE)
+                .now(NOW)
+                .cardStyle(CARD_STYLE)
+                .baby(아기1)
+                .build();
+
+        // when
+        content.updateURL(IMAGE_SOURCE);
+
+        // then
+        Assertions.assertThat(content.getImageSource()).isEqualTo(IMAGE_SOURCE);
     }
 }
