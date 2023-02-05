@@ -8,6 +8,8 @@ import static com.baba.back.fixture.RequestFixture.컨텐츠_생성_요청;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.times;
 
 import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.exception.BabyNotFoundException;
@@ -54,7 +56,7 @@ class ContentServiceTest {
     private ContentService contentService;
 
     @Test
-    void 멤버가_존재하지_않으면_예외를_던진다() {
+    void 멤버가_존재하지_않으면_예가외를_던진다() {
         // given
         given(memberRepository.findById(any())).willReturn(Optional.empty());
 
@@ -110,6 +112,7 @@ class ContentServiceTest {
         final CreateContentResponse response = contentService.createContent(컨텐츠_생성_요청, MEMBER_ID, BABY_ID);
 
         // then
+        then(contentRepository).should(times(1)).save(any());
         assertThat(response.success()).isTrue();
     }
 }
