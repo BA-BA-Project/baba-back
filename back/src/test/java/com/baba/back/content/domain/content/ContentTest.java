@@ -21,7 +21,7 @@ class ContentTest {
 
 
     @Test
-    void 컨텐츠를_생성한다() {
+    void 컨텐츠를_생성해야_한다() {
         // given
         Baby baby = Baby.builder()
                 .id(BABY_ID)
@@ -30,17 +30,15 @@ class ContentTest {
                 .now(NOW)
                 .build();
 
-        // when
-        Content content = Content.builder()
-                .title(TITLE)
-                .contentDate(CONTENT_DATE)
-                .now(NOW)
-                .cardStyle(CARD_STYLE)
-                .baby(baby)
-                .build();
-
-        // then
-        Assertions.assertThat(content.hasEqualBaby(baby)).isTrue();
+        // when & then
+        Assertions.assertThatCode(() -> Content.builder()
+                        .title(TITLE)
+                        .contentDate(CONTENT_DATE)
+                        .now(NOW)
+                        .cardStyle(CARD_STYLE)
+                        .baby(baby)
+                        .build())
+                .doesNotThrowAnyException();
     }
 
     @Test

@@ -45,10 +45,6 @@ public class Content {
         this.baby = baby;
     }
 
-    public Boolean hasEqualBaby(Baby baby) {
-        return this.baby.getId().equals(baby.getId());
-    }
-
     public void updateURL(String imageSource) {
         this.imageSource = new ImageSource(imageSource);
     }
