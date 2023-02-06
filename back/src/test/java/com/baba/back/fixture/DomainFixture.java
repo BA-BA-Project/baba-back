@@ -53,7 +53,6 @@ public class DomainFixture {
             .contentDate(LocalDate.now())
             .now(LocalDate.now())
             .cardStyle("card_basic_1")
-            .imageSource("")
             .baby(아기1)
             .build();
 

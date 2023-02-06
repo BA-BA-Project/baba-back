@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,7 +39,7 @@ public class ContentController {
     @ForbiddenResponse
     @NotFoundResponse
     @IntervalServerErrorResponse
-    @PostMapping("/album/{babyId}")
+    @PostMapping(value = "/album/{babyId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CreateContentResponse> createContent(@ModelAttribute @Valid CreateContentRequest request,
                                                                @Login String memberId,
                                                                @PathVariable("babyId") String babyId) {

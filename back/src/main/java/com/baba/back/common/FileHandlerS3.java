@@ -33,8 +33,8 @@ public class FileHandlerS3 implements FileHandler {
 
         try (InputStream inputStream = file.getInputStream()) {
             amazonS3.putObject(
-                    new PutObjectRequest(bucketName, key, inputStream, objectMetadata).withCannedAcl(
-                            CannedAccessControlList.PublicRead));
+                    new PutObjectRequest(bucketName, key, inputStream, objectMetadata)
+                            .withCannedAcl(CannedAccessControlList.PublicRead));
         } catch (Exception e) {
             throw new FileHandlerServerException("파일 업로드에 실패하였습니다.");
         }

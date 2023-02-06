@@ -37,17 +37,12 @@ public class Content {
     private Baby baby;
 
     @Builder
-    public Content(String title, LocalDate contentDate, LocalDate now, String cardStyle,
-                   String imageSource, Baby baby) {
+    public Content(String title, LocalDate contentDate, LocalDate now, String cardStyle, Baby baby) {
         this.title = new Title(title);
         this.contentDate = ContentDate.of(contentDate, now, baby.getBirthday());
         this.cardStyle = new CardStyle(cardStyle);
-        this.imageSource = new ImageSource(imageSource);
+        this.imageSource = new ImageSource("");
         this.baby = baby;
-    }
-
-    public Boolean hasEqualBaby(Baby baby) {
-        return this.baby.getId().equals(baby.getId());
     }
 
     public void updateURL(String imageSource) {
