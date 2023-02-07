@@ -51,6 +51,7 @@ public class ContentController {
     @BadRequestResponse
     @UnAuthorizedResponse
     @NotFoundResponse
+    @IntervalServerErrorResponse
     @PostMapping("/album/{babyId}/{contentId}/like")
     public ResponseEntity<AddLikeResponse> addLike(@Login String memberId, @PathVariable("babyId") String babyId,
                                                    @PathVariable("contentId") Long contentId) {
