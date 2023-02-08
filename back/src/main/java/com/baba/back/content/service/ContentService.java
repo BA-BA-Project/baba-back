@@ -3,6 +3,7 @@ package com.baba.back.content.service;
 import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.exception.BabyNotFoundException;
 import com.baba.back.baby.repository.BabyRepository;
+import com.baba.back.common.domain.BaseEntity;
 import com.baba.back.content.domain.FileHandler;
 import com.baba.back.content.domain.ImageFile;
 import com.baba.back.content.domain.Like;
@@ -86,23 +87,25 @@ public class ContentService {
         final Baby baby = findBaby(babyId);
         findRelation(member, baby);
         final Content content = findContent(contentId);
+        final Like like = findAndUpdateLike(member, content);
 
-        final Optional<Like> existLike = likeRepository.findByMemberAndContent(member, content);
-        if (existLike.isPresent()) {
-            likeRepository.delete(existLike.get());
-            return new LikeContentResponse(false);
-        }
+        likeRepository.save(like);
 
-        likeRepository.save(Like.builder()
-                .member(member)
-                .content(content)
-                .build());
-
-        return new LikeContentResponse(true);
+        return new LikeContentResponse(!like.isDeleted());
     }
 
     private Content findContent(Long contentId) {
         return contentRepository.findById(contentId)
                 .orElseThrow(() -> new ContentNotFountException(contentId + " 는 존재하지 않는 컨텐츠입니다."));
+    }
+
+    private Like findAndUpdateLike(Member member, Content content) {
+        final Optional<Like> like = likeRepository.findByMemberAndContent(member, content);
+        like.ifPresent(BaseEntity::updateDeleted);
+
+        return like.orElseGet(() -> Like.builder()
+                .member(member)
+                .content(content)
+                .build());
     }
 }

@@ -18,8 +18,8 @@ import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.exception.BabyNotFoundException;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.content.domain.FileHandler;
-import com.baba.back.content.dto.LikeContentResponse;
 import com.baba.back.content.dto.CreateContentResponse;
+import com.baba.back.content.dto.LikeContentResponse;
 import com.baba.back.content.exception.ContentAuthorizationException;
 import com.baba.back.content.exception.ContentNotFountException;
 import com.baba.back.content.repository.ContentRepository;
@@ -172,7 +172,26 @@ class ContentServiceTest {
     }
 
     @Test
-    void 이미_좋아요가_있을때_좋아요를_추가하면_기존의_좋아요가_삭제된다() {
+    void 좋아요가_추가된다() {
+        // given
+        given(memberRepository.findById(any())).willReturn(Optional.of(멤버1));
+        given(babyRepository.findById(any())).willReturn(Optional.of(아기1));
+        given(relationRepository.findByMemberAndBaby(any(), any())).willReturn(Optional.of(관계1));
+        given(contentRepository.findById(any())).willReturn(Optional.of(컨텐츠));
+        given(likeRepository.findByMemberAndContent(any(), any())).willReturn(Optional.empty());
+
+        // when
+        final LikeContentResponse likeContentResponse = contentService.likeContent(멤버1.getId(), 아기1.getId(),
+                컨텐츠.getId());
+
+        // then
+        then(likeRepository).should(times(1)).save(any());
+
+        assertThat(likeContentResponse.liked()).isTrue();
+    }
+
+    @Test
+    void 이미_좋아요가_있을때_좋아요를_누르면_기존의_좋아요가_취소된다() {
         // given
         given(memberRepository.findById(any())).willReturn(Optional.of(멤버1));
         given(babyRepository.findById(any())).willReturn(Optional.of(아기1));
@@ -181,27 +200,31 @@ class ContentServiceTest {
         given(likeRepository.findByMemberAndContent(any(), any())).willReturn(Optional.of(좋아요));
 
         // when
-        final LikeContentResponse likeContentResponse = contentService.likeContent(멤버1.getId(), 아기1.getId(), 컨텐츠.getId());
+        final LikeContentResponse likeContentResponse = contentService.likeContent(멤버1.getId(), 아기1.getId(),
+                컨텐츠.getId());
 
         // then
-        then(likeRepository).should(times(1)).delete(any());
+        then(likeRepository).should(times(1)).save(any());
 
         assertThat(likeContentResponse.liked()).isFalse();
     }
 
     @Test
-    void 좋아요가_추가된다() {
+    void 좋아요를_취소하고_다시_좋아요를_누르면_deleted만_변경된다() {
         // given
         given(memberRepository.findById(any())).willReturn(Optional.of(멤버1));
         given(babyRepository.findById(any())).willReturn(Optional.of(아기1));
         given(relationRepository.findByMemberAndBaby(any(), any())).willReturn(Optional.of(관계1));
         given(contentRepository.findById(any())).willReturn(Optional.of(컨텐츠));
+        given(likeRepository.findByMemberAndContent(any(), any())).willReturn(Optional.of(좋아요));
 
         // when
-        final LikeContentResponse likeContentResponse = contentService.likeContent(멤버1.getId(), 아기1.getId(), 컨텐츠.getId());
+        contentService.likeContent(멤버1.getId(), 아기1.getId(), 컨텐츠.getId());
+        final LikeContentResponse likeContentResponse = contentService.likeContent(멤버1.getId(), 아기1.getId(),
+                컨텐츠.getId());
 
         // then
-        then(likeRepository).should(times(1)).save(any());
+        then(likeRepository).should(times(2)).save(any());
 
         assertThat(likeContentResponse.liked()).isTrue();
     }
