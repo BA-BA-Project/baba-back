@@ -18,7 +18,6 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.Map;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,13 +37,6 @@ public class BabyAcceptanceTest extends AcceptanceTest {
 
     @Autowired
     private RelationRepository relationRepository;
-
-    @AfterEach
-    void 초기화() {
-        relationRepository.deleteAll();
-        memberRepository.deleteAll();
-        babyRepository.deleteAll();
-    }
 
     @Test
     void 기본_설정된_아기가_없으면_404를_던진다() {

@@ -51,8 +51,8 @@ public class ContentController {
     @NotFoundResponse
     @IntervalServerErrorResponse
     @PostMapping("/album/{babyId}/{contentId}/like")
-    public ResponseEntity<LikeContentResponse> addLike(@Login String memberId, @PathVariable("babyId") String babyId,
-                                                       @PathVariable("contentId") Long contentId) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(contentService.likeContent(memberId, babyId, contentId));
+    public ResponseEntity<LikeContentResponse> likeContent(@Login String memberId, @PathVariable("babyId") String babyId,
+                                                           @PathVariable("contentId") Long contentId) {
+        return ResponseEntity.status(HttpStatus.OK).body(contentService.likeContent(memberId, babyId, contentId));
     }
 }

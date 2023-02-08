@@ -26,7 +26,6 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Map;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -58,15 +57,6 @@ public class ContentAcceptanceTest extends AcceptanceTest {
 
     @MockBean
     private AmazonS3 amazonS3;
-
-    @AfterEach
-    void tearDown() {
-        likeRepository.deleteAll();
-        contentRepository.deleteAll();
-        relationRepository.deleteAll();
-        babyRepository.deleteAll();
-        memberRepository.deleteAll();
-    }
 
     @Test
     void 요청_body에_null값이_있으면_400을_던진다() {
