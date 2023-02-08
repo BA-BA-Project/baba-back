@@ -1,6 +1,7 @@
 package com.baba.back.fixture;
 
 import com.baba.back.baby.domain.Baby;
+import com.baba.back.content.domain.Like;
 import com.baba.back.content.domain.content.Content;
 import com.baba.back.oauth.domain.JoinedMember;
 import com.baba.back.oauth.domain.member.Member;
@@ -54,6 +55,11 @@ public class DomainFixture {
             .now(LocalDate.now())
             .cardStyle("card_basic_1")
             .baby(아기1)
+            .build();
+
+    public static final Like 좋아요 = Like.builder()
+            .member(멤버1)
+            .content(컨텐츠)
             .build();
 
     public static final JoinedMember 회원가입_안한_유저1 = new JoinedMember(멤버1.getId(), false);

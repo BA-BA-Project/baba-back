@@ -5,11 +5,15 @@ import com.baba.back.baby.exception.BabyNotFoundException;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.content.domain.FileHandler;
 import com.baba.back.content.domain.ImageFile;
+import com.baba.back.content.domain.Like;
 import com.baba.back.content.domain.content.Content;
 import com.baba.back.content.dto.CreateContentRequest;
 import com.baba.back.content.dto.CreateContentResponse;
+import com.baba.back.content.dto.LikeContentResponse;
 import com.baba.back.content.exception.ContentAuthorizationException;
+import com.baba.back.content.exception.ContentNotFountException;
 import com.baba.back.content.repository.ContentRepository;
+import com.baba.back.content.repository.LikeRepository;
 import com.baba.back.oauth.domain.member.Member;
 import com.baba.back.oauth.exception.MemberNotFoundException;
 import com.baba.back.oauth.repository.MemberRepository;
@@ -17,6 +21,7 @@ import com.baba.back.relation.domain.Relation;
 import com.baba.back.relation.exception.RelationNotFoundException;
 import com.baba.back.relation.repository.RelationRepository;
 import java.time.LocalDate;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +35,7 @@ public class ContentService {
     private final MemberRepository memberRepository;
     private final BabyRepository babyRepository;
     private final RelationRepository relationRepository;
+    private final LikeRepository likeRepository;
     private final FileHandler fileHandler;
 
     public CreateContentResponse createContent(CreateContentRequest request, String memberId, String babyId) {
@@ -73,5 +79,30 @@ public class ContentService {
         if (!relation.isFamily()) {
             throw new ContentAuthorizationException(relation.getId() + " 관계는 가족 관계가 아닙니다.");
         }
+    }
+
+    public LikeContentResponse likeContent(String memberId, String babyId, Long contentId) {
+        final Member member = findMember(memberId);
+        final Baby baby = findBaby(babyId);
+        findRelation(member, baby);
+        final Content content = findContent(contentId);
+
+        final Optional<Like> existLike = likeRepository.findByMemberAndContent(member, content);
+        if (existLike.isPresent()) {
+            likeRepository.delete(existLike.get());
+            return new LikeContentResponse(false);
+        }
+
+        likeRepository.save(Like.builder()
+                .member(member)
+                .content(content)
+                .build());
+
+        return new LikeContentResponse(true);
+    }
+
+    private Content findContent(Long contentId) {
+        return contentRepository.findById(contentId)
+                .orElseThrow(() -> new ContentNotFountException(contentId + " 는 존재하지 않는 컨텐츠입니다."));
     }
 }

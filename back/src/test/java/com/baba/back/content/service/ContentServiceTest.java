@@ -4,8 +4,11 @@ import static com.baba.back.fixture.DomainFixture.관계1;
 import static com.baba.back.fixture.DomainFixture.관계2;
 import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.DomainFixture.아기1;
+import static com.baba.back.fixture.DomainFixture.좋아요;
+import static com.baba.back.fixture.DomainFixture.컨텐츠;
 import static com.baba.back.fixture.RequestFixture.컨텐츠_생성_요청;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -15,9 +18,12 @@ import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.exception.BabyNotFoundException;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.content.domain.FileHandler;
+import com.baba.back.content.dto.LikeContentResponse;
 import com.baba.back.content.dto.CreateContentResponse;
 import com.baba.back.content.exception.ContentAuthorizationException;
+import com.baba.back.content.exception.ContentNotFountException;
 import com.baba.back.content.repository.ContentRepository;
+import com.baba.back.content.repository.LikeRepository;
 import com.baba.back.oauth.domain.member.Member;
 import com.baba.back.oauth.exception.MemberNotFoundException;
 import com.baba.back.oauth.repository.MemberRepository;
@@ -48,6 +54,9 @@ class ContentServiceTest {
 
     @Mock
     private RelationRepository relationRepository;
+
+    @Mock
+    private LikeRepository likeRepository;
 
     @Mock
     private FileHandler fileHandler;
@@ -114,5 +123,86 @@ class ContentServiceTest {
         // then
         then(contentRepository).should(times(1)).save(any());
         assertThat(response.success()).isTrue();
+    }
+
+    @Test
+    void 멤버가_없으면_예외를_던진다() {
+        // given
+        given(memberRepository.findById(any())).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> contentService.likeContent(멤버1.getId(), 아기1.getId(), 컨텐츠.getId()))
+                .isInstanceOf(MemberNotFoundException.class);
+    }
+
+    @Test
+    void 아기가_없으면_예외를_던진다() {
+        // given
+        given(memberRepository.findById(any())).willReturn(Optional.of(멤버1));
+        given(babyRepository.findById(any())).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> contentService.likeContent(멤버1.getId(), 아기1.getId(), 컨텐츠.getId()))
+                .isInstanceOf(BabyNotFoundException.class);
+    }
+
+    @Test
+    void 관계가_없으면_예외를_던진다() {
+        // given
+        given(memberRepository.findById(any())).willReturn(Optional.of(멤버1));
+        given(babyRepository.findById(any())).willReturn(Optional.of(아기1));
+        given(relationRepository.findByMemberAndBaby(any(), any())).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> contentService.likeContent(멤버1.getId(), 아기1.getId(), 컨텐츠.getId()))
+                .isInstanceOf(RelationNotFoundException.class);
+    }
+
+    @Test
+    void 컨텐츠가_없으면_예외를_던진다() {
+        // given
+        given(memberRepository.findById(any())).willReturn(Optional.of(멤버1));
+        given(babyRepository.findById(any())).willReturn(Optional.of(아기1));
+        given(relationRepository.findByMemberAndBaby(any(), any())).willReturn(Optional.of(관계1));
+        given(contentRepository.findById(any())).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> contentService.likeContent(멤버1.getId(), 아기1.getId(), 컨텐츠.getId()))
+                .isInstanceOf(ContentNotFountException.class);
+    }
+
+    @Test
+    void 이미_좋아요가_있을때_좋아요를_추가하면_기존의_좋아요가_삭제된다() {
+        // given
+        given(memberRepository.findById(any())).willReturn(Optional.of(멤버1));
+        given(babyRepository.findById(any())).willReturn(Optional.of(아기1));
+        given(relationRepository.findByMemberAndBaby(any(), any())).willReturn(Optional.of(관계1));
+        given(contentRepository.findById(any())).willReturn(Optional.of(컨텐츠));
+        given(likeRepository.findByMemberAndContent(any(), any())).willReturn(Optional.of(좋아요));
+
+        // when
+        final LikeContentResponse likeContentResponse = contentService.likeContent(멤버1.getId(), 아기1.getId(), 컨텐츠.getId());
+
+        // then
+        then(likeRepository).should(times(1)).delete(any());
+
+        assertThat(likeContentResponse.liked()).isFalse();
+    }
+
+    @Test
+    void 좋아요가_추가된다() {
+        // given
+        given(memberRepository.findById(any())).willReturn(Optional.of(멤버1));
+        given(babyRepository.findById(any())).willReturn(Optional.of(아기1));
+        given(relationRepository.findByMemberAndBaby(any(), any())).willReturn(Optional.of(관계1));
+        given(contentRepository.findById(any())).willReturn(Optional.of(컨텐츠));
+
+        // when
+        final LikeContentResponse likeContentResponse = contentService.likeContent(멤버1.getId(), 아기1.getId(), 컨텐츠.getId());
+
+        // then
+        then(likeRepository).should(times(1)).save(any());
+
+        assertThat(likeContentResponse.liked()).isTrue();
     }
 }
