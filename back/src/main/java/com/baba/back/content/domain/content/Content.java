@@ -1,7 +1,6 @@
 package com.baba.back.content.domain.content;
 
 import com.baba.back.baby.domain.Baby;
-import com.baba.back.common.domain.BaseEntity;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -17,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Content extends BaseEntity {
+public class Content {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

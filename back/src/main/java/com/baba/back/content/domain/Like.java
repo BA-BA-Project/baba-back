@@ -1,5 +1,6 @@
 package com.baba.back.content.domain;
 
+import com.baba.back.common.domain.BaseEntity;
 import com.baba.back.content.domain.content.Content;
 import com.baba.back.oauth.domain.member.Member;
 import jakarta.persistence.Entity;
@@ -17,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @Table(name = "LIKE_TABLE")
-public class Like {
+public class Like extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
