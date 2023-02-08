@@ -1,13 +1,9 @@
-name : push cd
+name : build and deploy
 
 on:
   push:
     branches:
       - main
-
-env:
-  AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     
 jobs:
   build:
@@ -15,14 +11,17 @@ jobs:
     
     steps:
       - uses: actions/checkout@v3
+      
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
+          
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
         working-directory: ./back
+        
       - name: Build with Gradle
         run: ./gradlew build
         working-directory: ./back
@@ -32,25 +31,36 @@ jobs:
           KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
           KAKAO_GRANT_TYPE: ${{ secrets.KAKAO_GRANT_TYPE }}
           KAKAO_REDIRECT_URI: ${{ secrets.KAKAO_REDIRECT_URI }}
-          AWS_ACCESS_KEY: ${{ env.AWS_ACCESS_KEY }}
-          AWS_SECRET_ACCESS_KEY: ${{ env.AWS_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
 
-        - name: Configure AWS credentials
-          uses: aws-actions/configure-aws-credentials@v1
-          with:
-            aws-access-key-id: ${{ env.AWS_ACCESS_KEY }}
-            aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
-            aws-region: ${{ secrets.AWS_REGION }}
-          options:
-            working-directory: ./back
-
-        - name: Upload to S3
-          uses: aws-actions/upload-to-s3@v1
-          with:
-            bucket-name: ${{ secrets.S3_BUILD_BUCKET_NAME }}
-            file-glob: build/libs/*.jar
-            acl: private
-            source-dir: build/libs
-          options:
-            working-directory: ./back 
+      - name: Package build artifacts
+        run: |
+          mkdir build
+          cp build/libs/*.jar build/
+          zip -r build.zip build/
+        working-directory: ./back
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          
+      - name: Upload to S3
+        uses: aws-actions/upload-to-s3@v1
+        with:
+          args: build.zip
+          bucket-name: ${{ secrets.S3_BUILD_BUCKET_NAME }}
+          
+      - name: Deploy with CodeDeploy
+        uses: aws-actions/aws-codedeploy-deployment@v1
+        with:
+          application-name: ${{ secrets.DEPLOY_APP_NAME }}
+          deployment-group: ${{ secrets.DEPLOY_GROUP }}
+          bundle-type: zip
+          s3-bucket: ${{ secrets.S3_BUILD_BUCKET_NAME }}
+          s3-key: build.zip
+          region: ${{ selects.AWS_REGION }}
