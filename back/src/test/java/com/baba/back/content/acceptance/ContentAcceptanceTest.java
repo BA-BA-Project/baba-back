@@ -3,6 +3,7 @@ package com.baba.back.content.acceptance;
 import static com.baba.back.fixture.DomainFixture.관계1;
 import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.DomainFixture.아기1;
+import static com.baba.back.fixture.DomainFixture.컨텐츠;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
@@ -11,8 +12,11 @@ import static org.mockito.BDDMockito.given;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.baba.back.AcceptanceTest;
+import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.repository.BabyRepository;
+import com.baba.back.content.domain.content.Content;
 import com.baba.back.content.repository.ContentRepository;
+import com.baba.back.content.repository.LikeRepository;
 import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.oauth.service.TokenProvider;
 import com.baba.back.relation.repository.RelationRepository;
@@ -24,7 +28,6 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Map;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -51,16 +54,11 @@ public class ContentAcceptanceTest extends AcceptanceTest {
     @Autowired
     private ContentRepository contentRepository;
 
+    @Autowired
+    private LikeRepository likeRepository;
+
     @MockBean
     private AmazonS3 amazonS3;
-
-    @AfterEach
-    void tearDown() {
-        contentRepository.deleteAll();
-        relationRepository.deleteAll();
-        babyRepository.deleteAll();
-        memberRepository.deleteAll();
-    }
 
     @Test
     void 요청_body에_null값이_있으면_400을_던진다() {
@@ -144,4 +142,112 @@ public class ContentAcceptanceTest extends AcceptanceTest {
 
     }
 
+    @Test
+    void 좋아요를_처음_누르면_좋아요가_추가된다() {
+        // given
+        final String token = tokenProvider.createToken(멤버1.getId());
+
+        memberRepository.save(멤버1);
+        final Baby baby = babyRepository.save(아기1);
+        relationRepository.save(관계1);
+        final Content content = contentRepository.save(컨텐츠);
+
+        // when
+        final ExtractableResponse<Response> response = RestAssured.given()
+                .headers(Map.of("Authorization", "Bearer " + token))
+                .when()
+                .post(Paths.get(BASE_PATH, baby.getId(), content.getId().toString(), "like").toString())
+                .then()
+                .log().all()
+                .extract();
+
+        final Boolean isLiked = response.response().jsonPath().get("isLiked");
+
+        // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(isLiked).isTrue()
+        );
+    }
+
+    @Test
+    void 좋아요를_처음_누르고_한번_더_누르면_기존의_좋아요가_취소된다() {
+        // given
+        final String token = tokenProvider.createToken(멤버1.getId());
+
+        memberRepository.save(멤버1);
+        final Baby baby = babyRepository.save(아기1);
+        relationRepository.save(관계1);
+        final Content content = contentRepository.save(컨텐츠);
+
+        // when
+        RestAssured.given()
+                .headers(Map.of("Authorization", "Bearer " + token))
+                .when()
+                .post(Paths.get(BASE_PATH, baby.getId(), content.getId().toString(), "like").toString())
+                .then()
+                .log().all()
+                .extract();
+
+        final ExtractableResponse<Response> response = RestAssured.given()
+                .headers(Map.of("Authorization", "Bearer " + token))
+                .when()
+                .post(Paths.get(BASE_PATH, baby.getId(), content.getId().toString(), "like").toString())
+                .then()
+                .log().all()
+                .extract();
+
+        final Boolean isLiked = response.response().jsonPath().get("isLiked");
+
+        // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(isLiked).isFalse()
+        );
+    }
+
+    @Test
+    void 좋아요를_취소하고_한번_더_누르면_다시_좋아요가_된다() {
+        // given
+        final String token = tokenProvider.createToken(멤버1.getId());
+
+        memberRepository.save(멤버1);
+        final Baby baby = babyRepository.save(아기1);
+        relationRepository.save(관계1);
+        final Content content = contentRepository.save(컨텐츠);
+
+        // when
+        RestAssured.given()
+                .headers(Map.of("Authorization", "Bearer " + token))
+                .when()
+                .post(Paths.get(BASE_PATH, baby.getId(), content.getId().toString(), "like").toString())
+                .then()
+                .log().all()
+                .extract();
+
+        // when
+        RestAssured.given()
+                .headers(Map.of("Authorization", "Bearer " + token))
+                .when()
+                .post(Paths.get(BASE_PATH, baby.getId(), content.getId().toString(), "like").toString())
+                .then()
+                .log().all()
+                .extract();
+
+        final ExtractableResponse<Response> response = RestAssured.given()
+                .headers(Map.of("Authorization", "Bearer " + token))
+                .when()
+                .post(Paths.get(BASE_PATH, baby.getId(), content.getId().toString(), "like").toString())
+                .then()
+                .log().all()
+                .extract();
+
+        final Boolean isLiked = response.response().jsonPath().get("isLiked");
+
+        // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(isLiked).isTrue()
+        );
+    }
 }

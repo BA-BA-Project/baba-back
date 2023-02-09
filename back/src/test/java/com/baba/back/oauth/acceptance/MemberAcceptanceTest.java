@@ -101,6 +101,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     void 이미_가입한_유저가_회원가입을_요청하면_400을_던진다() {
         // given
         final String validToken = tokenProvider.createToken(MEMBER_ID);
+        joinedMemberRepository.save(new JoinedMember(MEMBER_ID, false));
 
         RestAssured.given()
                 .headers(Map.of("Authorization", "Bearer " + validToken))

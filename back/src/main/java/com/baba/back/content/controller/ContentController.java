@@ -1,5 +1,6 @@
 package com.baba.back.content.controller;
 
+import com.baba.back.content.dto.LikeContentResponse;
 import com.baba.back.content.dto.CreateContentRequest;
 import com.baba.back.content.dto.CreateContentResponse;
 import com.baba.back.content.service.ContentService;
@@ -41,5 +42,17 @@ public class ContentController {
                                                                @Login String memberId,
                                                                @PathVariable("babyId") String babyId) {
         return ResponseEntity.status(HttpStatus.CREATED).body(contentService.createContent(request, memberId, babyId));
+    }
+
+    @Operation(summary = "좋아요 추가 요청")
+    @CreatedResponse
+    @BadRequestResponse
+    @UnAuthorizedResponse
+    @NotFoundResponse
+    @IntervalServerErrorResponse
+    @PostMapping("/album/{babyId}/{contentId}/like")
+    public ResponseEntity<LikeContentResponse> likeContent(@Login String memberId, @PathVariable("babyId") String babyId,
+                                                           @PathVariable("contentId") Long contentId) {
+        return ResponseEntity.status(HttpStatus.OK).body(contentService.likeContent(memberId, babyId, contentId));
     }
 }
