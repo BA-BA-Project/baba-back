@@ -12,7 +12,9 @@ import static org.mockito.BDDMockito.given;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.baba.back.AcceptanceTest;
+import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.repository.BabyRepository;
+import com.baba.back.content.domain.content.Content;
 import com.baba.back.content.repository.ContentRepository;
 import com.baba.back.content.repository.LikeRepository;
 import com.baba.back.oauth.repository.MemberRepository;
@@ -141,20 +143,101 @@ public class ContentAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    void 좋아요를_추가한다() {
+    void 좋아요를_처음_누르면_좋아요가_추가된다() {
         // given
         final String token = tokenProvider.createToken(멤버1.getId());
 
         memberRepository.save(멤버1);
-        babyRepository.save(아기1);
+        final Baby baby = babyRepository.save(아기1);
         relationRepository.save(관계1);
-        contentRepository.save(컨텐츠);
+        final Content content = contentRepository.save(컨텐츠);
 
         // when
         final ExtractableResponse<Response> response = RestAssured.given()
                 .headers(Map.of("Authorization", "Bearer " + token))
                 .when()
-                .post(Paths.get(BASE_PATH, 아기1.getId(), 컨텐츠.getId().toString(), "like").toString())
+                .post(Paths.get(BASE_PATH, baby.getId(), content.getId().toString(), "like").toString())
+                .then()
+                .log().all()
+                .extract();
+
+        final Boolean isLiked = response.response().jsonPath().get("isLiked");
+
+        // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(isLiked).isTrue()
+        );
+    }
+
+    @Test
+    void 좋아요를_처음_누르고_한번_더_누르면_기존의_좋아요가_취소된다() {
+        // given
+        final String token = tokenProvider.createToken(멤버1.getId());
+
+        memberRepository.save(멤버1);
+        final Baby baby = babyRepository.save(아기1);
+        relationRepository.save(관계1);
+        final Content content = contentRepository.save(컨텐츠);
+
+        // when
+        RestAssured.given()
+                .headers(Map.of("Authorization", "Bearer " + token))
+                .when()
+                .post(Paths.get(BASE_PATH, baby.getId(), content.getId().toString(), "like").toString())
+                .then()
+                .log().all()
+                .extract();
+
+        final ExtractableResponse<Response> response = RestAssured.given()
+                .headers(Map.of("Authorization", "Bearer " + token))
+                .when()
+                .post(Paths.get(BASE_PATH, baby.getId(), content.getId().toString(), "like").toString())
+                .then()
+                .log().all()
+                .extract();
+
+        final Boolean isLiked = response.response().jsonPath().get("isLiked");
+
+        // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(isLiked).isFalse()
+        );
+    }
+
+    @Test
+    void 좋아요를_취소하고_한번_더_누르면_다시_좋아요가_된다() {
+        // given
+        final String token = tokenProvider.createToken(멤버1.getId());
+
+        memberRepository.save(멤버1);
+        final Baby baby = babyRepository.save(아기1);
+        relationRepository.save(관계1);
+        final Content content = contentRepository.save(컨텐츠);
+
+        // when
+        RestAssured.given()
+                .headers(Map.of("Authorization", "Bearer " + token))
+                .when()
+                .post(Paths.get(BASE_PATH, baby.getId(), content.getId().toString(), "like").toString())
+                .then()
+                .log().all()
+                .extract();
+
+        // when
+        RestAssured.given()
+                .headers(Map.of("Authorization", "Bearer " + token))
+                .when()
+                .post(Paths.get(BASE_PATH, baby.getId(), content.getId().toString(), "like").toString())
+                .then()
+                .log().all()
+                .extract();
+
+        final ExtractableResponse<Response> response = RestAssured.given()
+                .headers(Map.of("Authorization", "Bearer " + token))
+                .when()
+                .post(Paths.get(BASE_PATH, baby.getId(), content.getId().toString(), "like").toString())
                 .then()
                 .log().all()
                 .extract();
