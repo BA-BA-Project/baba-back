@@ -20,9 +20,9 @@ public class BaseEntity {
     @LastModifiedDate
     private LocalDateTime updatedDate;
 
-    private boolean deleted = Boolean.FALSE;
+    private boolean deleted = false;
 
     public void updateDeleted() {
-        deleted = !deleted;
+        this.deleted = !this.deleted;
     }
 }
