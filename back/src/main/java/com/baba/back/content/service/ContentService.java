@@ -3,7 +3,6 @@ package com.baba.back.content.service;
 import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.exception.BabyNotFoundException;
 import com.baba.back.baby.repository.BabyRepository;
-import com.baba.back.common.domain.BaseEntity;
 import com.baba.back.content.domain.FileHandler;
 import com.baba.back.content.domain.ImageFile;
 import com.baba.back.content.domain.Like;
@@ -101,11 +100,12 @@ public class ContentService {
 
     private Like findAndUpdateLike(Member member, Content content) {
         final Optional<Like> like = likeRepository.findByMemberAndContent(member, content);
-        like.ifPresent(BaseEntity::updateDeleted);
+        like.ifPresent(Like::updateDeleted);
 
-        return like.orElseGet(() -> Like.builder()
-                .member(member)
-                .content(content)
-                .build());
+        return like.orElseGet(
+                () -> Like.builder()
+                        .member(member)
+                        .content(content)
+                        .build());
     }
 }
