@@ -1,6 +1,7 @@
 package com.baba.back.content.domain.content;
 
 import com.baba.back.baby.domain.Baby;
+import com.baba.back.oauth.domain.member.Member;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -36,13 +37,17 @@ public class Content {
     @ManyToOne(fetch = FetchType.LAZY)
     private Baby baby;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Member member;
+
     @Builder
-    public Content(String title, LocalDate contentDate, LocalDate now, String cardStyle, Baby baby) {
+    public Content(String title, LocalDate contentDate, LocalDate now, String cardStyle, Baby baby, Member member) {
         this.title = new Title(title);
         this.contentDate = ContentDate.of(contentDate, now, baby.getBirthday());
         this.cardStyle = new CardStyle(cardStyle);
         this.imageSource = new ImageSource("");
         this.baby = baby;
+        this.member = member;
     }
 
     public void updateURL(String imageSource) {
