@@ -21,6 +21,7 @@ import com.baba.back.content.domain.FileHandler;
 import com.baba.back.content.dto.CreateContentResponse;
 import com.baba.back.content.dto.LikeContentResponse;
 import com.baba.back.content.exception.ContentAuthorizationException;
+import com.baba.back.content.exception.ContentBadRequestException;
 import com.baba.back.content.exception.ContentNotFountException;
 import com.baba.back.content.repository.ContentRepository;
 import com.baba.back.content.repository.LikeRepository;
@@ -107,6 +108,19 @@ class ContentServiceTest {
         // when & then
         Assertions.assertThatThrownBy(() -> contentService.createContent(컨텐츠_생성_요청, MEMBER_ID, BABY_ID))
                 .isInstanceOf(ContentAuthorizationException.class);
+    }
+
+    @Test
+    void 해당_날짜에_이미_컨텐츠가_존재하면_예외를_던진다() {
+        // given
+        given(memberRepository.findById(any())).willReturn(Optional.of(멤버1));
+        given(babyRepository.findById(any())).willReturn(Optional.of(아기1));
+        given(relationRepository.findByMemberAndBaby(any(), any())).willReturn(Optional.of(관계1));
+        given(contentRepository.findByContentDateAndBaby(any(), any())).willReturn(Optional.of(컨텐츠));
+
+        // when & then
+        Assertions.assertThatThrownBy(() -> contentService.createContent(컨텐츠_생성_요청, MEMBER_ID, BABY_ID))
+                .isInstanceOf(ContentBadRequestException.class);
     }
 
     @Test
