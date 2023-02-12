@@ -22,8 +22,10 @@ jobs:
         run: chmod +x ./gradlew
         working-directory: ./back
         
-      - name: Build with Gradle
-        run: ./gradlew build
+      - name: Build and Package
+        run: |
+          ./gradlew build
+          zip -qq -r ./$GITHUB_SHA.zip .
         working-directory: ./back
         env:
           JWT_EXPIRE_LENGTH: ${{ secrets.JWT_EXPIRE_LENGTH }}
@@ -33,15 +35,8 @@ jobs:
           KAKAO_REDIRECT_URI: ${{ secrets.KAKAO_REDIRECT_URI }}
           AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
+          AWS_BUCKET_NAME: ${{ secrets.S3_IMAGES_BUCKET_NAME }}
 
-      - name: Package build artifacts
-        run: |
-          mkdir build
-          cp build/libs/*.jar build/
-          zip -r build.zip build/
-        working-directory: ./back
-      
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -49,18 +44,13 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
           
-      - name: Upload to S3
-        uses: aws-actions/upload-to-s3@v1
-        with:
-          args: build.zip
-          bucket-name: ${{ secrets.S3_BUILD_BUCKET_NAME }}
           
-      - name: Deploy with CodeDeploy
-        uses: aws-actions/aws-codedeploy-deployment@v1
-        with:
-          application-name: ${{ secrets.DEPLOY_APP_NAME }}
-          deployment-group: ${{ secrets.DEPLOY_GROUP }}
-          bundle-type: zip
-          s3-bucket: ${{ secrets.S3_BUILD_BUCKET_NAME }}
-          s3-key: build.zip
-          region: ${{ selects.AWS_REGION }}
+      - name: Upload to S3 
+        run: aws s3 cp --region ${{ secrets.AWS_REGION }} ./back/$GITHUB_SHA.zip s3://${{ secrets.S3_BUILD_BUCKET_NAME }}/$GITHUB_SHA.zip
+      
+     
+      - name: Code Deploy 
+        run: aws deploy create-deployment --application-name ${{ secrets.DEPLOY_APP_NAME }}
+          --deployment-config-name CodeDeployDefault.OneAtATime
+          --deployment-group-name ${{ secrets.DEPLOY_GROUP }}
+          --s3-location bucket=${{ secrets.S3_BUILD_BUCKET_NAME }},bundleType=zip,key=$GITHUB_SHA.zip
