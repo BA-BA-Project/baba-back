@@ -6,7 +6,6 @@ import static com.baba.back.fixture.DomainFixture.컨텐츠;
 
 import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.repository.BabyRepository;
-import com.baba.back.content.domain.content.Content;
 import com.baba.back.oauth.repository.MemberRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -26,17 +25,29 @@ class ContentRepositoryTest {
     private ContentRepository contentRepository;
 
     @Test
-    void 날짜와_아기로_컨텐츠를_조회할_수_있다() {
+    void 해당_날짜에_이미_컨텐츠를_추가했다() {
         // given
         memberRepository.save(멤버1);
         final Baby baby = babyRepository.save(아기1);
-        final Content savedContent = contentRepository.save(컨텐츠);
+        contentRepository.save(컨텐츠);
 
         // when
-        final Content foundContent = contentRepository.findByContentDateAndBaby(savedContent.getContentDate(), baby)
-                .orElseThrow();
+        final boolean exists = contentRepository.existsByContentDateAndBaby(컨텐츠.getContentDate(), baby);
 
         // then
-        Assertions.assertThat(foundContent).isEqualTo(savedContent);
+        Assertions.assertThat(exists).isTrue();
+    }
+
+    @Test
+    void 해당_날짜에_아직_컨텐츠가_없다() {
+        // given
+        memberRepository.save(멤버1);
+        final Baby baby = babyRepository.save(아기1);
+
+        // when
+        final boolean exists = contentRepository.existsByContentDateAndBaby(컨텐츠.getContentDate(), baby);
+
+        // then
+        Assertions.assertThat(exists).isFalse();
     }
 }

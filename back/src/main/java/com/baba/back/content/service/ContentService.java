@@ -88,9 +88,9 @@ public class ContentService {
     }
 
     private void checkDuplication(ContentDate contentDate, Baby baby) {
-        contentRepository.findByContentDateAndBaby(contentDate, baby).ifPresent(content -> {
+        if(contentRepository.existsByContentDateAndBaby(contentDate, baby)) {
             throw new ContentBadRequestException("컨텐츠가 이미 존재합니다.");
-        });
+        }
     }
 
     public LikeContentResponse likeContent(String memberId, String babyId, Long contentId) {

@@ -116,7 +116,7 @@ class ContentServiceTest {
         given(memberRepository.findById(any())).willReturn(Optional.of(멤버1));
         given(babyRepository.findById(any())).willReturn(Optional.of(아기1));
         given(relationRepository.findByMemberAndBaby(any(), any())).willReturn(Optional.of(관계1));
-        given(contentRepository.findByContentDateAndBaby(any(), any())).willReturn(Optional.of(컨텐츠));
+        given(contentRepository.existsByContentDateAndBaby(any(), any())).willReturn(true);
 
         // when & then
         Assertions.assertThatThrownBy(() -> contentService.createContent(컨텐츠_생성_요청, MEMBER_ID, BABY_ID))
@@ -129,6 +129,7 @@ class ContentServiceTest {
         given(memberRepository.findById(any())).willReturn(Optional.of(멤버1));
         given(babyRepository.findById(any())).willReturn(Optional.of(아기1));
         given(relationRepository.findByMemberAndBaby(any(), any())).willReturn(Optional.of(관계1));
+        given(contentRepository.existsByContentDateAndBaby(any(), any())).willReturn(false);
         given(fileHandler.upload(any())).willReturn("VALID_IMAGE_SOURCE");
 
         // when
