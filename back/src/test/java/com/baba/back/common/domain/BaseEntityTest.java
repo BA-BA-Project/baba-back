@@ -46,8 +46,8 @@ class BaseEntityTest {
         final Like like = likeRepository.save(new Like(savedMember, savedContent));
 
         // then
-        assertThat(like.getCreatedDate()).isNotNull();
-        assertThat(like.getUpdatedDate()).isNotNull();
+        assertThat(like.getCreatedAt()).isNotNull();
+        assertThat(like.getUpdatedAt()).isNotNull();
     }
 
     @Test
