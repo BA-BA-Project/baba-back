@@ -52,7 +52,7 @@ public class ContentService {
                 .now(LocalDate.now())
                 .cardStyle(request.getCardStyle())
                 .baby(baby)
-                .member(member)
+                .owner(member)
                 .build();
 
         checkDuplication(content.getContentDate(), baby);

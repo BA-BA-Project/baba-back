@@ -55,7 +55,7 @@ public class DomainFixture {
             .now(LocalDate.now())
             .cardStyle("card_basic_1")
             .baby(아기1)
-            .member(멤버1)
+            .owner(멤버1)
             .build();
 
     public static final Like 좋아요 = Like.builder()

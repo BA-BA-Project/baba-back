@@ -38,16 +38,16 @@ public class Content {
     private Baby baby;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Member member;
+    private Member owner;
 
     @Builder
-    public Content(String title, LocalDate contentDate, LocalDate now, String cardStyle, Baby baby, Member member) {
+    public Content(String title, LocalDate contentDate, LocalDate now, String cardStyle, Baby baby, Member owner) {
         this.title = new Title(title);
         this.contentDate = ContentDate.of(contentDate, now, baby.getBirthday());
         this.cardStyle = new CardStyle(cardStyle);
         this.imageSource = new ImageSource("");
         this.baby = baby;
-        this.member = member;
+        this.owner = owner;
     }
 
     public void updateURL(String imageSource) {
