@@ -19,6 +19,11 @@ fi
 
 echo "> 새 애플리케이션 배포"
 
+echo "> 환경변수 출력"
+echo $AWS_BUCKET_NAME
+echo $JWT_SECRET_KEY
+echo $DEPLOY_APP_NAME
+
 JAR_NAME=$(ls -tr $REPOSITORY/*.jar | tail -n 1)
 
 echo "> JAR Name: $JAR_NAME"
