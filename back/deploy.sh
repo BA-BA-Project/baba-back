@@ -1,9 +1,7 @@
 #! /bin/bash
 
 REPOSITORY=/home/ec2-user/baba-was/zip
-
-echo "> Build 파일 복사"
-cp $REPOSITORY/build/libs/*.jar $REPOSITORY
+BUILD_FILE_REPOSITORY=$REPOSITORY/build/libs
 
 echo "> 현재 구동 중인 애플리케이션 pid 확인"
 
@@ -25,7 +23,7 @@ echo $AWS_BUCKET_NAME
 echo $JWT_SECRET_KEY
 echo $DEPLOY_APP_NAME
 
-JAR_NAME=$(ls -tr $REPOSITORY/*.jar | tail -n 1)
+JAR_NAME=$(ls -tr $BUILD_FILE_REPOSITORY/*.jar | tail -n 1)
 
 echo "> JAR Name: $JAR_NAME"
 
