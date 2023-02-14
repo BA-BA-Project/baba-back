@@ -5,7 +5,7 @@ BUILD_FILE_REPOSITORY=$REPOSITORY/build/libs
 
 echo "> 현재 구동 중인 애플리케이션 pid 확인"
 
-CURRENT_PID=$(pgrep -fl back-0.0.1-SNAPSHOT.jar | grep jar | awk '{print $1}')
+CURRENT_PID=$(pgrep -fl back-0.0.1-SNAPSHOT.jar | awk '{print $1}')
 
 if [ -z "$CURRENT_PID" ]; then
   echo "> 현재 구동 중인 애플리케이션이 없으므로 종료하지 않습니다."
@@ -19,7 +19,6 @@ echo "> 환경변수 불러오기"
 source ~/.bashrc
 
 echo "> 환경변수 출력"
-echo $AWS_BUCKET_NAME
 echo $JWT_SECRET_KEY
 echo $DEPLOY_APP_NAME
 
@@ -36,5 +35,5 @@ rm -r $REPOSITORY/logs
 
 echo "> $JAR_NAME 실행"
 
-sudo nohup java -jar -Dspring.profiles.active=prd $JAR_NAME > $REPOSITORY/nohup.out 2>&1 &
+nohup java -jar -Dspring.profiles.active=prd $JAR_NAME > $REPOSITORY/nohup.out 2>&1 &
 # -DKAKAO_GRANT_TYPE=$KAKAO_GRANT_TYPE -DKAKAO_CLIENT_ID=$KAKAO_CLIENT_ID -DKAKAO_REDIRECT_URI=$KAKAO_REDIRECT_URI -DJWT_SECRET_KEY=$JWT_SECRET_KEY -DJWT_EXPIRE_LENGTH=$JWT_EXPIRE_LENGTH -DAWS_ACCESS_KEY=$AWS_ACCESS_KEY -DAWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -DS3_IMAGES_BUCKET_NAME=$S3_IMAGES_BUCKET_NAME $JAR_NAME > $REPOSITORY/nohup.out 2>&1 &
