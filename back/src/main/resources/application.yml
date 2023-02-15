@@ -11,16 +11,14 @@ server:
     context-path: "/api"
 
 security:
-  oauth:
-    kakao:
-      grant-type: ${KAKAO_GRANT_TYPE}
-      client-id: ${KAKAO_CLIENT_ID}
-      redirect-uri: ${KAKAO_REDIRECT_URI}
-
   jwt:
     token:
-      secret-key: ${JWT_SECRET_KEY}
-      expire-length: ${JWT_EXPIRE_LENGTH}
+      sign:
+        secret-key: ${JWT_SIGN_SECRET_KEY}
+        expire-length: ${JWT_SIGN_EXPIRE_LENGTH}
+      member:
+        secret-key: ${JWT_MEMBER_SECRET_KEY}
+        expire-length: ${JWT_MEMBER_EXPIRE_LENGTH}
 
 cloud:
   aws:

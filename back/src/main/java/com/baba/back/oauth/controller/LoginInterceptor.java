@@ -1,6 +1,6 @@
 package com.baba.back.oauth.controller;
 
-import com.baba.back.oauth.service.TokenProvider;
+import com.baba.back.oauth.service.MemberTokenProvider;
 import com.baba.back.oauth.support.AuthorizationExtractor;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -12,7 +12,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @RequiredArgsConstructor
 public class LoginInterceptor implements HandlerInterceptor {
 
-    private final TokenProvider tokenProvider;
+    private final MemberTokenProvider tokenProvider;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {

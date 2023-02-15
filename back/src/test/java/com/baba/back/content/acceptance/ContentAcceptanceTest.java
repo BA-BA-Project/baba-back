@@ -18,7 +18,7 @@ import com.baba.back.content.domain.content.Content;
 import com.baba.back.content.repository.ContentRepository;
 import com.baba.back.content.repository.LikeRepository;
 import com.baba.back.oauth.repository.MemberRepository;
-import com.baba.back.oauth.service.TokenProvider;
+import com.baba.back.oauth.service.MemberTokenProvider;
 import com.baba.back.relation.repository.RelationRepository;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -40,7 +40,7 @@ public class ContentAcceptanceTest extends AcceptanceTest {
     public static final String VALID_URL = "http://test";
 
     @Autowired
-    private TokenProvider tokenProvider;
+    private MemberTokenProvider tokenProvider;
 
     @Autowired
     private MemberRepository memberRepository;

@@ -1,6 +1,6 @@
 package com.baba.back.oauth.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class OAuthAccessTokenResponse {
+public class SocialTokenRequest {
 
-    @JsonProperty("access_token")
-    private String accessToken;
+    @NotNull
+    private String socialToken;
 }
