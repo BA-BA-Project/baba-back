@@ -1,13 +1,15 @@
 package com.baba.back.oauth.service;
 
 import com.baba.back.oauth.OAuthClient;
-import com.baba.back.oauth.domain.JoinedMember;
-import com.baba.back.oauth.dto.OAuthAccessTokenResponse;
-import com.baba.back.oauth.dto.TokenResponse;
-import com.baba.back.oauth.repository.JoinedMemberRepository;
+import com.baba.back.oauth.dto.MemberTokenResponse;
+import com.baba.back.oauth.dto.SignTokenResponse;
+import com.baba.back.oauth.dto.SocialLoginResponse;
+import com.baba.back.oauth.dto.SocialTokenRequest;
+import com.baba.back.oauth.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -17,19 +19,18 @@ import org.springframework.stereotype.Service;
 public class OAuthService {
 
     private final OAuthClient oAuthClient;
-    private final TokenProvider tokenProvider;
-    private final JoinedMemberRepository joinedMemberRepository;
+    private final MemberTokenProvider memberTokenProvider;
+    private final SignTokenProvider signTokenProvider;
+    private final MemberRepository memberRepository;
 
-    public TokenResponse signInKakao(final String code) {
-        final OAuthAccessTokenResponse accessTokenResponse = oAuthClient.getOAuthAccessToken(code);
-        final String memberId = oAuthClient.getMemberId(accessTokenResponse.getAccessToken());
-        final JoinedMember joinedMember = joinedMemberRepository.findById(memberId)
-                .orElseGet(() -> joinedMemberRepository.save(new JoinedMember(memberId, false)));
-        final String token = tokenProvider.createToken(memberId);
+    public SocialLoginResponse signInKakao(SocialTokenRequest request) {
+        final String memberId = oAuthClient.getMemberId(request.getSocialToken());
 
-        if (joinedMember.isSigned()) {
-            return new TokenResponse(true, "이미 가입되어 있습니다.", token);
+        if (memberRepository.existsById(memberId)) {
+            final String memberToken = memberTokenProvider.createToken(memberId);
+            return new SocialLoginResponse(HttpStatus.OK, new MemberTokenResponse(memberToken));
         }
-        return new TokenResponse(false, "가입이 필요합니다.", token);
+        final String signToken = signTokenProvider.createToken(memberId);
+        return new SocialLoginResponse(HttpStatus.NOT_FOUND, new SignTokenResponse(signToken));
     }
 }

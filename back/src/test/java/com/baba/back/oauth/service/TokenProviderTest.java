@@ -7,11 +7,11 @@ import com.baba.back.oauth.exception.ExpiredTokenAuthenticationException;
 import com.baba.back.oauth.exception.InvalidTokenAuthenticationException;
 import org.junit.jupiter.api.Test;
 
-class JwtTokenProviderTest {
+class TokenProviderTest {
 
     private static final String SECRET_KEY = "a".repeat(100);
     private static final Long VALIDITY_MILLISECONDS = 3600000L;
-    private final JwtTokenProvider jwtTokenProvider = new JwtTokenProvider(SECRET_KEY, VALIDITY_MILLISECONDS);
+    private final TokenProvider tokenProvider = new MemberTokenProvider(SECRET_KEY, VALIDITY_MILLISECONDS);
 
     @Test
     void payLoad를_통해_토큰을_만든다() {
@@ -19,7 +19,7 @@ class JwtTokenProviderTest {
         final String payLoad = "kakao1231";
 
         // when
-        final String token = jwtTokenProvider.createToken(payLoad);
+        final String token = tokenProvider.createToken(payLoad);
 
         // then
         assertThat(token).isNotNull();
@@ -28,11 +28,11 @@ class JwtTokenProviderTest {
     @Test
     void 만료된_토큰인지_확인한다() {
         // given
-        final JwtTokenProvider tokenProvider = new JwtTokenProvider(SECRET_KEY, 0L);
+        final MemberTokenProvider tokenProvider = new MemberTokenProvider(SECRET_KEY, 0L);
         final String expiredToken = tokenProvider.createToken("expiredToken");
 
         // when & then
-        assertThatThrownBy(() -> jwtTokenProvider.validateToken(expiredToken))
+        assertThatThrownBy(() -> this.tokenProvider.validateToken(expiredToken))
                 .isInstanceOf(ExpiredTokenAuthenticationException.class);
     }
 
@@ -42,7 +42,7 @@ class JwtTokenProviderTest {
         final String invalidToken = "invalidToken";
 
         // when & then
-        assertThatThrownBy(() -> jwtTokenProvider.validateToken(invalidToken))
+        assertThatThrownBy(() -> tokenProvider.validateToken(invalidToken))
                 .isInstanceOf(InvalidTokenAuthenticationException.class);
     }
 
@@ -50,10 +50,10 @@ class JwtTokenProviderTest {
     void 토큰을_파싱한다() {
         // given
         final String actual = "payload";
-        final String token = jwtTokenProvider.createToken(actual);
+        final String token = tokenProvider.createToken(actual);
 
         // when
-        final String result = jwtTokenProvider.parseToken(token);
+        final String result = tokenProvider.parseToken(token);
 
         // then
         assertThat(actual).isEqualTo(result);
@@ -65,18 +65,18 @@ class JwtTokenProviderTest {
         final String invalidToken = "invalidToken";
 
         // when & then
-        assertThatThrownBy(() -> jwtTokenProvider.parseToken(invalidToken))
+        assertThatThrownBy(() -> tokenProvider.parseToken(invalidToken))
                 .isInstanceOf(InvalidTokenAuthenticationException.class);
     }
 
     @Test
     void 토큰을_파싱_시_만료된_토큰이라면_예외를_던진다() {
         // given
-        final JwtTokenProvider tokenProvider = new JwtTokenProvider(SECRET_KEY, 0L);
+        final MemberTokenProvider tokenProvider = new MemberTokenProvider(SECRET_KEY, 0L);
         final String expiredToken = tokenProvider.createToken("expiredToken");
 
         // when & then
-        assertThatThrownBy(() -> jwtTokenProvider.parseToken(expiredToken))
+        assertThatThrownBy(() -> this.tokenProvider.parseToken(expiredToken))
                 .isInstanceOf(InvalidTokenAuthenticationException.class);
     }
 }
