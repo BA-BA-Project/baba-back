@@ -12,7 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "로그인 관련 API")
@@ -27,7 +27,7 @@ public class OAuthController {
     @BadRequestResponse
     @NotFoundResponse
     @IntervalServerErrorResponse
-    @GetMapping("/auth/login")
+    @PostMapping("/auth/login")
     public ResponseEntity<TokenResponse> signInKakao(SocialTokenRequest tokenRequest) {
         final SocialLoginResponse socialLoginResponse = OAuthService.signInKakao(tokenRequest);
         return ResponseEntity.status(socialLoginResponse.httpStatus()).body(socialLoginResponse.tokenResponse());
