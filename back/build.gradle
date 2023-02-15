@@ -38,6 +38,10 @@ dependencies {
     testImplementation 'io.rest-assured:rest-assured:5.2.0'
 }
 
+jar {
+    enabled=false
+}
+
 tasks.named('test') {
     useJUnitPlatform()
 }
