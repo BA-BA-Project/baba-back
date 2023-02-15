@@ -7,10 +7,12 @@ import com.baba.back.content.domain.FileHandler;
 import com.baba.back.content.domain.ImageFile;
 import com.baba.back.content.domain.Like;
 import com.baba.back.content.domain.content.Content;
+import com.baba.back.content.domain.content.ContentDate;
 import com.baba.back.content.dto.CreateContentRequest;
 import com.baba.back.content.dto.CreateContentResponse;
 import com.baba.back.content.dto.LikeContentResponse;
 import com.baba.back.content.exception.ContentAuthorizationException;
+import com.baba.back.content.exception.ContentBadRequestException;
 import com.baba.back.content.exception.ContentNotFountException;
 import com.baba.back.content.repository.ContentRepository;
 import com.baba.back.content.repository.LikeRepository;
@@ -50,7 +52,11 @@ public class ContentService {
                 .now(LocalDate.now())
                 .cardStyle(request.getCardStyle())
                 .baby(baby)
+                .owner(member)
                 .build();
+
+        checkDuplication(content.getContentDate(), baby);
+
         final ImageFile imageFile = new ImageFile(request.getPhoto());
         final String imageSource = fileHandler.upload(imageFile);
         content.updateURL(imageSource);
@@ -78,6 +84,12 @@ public class ContentService {
     private void checkAuthorization(Relation relation) {
         if (!relation.isFamily()) {
             throw new ContentAuthorizationException(relation.getId() + " 관계는 가족 관계가 아닙니다.");
+        }
+    }
+
+    private void checkDuplication(ContentDate contentDate, Baby baby) {
+        if(contentRepository.existsByContentDateAndBaby(contentDate, baby)) {
+            throw new ContentBadRequestException("컨텐츠가 이미 존재합니다.");
         }
     }
 
