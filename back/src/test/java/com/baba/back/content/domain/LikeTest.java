@@ -13,6 +13,8 @@ import com.baba.back.content.repository.LikeRepository;
 import com.baba.back.oauth.domain.member.Member;
 import com.baba.back.oauth.repository.MemberRepository;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -34,18 +36,21 @@ class LikeTest {
     @Test
     void 생성시간과_업데이트시간을_확인한다() {
         // given
-        final LocalDate now = LocalDate.now();
+        final LocalDateTime now = LocalDateTime.now();
+        final LocalDate today = now.toLocalDate();
         final Member savedMember = memberRepository.save(멤버1);
         final Baby savedBaby = babyRepository.save(아기1);
         final Content savedContent = contentRepository.save(
-                new Content("제목", now, now, "card_basic_1", savedBaby, savedMember));
+                new Content("제목", today, today, "card_basic_1", savedBaby, savedMember));
 
         // when
         final Like like = likeRepository.save(new Like(savedMember, savedContent));
 
         // then
-        assertThat(like.getCreatedAt()).isNotNull();
-        assertThat(like.getUpdatedAt()).isNotNull();
+        Assertions.assertAll(
+                () -> assertThat(like.getCreatedAt()).isAfter(now),
+                () -> assertThat(like.getUpdatedAt()).isAfter(now)
+        );
     }
 
     @Test
