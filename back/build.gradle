@@ -48,26 +48,17 @@ jacoco {
     toolVersion = '0.8.7'
 }
 
-task testCoverage(type: Test) {
-    group 'verification'
-    description 'Runs the unit tests with coverage'
-
-    dependsOn('test',
-            ':jacocoTestReport',
-            ':jacocoTestCoverageVerification')
-
-    tasks['jacocoTestReport'].mustRunAfter(tasks['test'])
-    tasks['jacocoTestCoverageVerification'].mustRunAfter(tasks['jacocoTestReport'])
-}
-
 test {
     useJUnitPlatform()
+    finalizedBy 'jacocoTestReport'
 }
 
 jacocoTestReport {
     reports {
         html.enabled true
     }
+
+    finalizedBy 'jacocoTestCoverageVerification'
 }
 
 jacocoTestCoverageVerification {
