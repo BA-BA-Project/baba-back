@@ -19,7 +19,7 @@
         <property name="PROFILE" value="${spring.profiles.active}"/>
 
         <appender name="INFO_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <file>${LOGS_ABSOLUTE_PATH}/${PROFILE}/info.log</file>
+            <file>${LOGS_ABSOLUTE_PATH}/${PROFILE}/logs/info.log</file>
             <filter class="ch.qos.logback.classic.filter.LevelFilter">
                 <level>INFO</level>
                 <onMatch>ACCEPT</onMatch>
@@ -29,7 +29,7 @@
                 <pattern>[%d{yyyy-MM-dd HH:mm:ss}:%-3relative][%thread] %-5level %logger{35} - %msg%n</pattern>
             </encoder>
             <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                <fileNamePattern>${LOGS_ABSOLUTE_PATH}/${PROFILE}/was-logs/info.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+                <fileNamePattern>${LOGS_ABSOLUTE_PATH}/${PROFILE}/logs/was-logs/info.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
                 <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                     <maxFileSize>100MB</maxFileSize>
                 </timeBasedFileNamingAndTriggeringPolicy>
@@ -38,7 +38,7 @@
         </appender>
 
         <appender name="WARN_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <file>${LOGS_ABSOLUTE_PATH}/${PROFILE}/warn.log</file>
+            <file>${LOGS_ABSOLUTE_PATH}/${PROFILE}/logs/warn.log</file>
             <filter class="ch.qos.logback.classic.filter.LevelFilter">
                 <level>WARN</level>
                 <onMatch>ACCEPT</onMatch>
@@ -48,7 +48,7 @@
                 <pattern>[%d{yyyy-MM-dd HH:mm:ss}:%-3relative][%thread] %-5level %logger{35} - %msg%n</pattern>
             </encoder>
             <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                <fileNamePattern>${LOGS_ABSOLUTE_PATH}/${PROFILE}/was-logs/warn.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+                <fileNamePattern>${LOGS_ABSOLUTE_PATH}/${PROFILE}/logs/was-logs/warn.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
                 <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                     <maxFileSize>100MB</maxFileSize>
                 </timeBasedFileNamingAndTriggeringPolicy>
@@ -57,7 +57,7 @@
         </appender>
 
         <appender name="ERROR_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <file>${LOGS_ABSOLUTE_PATH}/${PROFILE}/error.log</file>
+            <file>${LOGS_ABSOLUTE_PATH}/${PROFILE}/logs/error.log</file>
             <filter class="ch.qos.logback.classic.filter.LevelFilter">
                 <level>ERROR</level>
                 <onMatch>ACCEPT</onMatch>
@@ -67,7 +67,7 @@
                 <pattern>[%d{yyyy-MM-dd HH:mm:ss}:%-3relative][%thread] %-5level %logger{35} - %msg%n</pattern>
             </encoder>
             <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                <fileNamePattern>${LOGS_ABSOLUTE_PATH}/${PROFILE}/was-logs/error.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+                <fileNamePattern>${LOGS_ABSOLUTE_PATH}/${PROFILE}/logs/was-logs/error.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
                 <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                     <maxFileSize>100MB</maxFileSize>
                 </timeBasedFileNamingAndTriggeringPolicy>
