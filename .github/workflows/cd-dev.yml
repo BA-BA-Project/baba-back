@@ -3,7 +3,7 @@ name : build and deploy
 on:
   push:
     branches:
-      - feat/cd-dev-#36
+      - dev
 
 jobs:
   build:
