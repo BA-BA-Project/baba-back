@@ -68,13 +68,39 @@ spring:
 
 ---
 
+# Dev Configuration
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:mysql://${DATABASE_HOST}:3306/${DATABASE_NAME_DEV}?serverTimezone=Asia/Seoul&character_set_server=utf8mb4
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  sql:
+    init:
+      mode: never
+  jpa:
+    generate-ddl: true
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
+server:
+  port: 8081
+
+---
+
 # Prd Configuration
 spring:
   config:
     activate:
       on-profile: prd
   datasource:
-    url: jdbc:mysql://${DATABASE_HOST}:3306/${DATABASE_NAME}?serverTimezone=Asia/Seoul&character_set_server=utf8mb4
+    url: jdbc:mysql://${DATABASE_HOST}:3306/${DATABASE_NAME_PRD}?serverTimezone=Asia/Seoul&character_set_server=utf8mb4
     username: ${DATABASE_USERNAME}
     password: ${DATABASE_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -87,3 +113,6 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: validate
+
+server:
+  port: 8080
