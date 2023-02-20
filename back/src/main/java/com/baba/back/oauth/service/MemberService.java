@@ -44,7 +44,7 @@ public class MemberService {
         Babies babies = saveBabies(request);
         saveRelations(babies, member, request.getRelationName());
 
-        return new MemberJoinResponse(true, "회원가입이 완료되었습니다.");
+        return new MemberJoinResponse("OK");
     }
 
     private void validateJoinedMember(JoinedMember joinedMember) {

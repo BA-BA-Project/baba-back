@@ -3,7 +3,6 @@ package com.baba.back.oauth.service;
 import static com.baba.back.fixture.DomainFixture.이미_회원가입한_유저1;
 import static com.baba.back.fixture.DomainFixture.회원가입_안한_유저1;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -97,9 +96,6 @@ class MemberServiceTest {
         then(babyRepository).should(times(2)).save(any());
         then(relationRepository).should(times(2)).save(any());
 
-        assertAll(
-                () -> assertThat(response.getSignedUp()).isTrue(),
-                () -> assertThat(response.getMessage()).isNotBlank()
-        );
+        assertThat(response.result()).isNotBlank();
     }
 }
