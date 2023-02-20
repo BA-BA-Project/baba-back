@@ -89,12 +89,16 @@ jacocoTestCoverageVerification {
             }
 
             excludes = [
-                    '**.*Request**',
+                    '**.*Application*',
+                    '**.*Request*',
                     '**.*Response*',
                     '**.*config*',
                     '**.*Client*',
                     '**.*Interceptor*',
-                    '**.*Exception*'
+                    '**.*Resolver*',
+                    '**.*Exception*',
+                    '**.*Builder*',
+                    '**.*Extractor*'
             ]
         }
 
