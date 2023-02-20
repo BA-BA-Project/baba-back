@@ -32,7 +32,7 @@ public class MemberController {
     @UnAuthorizedResponse
     @NotFoundResponse
     @IntervalServerErrorResponse
-    @PostMapping("/members")
+    @PostMapping("/members/baby")
     public ResponseEntity<MemberJoinResponse> joinMember(@RequestBody @Valid MemberJoinRequest request,
                                                          @Login String memberId) {
         return ResponseEntity.status(HttpStatus.CREATED).body(memberService.join(request, memberId));
