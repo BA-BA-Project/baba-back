@@ -15,7 +15,7 @@ public class DomainFixture {
             .id("member1")
             .name("멤버1")
             .introduction("안녕하세요")
-            .iconName("icon1")
+            .iconName("PROFILE_W_1")
             .colorPicker(colors -> "FFAEBA")
             .build();
 

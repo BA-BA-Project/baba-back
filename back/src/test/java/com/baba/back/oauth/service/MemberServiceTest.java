@@ -2,6 +2,7 @@ package com.baba.back.oauth.service;
 
 import static com.baba.back.fixture.DomainFixture.이미_회원가입한_유저1;
 import static com.baba.back.fixture.DomainFixture.회원가입_안한_유저1;
+import static com.baba.back.fixture.RequestFixture.멤버_가입_요청;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -11,7 +12,6 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
 import com.baba.back.baby.domain.IdConstructor;
-import com.baba.back.baby.dto.BabyRequest;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.oauth.domain.ColorPicker;
 import com.baba.back.oauth.dto.MemberJoinRequest;
@@ -21,8 +21,6 @@ import com.baba.back.oauth.exception.JoinedMemberNotFoundException;
 import com.baba.back.oauth.repository.JoinedMemberRepository;
 import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.relation.repository.RelationRepository;
-import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -80,15 +78,10 @@ class MemberServiceTest {
     @Test
     void 회원가입을_진행한다() {
         // given
-        final MemberJoinRequest request = new MemberJoinRequest("박재희", "icon1", "엄마",
-                List.of(new BabyRequest("아기1", LocalDate.of(2022, 1, 1)),
-                        new BabyRequest("아기2", LocalDate.of(2023, 1, 1)))
-        );
-
         given(joinedMemberRepository.findById(anyString())).willReturn(Optional.of(회원가입_안한_유저1));
         given(colorPicker.pick(anyList())).willReturn("FFAEBA");
 
-        final MemberJoinResponse response = memberService.join(request, "memberId");
+        final MemberJoinResponse response = memberService.join(멤버_가입_요청, "memberId");
 
         //then
         then(memberRepository).should(times(1)).save(any());
