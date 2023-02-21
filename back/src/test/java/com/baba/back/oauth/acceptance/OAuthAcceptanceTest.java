@@ -71,7 +71,7 @@ public class OAuthAcceptanceTest extends AcceptanceTest {
                 .extract();
 
         // then
-        final String signTokenResponse = response.response().jsonPath().get("signToken");
+        final String signTokenResponse = response.response().jsonPath().get("accessToken");
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value()),
                 () -> assertThat(signTokenResponse).isNotNull()

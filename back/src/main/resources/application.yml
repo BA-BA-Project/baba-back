@@ -13,9 +13,6 @@ server:
 security:
   jwt:
     token:
-      sign:
-        secret-key: ${JWT_SIGN_SECRET_KEY}
-        expire-length: ${JWT_SIGN_EXPIRE_LENGTH}
       member:
         secret-key: ${JWT_MEMBER_SECRET_KEY}
         expire-length: ${JWT_MEMBER_EXPIRE_LENGTH}

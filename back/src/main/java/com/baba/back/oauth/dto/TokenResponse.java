@@ -1,4 +1,5 @@
 package com.baba.back.oauth.dto;
 
-public interface TokenResponse {
+public record TokenResponse(String accessToken) {
+
 }

@@ -31,9 +31,6 @@ class OAuthServiceTest {
     private MemberTokenProvider memberTokenProvider;
 
     @Mock
-    private SignTokenProvider signTokenProvider;
-
-    @Mock
     private MemberRepository memberRepository;
 
     @Test
@@ -48,7 +45,7 @@ class OAuthServiceTest {
     }
 
     @Test
-    void 가입이_되어_있으면_멤버_토큰을_발급한다() {
+    void 가입이_되어_있으면_200을_응답한다() {
         // given
         final String validToken = "validToken";
         final String memberId = "memberId";
@@ -67,14 +64,13 @@ class OAuthServiceTest {
     }
 
     @Test
-    void 가입이_되어있지_않으면_회원가입_토큰을_발급한다() {
+    void 가입이_되어있지_않으면_404를_응답한다() {
         // given
         final String notMemberToken = "not member token";
         final String memberId = "memberId";
-        final String signToken = "signToken";
         given(oAuthClient.getMemberId(notMemberToken)).willReturn(memberId);
         given(memberRepository.existsById(memberId)).willReturn(false);
-        given(signTokenProvider.createToken(memberId)).willReturn(signToken);
+        given(memberTokenProvider.createToken(memberId)).willReturn("memberToken");
 
         // when
         final SocialLoginResponse response = oAuthService.signInKakao(new SocialTokenRequest(notMemberToken));
