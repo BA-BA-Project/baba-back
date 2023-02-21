@@ -21,6 +21,6 @@ public class Icon {
     private IconName iconName;
 
     public static Icon of(ColorPicker colorPicker, String iconName) {
-        return new Icon(IconColor.from(colorPicker), IconName.valueOf(iconName));
+        return new Icon(IconColor.from(colorPicker), IconName.from(iconName));
     }
 }
