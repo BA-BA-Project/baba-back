@@ -2,42 +2,27 @@ package com.baba.back.oauth.domain.member;
 
 import com.baba.back.oauth.domain.ColorPicker;
 import com.baba.back.oauth.exception.IconColorBadRequestException;
-import jakarta.persistence.Embeddable;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Getter
-@Embeddable
-@NoArgsConstructor
-public class IconColor {
-    private static final List<String> COLORS
-            = List.of("FFAEBA", "FF8698", "FFE3C8", "FFD2A7", "FFD400", "9ED883", "30BE9B", "81E0D5", "5BD2FF",
-            "97BEFF", "98A2FF", "BFA1FF");
+@RequiredArgsConstructor
+public enum IconColor {
+    COLOR_1("FFAEBA"), COLOR_2("FF8698"), COLOR_3("FFE3C8"), COLOR_4("FFD2A7"), COLOR_5("FFD400"), COLOR_6("9ED883"),
+    COLOR_7("30BE9B"), COLOR_8("81E0D5"), COLOR_9("5BD2FF"), COLOR_10("97BEFF"), COLOR_11("98A2FF"), COLOR_12("BFA1FF");
 
-    private String iconColor;
+    private final String color;
 
-    private IconColor(String iconColor) {
-        validateNull(iconColor);
-        validateIconColor(iconColor);
-        this.iconColor = iconColor;
+    public static IconColor from(String color) {
+        return Arrays.stream(IconColor.values())
+                .filter(iconColor -> iconColor.getColor().equals(color))
+                .findAny()
+                .orElseThrow(() -> new IconColorBadRequestException(color + " 는 잘못된 IconColor 입니다."));
     }
 
-    public static IconColor from(ColorPicker<String> colorPicker) {
-        String color = colorPicker.pick(COLORS);
-        return new IconColor(color);
-    }
-
-    private void validateNull(String iconColor) {
-        if (Objects.isNull(iconColor)) {
-            throw new IconColorBadRequestException("색은 null일 수 없습니다.");
-        }
-    }
-
-    private void validateIconColor(String iconColor) {
-        if (!COLORS.contains(iconColor)) {
-            throw new IconColorBadRequestException(iconColor + "는 선택할 수 없는 색입니다.");
-        }
+    public static IconColor from(ColorPicker colorPicker) {
+        return colorPicker.pick(List.of(IconColor.values()));
     }
 }

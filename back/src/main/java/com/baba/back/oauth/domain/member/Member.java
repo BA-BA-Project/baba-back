@@ -26,7 +26,7 @@ public class Member {
     private Icon icon;
 
     @Builder
-    public Member(String id, String name, String introduction, ColorPicker<String> colorPicker, String iconName) {
+    public Member(String id, String name, String introduction, ColorPicker colorPicker, String iconName) {
         this.id = id;
         this.name = new Name(name);
         this.introduction = new Introduction(introduction);

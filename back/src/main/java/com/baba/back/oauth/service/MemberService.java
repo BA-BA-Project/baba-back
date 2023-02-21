@@ -29,7 +29,7 @@ public class MemberService {
     private final JoinedMemberRepository joinedMemberRepository;
     private final BabyRepository babyRepository;
     private final RelationRepository relationRepository;
-    private final ColorPicker<String> colorPicker;
+    private final ColorPicker colorPicker;
     private final IdConstructor idConstructor;
 
     private final LocalDate now = LocalDate.now();

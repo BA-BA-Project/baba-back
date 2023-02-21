@@ -4,6 +4,8 @@ import com.baba.back.baby.domain.Baby;
 import com.baba.back.content.domain.Like;
 import com.baba.back.content.domain.content.Content;
 import com.baba.back.oauth.domain.JoinedMember;
+import com.baba.back.oauth.domain.member.IconColor;
+import com.baba.back.oauth.domain.member.IconName;
 import com.baba.back.oauth.domain.member.Member;
 import com.baba.back.relation.domain.Relation;
 import com.baba.back.relation.domain.RelationGroup;
@@ -15,8 +17,8 @@ public class DomainFixture {
             .id("member1")
             .name("멤버1")
             .introduction("안녕하세요")
-            .iconName("PROFILE_W_1")
-            .colorPicker(colors -> "FFAEBA")
+            .iconName(IconName.PROFILE_G_1.toString())
+            .colorPicker(colors -> IconColor.COLOR_1)
             .build();
 
     public static final Baby 아기1 = Baby.builder()
