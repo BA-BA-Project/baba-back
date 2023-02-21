@@ -25,7 +25,7 @@ import org.springframework.http.MediaType;
 
 public class MemberAcceptanceTest extends AcceptanceTest {
 
-    private static final String MEMBER_BASE_PATH = "/api/members";
+    private static final String MEMBER_BASE_PATH = "/api/members/baby";
     private static final String MEMBER_ID = "memberId";
     @Autowired
     private MemberTokenProvider tokenProvider;
@@ -151,7 +151,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
-                () -> assertThat(response.as(MemberJoinResponse.class).getSignedUp()).isTrue()
+                () -> assertThat(response.as(MemberJoinResponse.class).result()).isNotBlank()
         );
     }
 }

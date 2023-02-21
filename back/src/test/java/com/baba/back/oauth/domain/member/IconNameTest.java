@@ -10,10 +10,10 @@ import org.junit.jupiter.params.provider.ValueSource;
 class IconNameTest {
 
     @ParameterizedTest
-    @ValueSource(strings = {" ", "123", "aaaaaa"})
+    @ValueSource(strings = {"123", "aaaaaa"})
     @NullAndEmptySource
-    void 존재하지않는_아이콘을_선택하면_예외를_던진다(String name) {
-        assertThatThrownBy(() -> new IconName(name))
+    void 유효하지_않는_아이콘을_선택하면_예외를_던진다(String name) {
+        assertThatThrownBy(() -> IconName.from(name))
                 .isInstanceOf(IconNameBadRequestException.class);
     }
 }

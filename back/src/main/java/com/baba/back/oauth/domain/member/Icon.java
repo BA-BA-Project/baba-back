@@ -1,8 +1,8 @@
 package com.baba.back.oauth.domain.member;
 
-import com.baba.back.oauth.domain.ColorPicker;
+import com.baba.back.oauth.domain.Picker;
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.Embedded;
+import jakarta.persistence.Enumerated;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,13 +14,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Icon {
 
-    @Embedded
+    @Enumerated
     private IconColor iconColor;
 
-    @Embedded
+    @Enumerated
     private IconName iconName;
 
-    public static Icon of(ColorPicker<String> colorPicker, String iconName) {
-        return new Icon(IconColor.from(colorPicker), new IconName(iconName));
+    public static Icon of(Picker<IconColor> picker, String iconName) {
+        return new Icon(IconColor.from(picker), IconName.from(iconName));
     }
 }
