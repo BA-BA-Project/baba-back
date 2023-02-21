@@ -11,7 +11,7 @@ class TokenProviderTest {
 
     private static final String SECRET_KEY = "a".repeat(100);
     private static final Long VALIDITY_MILLISECONDS = 3600000L;
-    private final TokenProvider tokenProvider = new MemberTokenProvider(SECRET_KEY, VALIDITY_MILLISECONDS);
+    private final TokenProvider tokenProvider = new AccessTokenProvider(SECRET_KEY, VALIDITY_MILLISECONDS);
 
     @Test
     void payLoad를_통해_토큰을_만든다() {
@@ -28,7 +28,7 @@ class TokenProviderTest {
     @Test
     void 만료된_토큰인지_확인한다() {
         // given
-        final MemberTokenProvider tokenProvider = new MemberTokenProvider(SECRET_KEY, 0L);
+        final AccessTokenProvider tokenProvider = new AccessTokenProvider(SECRET_KEY, 0L);
         final String expiredToken = tokenProvider.createToken("expiredToken");
 
         // when & then
@@ -72,7 +72,7 @@ class TokenProviderTest {
     @Test
     void 토큰을_파싱_시_만료된_토큰이라면_예외를_던진다() {
         // given
-        final MemberTokenProvider tokenProvider = new MemberTokenProvider(SECRET_KEY, 0L);
+        final AccessTokenProvider tokenProvider = new AccessTokenProvider(SECRET_KEY, 0L);
         final String expiredToken = tokenProvider.createToken("expiredToken");
 
         // when & then

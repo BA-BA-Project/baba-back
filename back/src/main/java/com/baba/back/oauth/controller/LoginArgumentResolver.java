@@ -1,6 +1,6 @@
 package com.baba.back.oauth.controller;
 
-import com.baba.back.oauth.service.MemberTokenProvider;
+import com.baba.back.oauth.service.AccessTokenProvider;
 import com.baba.back.oauth.support.AuthorizationExtractor;
 import com.baba.back.oauth.support.Login;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,7 +16,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 @RequiredArgsConstructor
 public class LoginArgumentResolver implements HandlerMethodArgumentResolver {
 
-    private final MemberTokenProvider tokenProvider;
+    private final AccessTokenProvider tokenProvider;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {

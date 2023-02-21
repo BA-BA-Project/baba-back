@@ -10,7 +10,7 @@ import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.oauth.domain.member.Member;
 import com.baba.back.oauth.repository.MemberRepository;
-import com.baba.back.oauth.service.MemberTokenProvider;
+import com.baba.back.oauth.service.AccessTokenProvider;
 import com.baba.back.relation.domain.Relation;
 import com.baba.back.relation.domain.RelationGroup;
 import com.baba.back.relation.repository.RelationRepository;
@@ -27,7 +27,7 @@ public class BabyAcceptanceTest extends AcceptanceTest {
     public static final String BABY_BASE_PATH = "/api/baby";
 
     @Autowired
-    private MemberTokenProvider tokenProvider;
+    private AccessTokenProvider tokenProvider;
 
     @Autowired
     private MemberRepository memberRepository;
