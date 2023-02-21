@@ -3,7 +3,7 @@ package com.baba.back.oauth.domain.member;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.baba.back.oauth.domain.ColorPicker;
+import com.baba.back.oauth.domain.Picker;
 import com.baba.back.oauth.exception.IconColorBadRequestException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -16,10 +16,10 @@ class IconColorTest {
     @Test
     void 아이콘_색을_선택한다() {
         // given
-        ColorPicker colorPicker = colors -> IconColor.COLOR_1;
+        Picker<IconColor> picker = colors -> IconColor.COLOR_1;
 
         // when
-        final IconColor iconColor = IconColor.from(colorPicker);
+        final IconColor iconColor = IconColor.from(picker);
 
         // then
         Assertions.assertThat(iconColor).isEqualTo(IconColor.COLOR_1);

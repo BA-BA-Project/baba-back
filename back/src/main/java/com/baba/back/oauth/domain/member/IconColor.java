@@ -1,6 +1,6 @@
 package com.baba.back.oauth.domain.member;
 
-import com.baba.back.oauth.domain.ColorPicker;
+import com.baba.back.oauth.domain.Picker;
 import com.baba.back.oauth.exception.IconColorBadRequestException;
 import java.util.Arrays;
 import java.util.List;
@@ -22,7 +22,7 @@ public enum IconColor {
                 .orElseThrow(() -> new IconColorBadRequestException(color + " 는 잘못된 IconColor 입니다."));
     }
 
-    public static IconColor from(ColorPicker colorPicker) {
-        return colorPicker.pick(List.of(IconColor.values()));
+    public static IconColor from(Picker<IconColor> picker) {
+        return picker.pick(List.of(IconColor.values()));
     }
 }

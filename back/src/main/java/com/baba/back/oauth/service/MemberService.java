@@ -3,8 +3,9 @@ package com.baba.back.oauth.service;
 import com.baba.back.baby.domain.Babies;
 import com.baba.back.baby.domain.IdConstructor;
 import com.baba.back.baby.repository.BabyRepository;
-import com.baba.back.oauth.domain.ColorPicker;
 import com.baba.back.oauth.domain.JoinedMember;
+import com.baba.back.oauth.domain.Picker;
+import com.baba.back.oauth.domain.member.IconColor;
 import com.baba.back.oauth.domain.member.Member;
 import com.baba.back.oauth.dto.MemberJoinRequest;
 import com.baba.back.oauth.dto.MemberJoinResponse;
@@ -29,7 +30,7 @@ public class MemberService {
     private final JoinedMemberRepository joinedMemberRepository;
     private final BabyRepository babyRepository;
     private final RelationRepository relationRepository;
-    private final ColorPicker colorPicker;
+    private final Picker<IconColor> picker;
     private final IdConstructor idConstructor;
 
     private final LocalDate now = LocalDate.now();
@@ -59,7 +60,7 @@ public class MemberService {
                 .name(request.getName())
                 .introduction("")
                 .iconName(request.getIconName())
-                .colorPicker(colorPicker)
+                .colorPicker(picker)
                 .build());
     }
 

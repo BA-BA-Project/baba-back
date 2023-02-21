@@ -13,7 +13,7 @@ import static org.mockito.Mockito.times;
 
 import com.baba.back.baby.domain.IdConstructor;
 import com.baba.back.baby.repository.BabyRepository;
-import com.baba.back.oauth.domain.ColorPicker;
+import com.baba.back.oauth.domain.Picker;
 import com.baba.back.oauth.domain.member.IconColor;
 import com.baba.back.oauth.dto.MemberJoinRequest;
 import com.baba.back.oauth.dto.MemberJoinResponse;
@@ -50,7 +50,7 @@ class MemberServiceTest {
     private RelationRepository relationRepository;
 
     @Spy
-    private ColorPicker colorPicker;
+    private Picker<IconColor> picker;
 
     @Mock
     private IdConstructor idConstructor;
@@ -80,7 +80,7 @@ class MemberServiceTest {
     void 회원가입을_진행한다() {
         // given
         given(joinedMemberRepository.findById(anyString())).willReturn(Optional.of(회원가입_안한_유저1));
-        given(colorPicker.pick(anyList())).willReturn(IconColor.COLOR_1);
+        given(picker.pick(anyList())).willReturn(IconColor.COLOR_1);
 
         final MemberJoinResponse response = memberService.join(멤버_가입_요청, "memberId");
 

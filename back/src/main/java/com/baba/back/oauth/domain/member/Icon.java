@@ -1,6 +1,6 @@
 package com.baba.back.oauth.domain.member;
 
-import com.baba.back.oauth.domain.ColorPicker;
+import com.baba.back.oauth.domain.Picker;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Enumerated;
 import lombok.AccessLevel;
@@ -20,7 +20,7 @@ public class Icon {
     @Enumerated
     private IconName iconName;
 
-    public static Icon of(ColorPicker colorPicker, String iconName) {
-        return new Icon(IconColor.from(colorPicker), IconName.from(iconName));
+    public static Icon of(Picker<IconColor> picker, String iconName) {
+        return new Icon(IconColor.from(picker), IconName.from(iconName));
     }
 }
