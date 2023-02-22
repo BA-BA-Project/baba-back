@@ -1,5 +1,7 @@
 package com.baba.back.oauth.acceptance;
 
+import static com.baba.back.SimpleRestAssured.post;
+import static com.baba.back.SimpleRestAssured.toObject;
 import static com.baba.back.fixture.DomainFixture.멤버1;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -8,9 +10,10 @@ import static org.mockito.BDDMockito.given;
 
 import com.baba.back.AcceptanceTest;
 import com.baba.back.oauth.OAuthClient;
+import com.baba.back.oauth.dto.MemberTokenResponse;
+import com.baba.back.oauth.dto.SignTokenResponse;
 import com.baba.back.oauth.dto.SocialTokenRequest;
 import com.baba.back.oauth.repository.MemberRepository;
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.Test;
@@ -37,20 +40,12 @@ public class OAuthAcceptanceTest extends AcceptanceTest {
         given(oAuthClient.getMemberId(any())).willReturn(멤버1.getId());
 
         // when
-        final ExtractableResponse<Response> response = RestAssured.given()
-                .body(request)
-                .when()
-                .post(BASE_URL)
-                .then()
-                .log().all()
-                .extract();
-
-        final String accessToken = response.response().jsonPath().get("accessToken");
+        final ExtractableResponse<Response> response = post(BASE_URL, request);
 
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(accessToken).isNotNull()
+                () -> assertThat(toObject(response, MemberTokenResponse.class).accessToken()).isNotNull()
         );
 
     }
@@ -62,19 +57,12 @@ public class OAuthAcceptanceTest extends AcceptanceTest {
         given(oAuthClient.getMemberId(any())).willReturn("invalid member");
 
         // when
-        final ExtractableResponse<Response> response = RestAssured.given()
-                .body(request)
-                .when()
-                .post(BASE_URL)
-                .then()
-                .log().all()
-                .extract();
+        final ExtractableResponse<Response> response = post(BASE_URL, request);
 
         // then
-        final String signTokenResponse = response.response().jsonPath().get("signToken");
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value()),
-                () -> assertThat(signTokenResponse).isNotNull()
+                () -> assertThat(toObject(response, SignTokenResponse.class).signToken()).isNotNull()
         );
     }
 }

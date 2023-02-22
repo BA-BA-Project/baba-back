@@ -36,8 +36,8 @@ public class SimpleRestAssured {
 
         return thenExtract(
                 given
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post(path));
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when().post(path));
     }
 
     private static RequestSpecification given() {

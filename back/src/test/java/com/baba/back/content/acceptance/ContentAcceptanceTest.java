@@ -1,5 +1,8 @@
 package com.baba.back.content.acceptance;
 
+import static com.baba.back.SimpleRestAssured.post;
+import static com.baba.back.SimpleRestAssured.thenExtract;
+import static com.baba.back.SimpleRestAssured.toObject;
 import static com.baba.back.fixture.DomainFixture.관계1;
 import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.DomainFixture.아기1;
@@ -15,8 +18,9 @@ import com.baba.back.AcceptanceTest;
 import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.content.domain.content.Content;
+import com.baba.back.content.dto.CreateContentResponse;
+import com.baba.back.content.dto.LikeContentResponse;
 import com.baba.back.content.repository.ContentRepository;
-import com.baba.back.content.repository.LikeRepository;
 import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.oauth.service.MemberTokenProvider;
 import com.baba.back.relation.repository.RelationRepository;
@@ -54,9 +58,6 @@ public class ContentAcceptanceTest extends AcceptanceTest {
     @Autowired
     private ContentRepository contentRepository;
 
-    @Autowired
-    private LikeRepository likeRepository;
-
     @MockBean
     private AmazonS3 amazonS3;
 
@@ -66,16 +67,15 @@ public class ContentAcceptanceTest extends AcceptanceTest {
         final String token = tokenProvider.createToken(멤버1.getId());
 
         // when
-        final ExtractableResponse<Response> response = RestAssured.given()
-                .headers(Map.of("Authorization", "Bearer " + token))
-                .multiPart("photo", "test_file.jpg", "Something".getBytes(), MediaType.IMAGE_PNG_VALUE)
-                .multiPart("date", LocalDate.of(2023, 1, 25).toString())
-                .multiPart("cardStyle", "card_basic_1")
-                .when()
-                .post(Paths.get(BASE_PATH, 아기1.getId()).toString())
-                .then()
-                .log().all()
-                .extract();
+        final ExtractableResponse<Response> response = thenExtract(
+                RestAssured.given()
+                        .headers(Map.of("Authorization", "Bearer " + token))
+                        .multiPart("photo", "test_file.jpg", "Something".getBytes(), MediaType.IMAGE_PNG_VALUE)
+                        .multiPart("date", LocalDate.of(2023, 1, 25).toString())
+                        .multiPart("cardStyle", "card_basic_1")
+                        .when()
+                        .post(Paths.get(BASE_PATH, 아기1.getId()).toString())
+        );
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -93,17 +93,16 @@ public class ContentAcceptanceTest extends AcceptanceTest {
         given(amazonS3.putObject(any())).willThrow(AmazonServiceException.class);
 
         // when
-        final ExtractableResponse<Response> response = RestAssured.given()
-                .headers(Map.of("Authorization", "Bearer " + token))
-                .multiPart("photo", "test_file.jpg", "Something".getBytes(), MediaType.IMAGE_PNG_VALUE)
-                .multiPart("date", LocalDate.of(2023, 1, 25).toString())
-                .multiPart("title", "제목")
-                .multiPart("cardStyle", "card_basic_1")
-                .when()
-                .post(Paths.get(BASE_PATH, 아기1.getId()).toString())
-                .then()
-                .log().all()
-                .extract();
+        final ExtractableResponse<Response> response = thenExtract(
+                RestAssured.given()
+                        .headers(Map.of("Authorization", "Bearer " + token))
+                        .multiPart("photo", "test_file.jpg", "Something".getBytes(), MediaType.IMAGE_PNG_VALUE)
+                        .multiPart("date", LocalDate.of(2023, 1, 25).toString())
+                        .multiPart("title", "제목")
+                        .multiPart("cardStyle", "card_basic_1")
+                        .when()
+                        .post(Paths.get(BASE_PATH, 아기1.getId()).toString())
+        );
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -121,25 +120,22 @@ public class ContentAcceptanceTest extends AcceptanceTest {
         given(amazonS3.getUrl(any(String.class), any(String.class))).willReturn(new URL(VALID_URL));
 
         // when
-        final ExtractableResponse<Response> response = RestAssured.given()
-                .headers(Map.of("Authorization", "Bearer " + token))
-                .multiPart("photo", "test_file.jpg", "Something".getBytes(), MediaType.IMAGE_PNG_VALUE)
-                .multiPart("date", LocalDate.of(2023, 1, 25).toString())
-                .multiPart("title", "제목")
-                .multiPart("cardStyle", "card_basic_1")
-                .when()
-                .post(Paths.get(BASE_PATH, 아기1.getId()).toString())
-                .then()
-                .log().all()
-                .extract();
+        final ExtractableResponse<Response> response = thenExtract(
+                RestAssured.given()
+                        .headers(Map.of("Authorization", "Bearer " + token))
+                        .multiPart("photo", "test_file.jpg", "Something".getBytes(), MediaType.IMAGE_PNG_VALUE)
+                        .multiPart("date", LocalDate.of(2023, 1, 25).toString())
+                        .multiPart("title", "제목")
+                        .multiPart("cardStyle", "card_basic_1")
+                        .when()
+                        .post(Paths.get(BASE_PATH, 아기1.getId()).toString())
+        );
 
-        final Boolean isSuccess = response.response().jsonPath().get("isSuccess");
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
-                () -> assertThat(isSuccess).isTrue()
+                () -> assertThat(toObject(response, CreateContentResponse.class).isSuccess()).isTrue()
         );
-
     }
 
     @Test
@@ -153,20 +149,15 @@ public class ContentAcceptanceTest extends AcceptanceTest {
         final Content content = contentRepository.save(컨텐츠);
 
         // when
-        final ExtractableResponse<Response> response = RestAssured.given()
-                .headers(Map.of("Authorization", "Bearer " + token))
-                .when()
-                .post(Paths.get(BASE_PATH, baby.getId(), content.getId().toString(), "like").toString())
-                .then()
-                .log().all()
-                .extract();
-
-        final Boolean isLiked = response.response().jsonPath().get("isLiked");
+        final ExtractableResponse<Response> response = post(
+                Paths.get(BASE_PATH, baby.getId(), content.getId().toString(), "like").toString(),
+                Map.of("Authorization", "Bearer " + token)
+        );
 
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(isLiked).isTrue()
+                () -> assertThat(toObject(response, LikeContentResponse.class).isLiked()).isTrue()
         );
     }
 
@@ -181,28 +172,20 @@ public class ContentAcceptanceTest extends AcceptanceTest {
         final Content content = contentRepository.save(컨텐츠);
 
         // when
-        RestAssured.given()
-                .headers(Map.of("Authorization", "Bearer " + token))
-                .when()
-                .post(Paths.get(BASE_PATH, baby.getId(), content.getId().toString(), "like").toString())
-                .then()
-                .log().all()
-                .extract();
+        post(
+                Paths.get(BASE_PATH, baby.getId(), content.getId().toString(), "like").toString(),
+                Map.of("Authorization", "Bearer " + token)
+        );
 
-        final ExtractableResponse<Response> response = RestAssured.given()
-                .headers(Map.of("Authorization", "Bearer " + token))
-                .when()
-                .post(Paths.get(BASE_PATH, baby.getId(), content.getId().toString(), "like").toString())
-                .then()
-                .log().all()
-                .extract();
-
-        final Boolean isLiked = response.response().jsonPath().get("isLiked");
+        final ExtractableResponse<Response> response = post(
+                Paths.get(BASE_PATH, baby.getId(), content.getId().toString(), "like").toString(),
+                Map.of("Authorization", "Bearer " + token)
+        );
 
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(isLiked).isFalse()
+                () -> assertThat(toObject(response, LikeContentResponse.class).isLiked()).isFalse()
         );
     }
 
@@ -217,37 +200,26 @@ public class ContentAcceptanceTest extends AcceptanceTest {
         final Content content = contentRepository.save(컨텐츠);
 
         // when
-        RestAssured.given()
-                .headers(Map.of("Authorization", "Bearer " + token))
-                .when()
-                .post(Paths.get(BASE_PATH, baby.getId(), content.getId().toString(), "like").toString())
-                .then()
-                .log().all()
-                .extract();
+        post(
+                Paths.get(BASE_PATH, baby.getId(), content.getId().toString(), "like").toString(),
+                Map.of("Authorization", "Bearer " + token)
+        );
 
         // when
-        RestAssured.given()
-                .headers(Map.of("Authorization", "Bearer " + token))
-                .when()
-                .post(Paths.get(BASE_PATH, baby.getId(), content.getId().toString(), "like").toString())
-                .then()
-                .log().all()
-                .extract();
+        post(
+                Paths.get(BASE_PATH, baby.getId(), content.getId().toString(), "like").toString(),
+                Map.of("Authorization", "Bearer " + token)
+        );
 
-        final ExtractableResponse<Response> response = RestAssured.given()
-                .headers(Map.of("Authorization", "Bearer " + token))
-                .when()
-                .post(Paths.get(BASE_PATH, baby.getId(), content.getId().toString(), "like").toString())
-                .then()
-                .log().all()
-                .extract();
-
-        final Boolean isLiked = response.response().jsonPath().get("isLiked");
+        final ExtractableResponse<Response> response = post(
+                Paths.get(BASE_PATH, baby.getId(), content.getId().toString(), "like").toString(),
+                Map.of("Authorization", "Bearer " + token)
+        );
 
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(isLiked).isTrue()
+                () -> assertThat(toObject(response, LikeContentResponse.class).isLiked()).isTrue()
         );
     }
 }

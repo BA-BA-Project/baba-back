@@ -1,5 +1,7 @@
 package com.baba.back.baby.acceptance;
 
+import static com.baba.back.SimpleRestAssured.get;
+import static com.baba.back.SimpleRestAssured.toObject;
 import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.DomainFixture.아기1;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -7,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.baba.back.AcceptanceTest;
 import com.baba.back.baby.domain.Baby;
+import com.baba.back.baby.dto.SearchDefaultBabyResponse;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.oauth.domain.member.Member;
 import com.baba.back.oauth.repository.MemberRepository;
@@ -14,7 +17,6 @@ import com.baba.back.oauth.service.MemberTokenProvider;
 import com.baba.back.relation.domain.Relation;
 import com.baba.back.relation.domain.RelationGroup;
 import com.baba.back.relation.repository.RelationRepository;
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.Map;
@@ -44,13 +46,8 @@ public class BabyAcceptanceTest extends AcceptanceTest {
         final String token = tokenProvider.createToken(멤버1.getId());
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given()
-                .headers(Map.of("Authorization", "Bearer " + token))
-                .when()
-                .get(BABY_BASE_PATH + "/default")
-                .then()
-                .log().all()
-                .extract();
+        final ExtractableResponse<Response> response =
+                get(BABY_BASE_PATH + "/default", Map.of("Authorization", "Bearer " + token));
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
@@ -73,18 +70,13 @@ public class BabyAcceptanceTest extends AcceptanceTest {
                 .build());
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given()
-                .headers(Map.of("Authorization", "Bearer " + token))
-                .when()
-                .get(BABY_BASE_PATH + "/default")
-                .then()
-                .log().all()
-                .extract();
+        ExtractableResponse<Response> response =
+                get(BABY_BASE_PATH + "/default", Map.of("Authorization", "Bearer " + token));
 
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(response.response().jsonPath().getString("babyId")).isEqualTo(baby.getId())
+                () -> assertThat(toObject(response, SearchDefaultBabyResponse.class).babyId()).isEqualTo(baby.getId())
         );
 
     }

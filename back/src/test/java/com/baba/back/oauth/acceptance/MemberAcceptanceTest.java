@@ -1,10 +1,13 @@
 package com.baba.back.oauth.acceptance;
 
+import static com.baba.back.SimpleRestAssured.post;
+import static com.baba.back.SimpleRestAssured.toObject;
 import static com.baba.back.fixture.RequestFixture.멤버_가입_요청;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.baba.back.AcceptanceTest;
+import com.baba.back.SimpleRestAssured;
 import com.baba.back.baby.dto.BabyRequest;
 import com.baba.back.common.dto.ExceptionResponse;
 import com.baba.back.oauth.domain.JoinedMember;
@@ -12,7 +15,6 @@ import com.baba.back.oauth.dto.MemberJoinRequest;
 import com.baba.back.oauth.dto.MemberJoinResponse;
 import com.baba.back.oauth.repository.JoinedMemberRepository;
 import com.baba.back.oauth.service.MemberTokenProvider;
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.time.LocalDate;
@@ -21,7 +23,6 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 public class MemberAcceptanceTest extends AcceptanceTest {
 
@@ -35,19 +36,12 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     @Test
     void 요청에_토큰이_존재하지않으면_400을_응답한다() {
         // given
-        final ExtractableResponse<Response> response = RestAssured.given()
-                .body(멤버_가입_요청)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post(MEMBER_BASE_PATH)
-                .then()
-                .log().all()
-                .extract();
+        final ExtractableResponse<Response> response = SimpleRestAssured.post(MEMBER_BASE_PATH, 멤버_가입_요청);
 
         // when & then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
-                () -> assertThat(response.as(ExceptionResponse.class).message()).isNotBlank()
+                () -> assertThat(toObject(response, ExceptionResponse.class).message()).isNotBlank()
         );
     }
 
@@ -55,20 +49,14 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     void 유효하지_않은_토큰으로_요청_시_401을_응답한다() {
         // given
         final String invalidToken = "111";
-        final ExtractableResponse<Response> response = RestAssured.given()
-                .headers(Map.of("Authorization", "Bearer " + invalidToken))
-                .body(멤버_가입_요청)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post(MEMBER_BASE_PATH)
-                .then()
-                .log().all()
-                .extract();
+        final ExtractableResponse<Response> response = post(
+                MEMBER_BASE_PATH, Map.of("Authorization", "Bearer " + invalidToken), 멤버_가입_요청
+        );
 
         // when & then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value()),
-                () -> assertThat(response.as(ExceptionResponse.class).message()).isNotBlank()
+                () -> assertThat(toObject(response, ExceptionResponse.class).message()).isNotBlank()
         );
     }
 
@@ -80,15 +68,9 @@ public class MemberAcceptanceTest extends AcceptanceTest {
                         new BabyRequest("아기2", LocalDate.of(2023, 1, 1)))
         );
         final String validToken = tokenProvider.createToken(MEMBER_ID);
-        final ExtractableResponse<Response> response = RestAssured.given()
-                .headers(Map.of("Authorization", "Bearer " + validToken))
-                .body(INVALID_MEMBER_JOIN_REQUEST)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post(MEMBER_BASE_PATH)
-                .then()
-                .log().all()
-                .extract();
+        final ExtractableResponse<Response> response = post(
+                MEMBER_BASE_PATH, Map.of("Authorization", "Bearer " + validToken), INVALID_MEMBER_JOIN_REQUEST
+        );
 
         // when & then
         assertAll(
@@ -103,31 +85,17 @@ public class MemberAcceptanceTest extends AcceptanceTest {
         final String validToken = tokenProvider.createToken(MEMBER_ID);
         joinedMemberRepository.save(new JoinedMember(MEMBER_ID, false));
 
-        RestAssured.given()
-                .headers(Map.of("Authorization", "Bearer " + validToken))
-                .body(멤버_가입_요청)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post(MEMBER_BASE_PATH)
-                .then()
-                .log().all()
-                .extract();
+        post(MEMBER_BASE_PATH, Map.of("Authorization", "Bearer " + validToken), 멤버_가입_요청);
 
         // when
-        final ExtractableResponse<Response> response = RestAssured.given()
-                .headers(Map.of("Authorization", "Bearer " + validToken))
-                .body(멤버_가입_요청)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post(MEMBER_BASE_PATH)
-                .then()
-                .log().all()
-                .extract();
+        final ExtractableResponse<Response> response = post(
+                MEMBER_BASE_PATH, Map.of("Authorization", "Bearer " + validToken), 멤버_가입_요청
+        );
 
         //  then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
-                () -> assertThat(response.as(ExceptionResponse.class).message()).isNotBlank()
+                () -> assertThat(toObject(response, ExceptionResponse.class).message()).isNotBlank()
         );
     }
 
@@ -138,15 +106,9 @@ public class MemberAcceptanceTest extends AcceptanceTest {
         joinedMemberRepository.save(new JoinedMember(MEMBER_ID, false));
 
         // when
-        final ExtractableResponse<Response> response = RestAssured.given()
-                .headers(Map.of("Authorization", "Bearer " + token))
-                .body(멤버_가입_요청)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post(MEMBER_BASE_PATH)
-                .then()
-                .log().all()
-                .extract();
+        final ExtractableResponse<Response> response = post(
+                MEMBER_BASE_PATH, Map.of("Authorization", "Bearer " + token), 멤버_가입_요청
+        );
 
         // then
         assertAll(
