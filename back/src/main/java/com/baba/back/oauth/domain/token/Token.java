@@ -1,26 +1,26 @@
 package com.baba.back.oauth.domain.token;
 
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
 @Entity
+@Getter
 @NoArgsConstructor
 public class Token {
 
     @Id
     private String id;
 
-    @Embedded
-    private TokenInfo tokenInfo;
+    @NotNull
+    private String token;
 
     @Builder
     public Token(String id, String token) {
         this.id = id;
-        this.tokenInfo = new TokenInfo(token);
+        this.token = token;
     }
 }
