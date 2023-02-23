@@ -67,6 +67,6 @@ class BabyServiceTest {
         final SearchDefaultBabyResponse response = babyService.searchDefaultBaby("멤버1");
 
         // then
-        assertThat(response.getBabyId()).isEqualTo(아기1.getId());
+        assertThat(response.babyId()).isEqualTo(아기1.getId());
     }
 }

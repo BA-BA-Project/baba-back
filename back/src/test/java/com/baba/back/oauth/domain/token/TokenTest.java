@@ -8,17 +8,15 @@ import org.junit.jupiter.api.Test;
 
 class TokenTest {
     @Test
-    void token이_null일수_없다() {
+    void token은_null일수_없다() {
         // given
         String invalidToken = null;
 
-        // when
+        // when & then
         Assertions.assertThatThrownBy(() -> Token.builder()
                         .id(멤버1.getId())
                         .token(invalidToken)
                         .build())
                 .isInstanceOf(TokenBadRequestException.class);
-
-        // then
     }
 }

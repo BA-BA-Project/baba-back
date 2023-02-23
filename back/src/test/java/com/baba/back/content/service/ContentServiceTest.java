@@ -137,7 +137,7 @@ class ContentServiceTest {
 
         // then
         then(contentRepository).should(times(1)).save(any());
-        assertThat(response.success()).isTrue();
+        assertThat(response.isSuccess()).isTrue();
     }
 
     @Test
@@ -202,7 +202,7 @@ class ContentServiceTest {
         // then
         then(likeRepository).should(times(1)).save(any());
 
-        assertThat(likeContentResponse.liked()).isTrue();
+        assertThat(likeContentResponse.isLiked()).isTrue();
     }
 
     @Test
@@ -221,7 +221,7 @@ class ContentServiceTest {
         // then
         then(likeRepository).should(times(1)).save(any());
 
-        assertThat(likeContentResponse.liked()).isFalse();
+        assertThat(likeContentResponse.isLiked()).isFalse();
     }
 
     @Test
@@ -241,6 +241,6 @@ class ContentServiceTest {
         // then
         then(likeRepository).should(times(2)).save(any());
 
-        assertThat(likeContentResponse.liked()).isTrue();
+        assertThat(likeContentResponse.isLiked()).isTrue();
     }
 }
