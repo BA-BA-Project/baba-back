@@ -15,9 +15,7 @@ public class SimpleRestAssured {
     }
 
     public static ExtractableResponse<Response> get(String path, Map<String, String> headers) {
-        return thenExtract(givenWithHeaders(headers)
-                .when()
-                .get(path));
+        return thenExtract(givenWithHeaders(headers).when().get(path));
     }
 
     public static ExtractableResponse<Response> post(String path, Object request) {
@@ -34,14 +32,7 @@ public class SimpleRestAssured {
             given.body(request);
         }
 
-        return thenExtract(
-                given
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post(path));
-    }
-
-    private static RequestSpecification given() {
-        return RestAssured.given().log().all();
+        return thenExtract(given.contentType(MediaType.APPLICATION_JSON_VALUE).when().post(path));
     }
 
     private static RequestSpecification givenWithHeaders(Map<String, String> headers) {
@@ -52,10 +43,12 @@ public class SimpleRestAssured {
         return given;
     }
 
+    private static RequestSpecification given() {
+        return RestAssured.given().log().all();
+    }
+
     public static ExtractableResponse<Response> thenExtract(Response response) {
-        return response
-                .then().log().all()
-                .extract();
+        return response.then().log().all().extract();
     }
 
     public static <T> T toObject(ExtractableResponse<Response> response, Class<T> clazz) {
