@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 
 public class OAuthAcceptanceTest extends AcceptanceTest {
 
@@ -29,7 +30,7 @@ public class OAuthAcceptanceTest extends AcceptanceTest {
     private MemberRepository memberRepository;
 
     @Test
-    void 가입되어_있으면_멤버_토큰을_응답한다() {
+    void 가입되어_있으면_200을_응답한다() {
         // given
         final SocialTokenRequest request = new SocialTokenRequest("token");
         memberRepository.save(멤버1);
@@ -39,24 +40,27 @@ public class OAuthAcceptanceTest extends AcceptanceTest {
         // when
         final ExtractableResponse<Response> response = RestAssured.given()
                 .body(request)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post(BASE_URL)
                 .then()
                 .log().all()
                 .extract();
 
-        final String accessToken = response.response().jsonPath().get("accessToken");
+        final String accessTokenResponse = response.response().jsonPath().get("accessToken");
+        final String refreshTokenResponse = response.response().jsonPath().get("refreshToken");
 
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(accessToken).isNotNull()
+                () -> assertThat(accessTokenResponse).isNotBlank(),
+                () -> assertThat(refreshTokenResponse).isNotBlank()
         );
 
     }
 
     @Test
-    void 가입되어_있지_않으면_회원가입_토큰을_응답한다() {
+    void 가입되어_있지_않으면_404를_응답한다() {
         // given
         final SocialTokenRequest request = new SocialTokenRequest("invalidToken");
         given(oAuthClient.getMemberId(any())).willReturn("invalid member");
@@ -64,6 +68,7 @@ public class OAuthAcceptanceTest extends AcceptanceTest {
         // when
         final ExtractableResponse<Response> response = RestAssured.given()
                 .body(request)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post(BASE_URL)
                 .then()
@@ -71,10 +76,13 @@ public class OAuthAcceptanceTest extends AcceptanceTest {
                 .extract();
 
         // then
-        final String signTokenResponse = response.response().jsonPath().get("signToken");
+        final String accessTokenResponse = response.response().jsonPath().get("accessToken");
+        final String refreshTokenResponse = response.response().jsonPath().get("refreshToken");
+
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value()),
-                () -> assertThat(signTokenResponse).isNotNull()
+                () -> assertThat(accessTokenResponse).isNotBlank(),
+                () -> assertThat(refreshTokenResponse).isNotBlank()
         );
     }
 }

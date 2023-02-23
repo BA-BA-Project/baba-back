@@ -5,11 +5,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.times;
 
 import com.baba.back.oauth.OAuthClient;
 import com.baba.back.oauth.dto.SocialLoginResponse;
 import com.baba.back.oauth.dto.SocialTokenRequest;
 import com.baba.back.oauth.repository.MemberRepository;
+import com.baba.back.oauth.repository.TokenRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,13 +31,16 @@ class OAuthServiceTest {
     private OAuthClient oAuthClient;
 
     @Mock
-    private MemberTokenProvider memberTokenProvider;
+    private AccessTokenProvider accessTokenProvider;
 
     @Mock
-    private SignTokenProvider signTokenProvider;
+    private RefreshTokenProvider refreshTokenProvider;
 
     @Mock
     private MemberRepository memberRepository;
+
+    @Mock
+    private TokenRepository tokenRepository;
 
     @Test
     void 소셜_토큰이_유효하지_않다면_400을_반환한다() {
@@ -48,13 +54,15 @@ class OAuthServiceTest {
     }
 
     @Test
-    void 가입이_되어_있으면_멤버_토큰을_발급한다() {
+    void 가입이_되어_있으면_200을_응답한다() {
         // given
         final String validToken = "validToken";
         final String memberId = "memberId";
         given(oAuthClient.getMemberId(any())).willReturn(memberId);
         given(memberRepository.existsById(memberId)).willReturn(true);
-        given(memberTokenProvider.createToken(memberId)).willReturn("memberToken");
+        given(tokenRepository.save(any())).willReturn(any());
+        given(accessTokenProvider.createToken(memberId)).willReturn("accessToken");
+        given(refreshTokenProvider.createToken(memberId)).willReturn("refreshToken");
 
         // when
         final SocialLoginResponse response = oAuthService.signInKakao(new SocialTokenRequest(validToken));
@@ -62,27 +70,34 @@ class OAuthServiceTest {
         // then
         assertAll(
                 () -> assertThat(response.httpStatus()).isEqualTo(HttpStatus.OK),
-                () -> assertThat(response.tokenResponse()).isNotNull()
+                () -> assertThat(response.tokenResponse().accessToken()).isNotBlank(),
+                () -> assertThat(response.tokenResponse().refreshToken()).isNotBlank()
         );
+
+        then(tokenRepository).should(times(1)).save(any());
     }
 
     @Test
-    void 가입이_되어있지_않으면_회원가입_토큰을_발급한다() {
+    void 가입이_되어있지_않으면_404를_응답한다() {
         // given
-        final String notMemberToken = "not member token";
+        final String validToken = "validToken";
         final String memberId = "memberId";
-        final String signToken = "signToken";
-        given(oAuthClient.getMemberId(notMemberToken)).willReturn(memberId);
+        given(oAuthClient.getMemberId(validToken)).willReturn(memberId);
         given(memberRepository.existsById(memberId)).willReturn(false);
-        given(signTokenProvider.createToken(memberId)).willReturn(signToken);
+        given(tokenRepository.save(any())).willReturn(any());
+        given(accessTokenProvider.createToken(memberId)).willReturn("accessToken");
+        given(refreshTokenProvider.createToken(memberId)).willReturn("refreshToken");
 
         // when
-        final SocialLoginResponse response = oAuthService.signInKakao(new SocialTokenRequest(notMemberToken));
+        final SocialLoginResponse response = oAuthService.signInKakao(new SocialTokenRequest(validToken));
 
         // then
         assertAll(
                 () -> assertThat(response.httpStatus()).isEqualTo(HttpStatus.NOT_FOUND),
-                () -> assertThat(response.tokenResponse()).isNotNull()
+                () -> assertThat(response.tokenResponse().accessToken()).isNotBlank(),
+                () -> assertThat(response.tokenResponse().refreshToken()).isNotBlank()
         );
+
+        then(tokenRepository).should(times(1)).save(any());
     }
 }
