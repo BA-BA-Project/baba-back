@@ -17,14 +17,14 @@ public class LoginConfig implements WebMvcConfigurer {
     private final LoginInterceptor loginInterceptor;
     private final LoginArgumentResolver loginArgumentResolver;
 
-    @Value("${server.servlet.context-path}")
-    private String baseUrl;
+    @Value("${springdoc.swagger-ui.path}")
+    private String swaggerPath;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(loginInterceptor)
-                .addPathPatterns(baseUrl + "/**")
-                .excludePathPatterns(baseUrl + "/login/**");
+                .addPathPatterns("/**")
+                .excludePathPatterns("/auth/login", swaggerPath, "/swagger-ui/**", "/v3/api-docs/**");
     }
 
     @Override
