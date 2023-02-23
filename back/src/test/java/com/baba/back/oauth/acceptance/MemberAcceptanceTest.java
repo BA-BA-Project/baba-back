@@ -14,7 +14,7 @@ import com.baba.back.oauth.domain.JoinedMember;
 import com.baba.back.oauth.dto.MemberJoinRequest;
 import com.baba.back.oauth.dto.MemberJoinResponse;
 import com.baba.back.oauth.repository.JoinedMemberRepository;
-import com.baba.back.oauth.service.MemberTokenProvider;
+import com.baba.back.oauth.service.AccessTokenProvider;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.time.LocalDate;
@@ -29,7 +29,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     private static final String MEMBER_BASE_PATH = "/api/members/baby";
     private static final String MEMBER_ID = "memberId";
     @Autowired
-    private MemberTokenProvider tokenProvider;
+    private AccessTokenProvider tokenProvider;
     @Autowired
     private JoinedMemberRepository joinedMemberRepository;
 

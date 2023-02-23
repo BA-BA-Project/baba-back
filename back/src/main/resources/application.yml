@@ -13,12 +13,12 @@ server:
 security:
   jwt:
     token:
-      sign:
-        secret-key: ${JWT_SIGN_SECRET_KEY}
-        expire-length: ${JWT_SIGN_EXPIRE_LENGTH}
-      member:
-        secret-key: ${JWT_MEMBER_SECRET_KEY}
-        expire-length: ${JWT_MEMBER_EXPIRE_LENGTH}
+      access:
+        secret-key: ${JWT_ACCESS_SECRET_KEY}
+        expire-length: ${JWT_ACCESS_EXPIRE_LENGTH}
+      refresh:
+        secret-key: ${JWT_REFRESH_SECRET_KEY}
+        expire-length: ${JWT_REFRESH_EXPIRE_LENGTH}
 
 cloud:
   aws:
