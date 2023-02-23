@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 
 public class OAuthAcceptanceTest extends AcceptanceTest {
 
@@ -39,6 +40,7 @@ public class OAuthAcceptanceTest extends AcceptanceTest {
         // when
         final ExtractableResponse<Response> response = RestAssured.given()
                 .body(request)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post(BASE_URL)
                 .then()
@@ -66,6 +68,7 @@ public class OAuthAcceptanceTest extends AcceptanceTest {
         // when
         final ExtractableResponse<Response> response = RestAssured.given()
                 .body(request)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post(BASE_URL)
                 .then()
