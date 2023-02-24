@@ -28,12 +28,12 @@ jobs:
           zip -qq -r ./$GITHUB_SHA.zip .
         working-directory: ./back
         env:
+          JWT_ACCESS_EXPIRE_LENGTH: ${{ secrets.JWT_ACCESS_EXPIRE_LENGTH }}
+          JWT_ACCESS_SECRET_KEY: ${{ secrets.JWT_ACCESS_SECRET_KEY }}
+          JWT_REFRESH_EXPIRE_LENGTH: ${{ secrets.JWT_REFRESH_EXPIRE_LENGTH }}
+          JWT_REFRESH_SECRET_KEY: ${{ secrets.JWT_REFRESH_SECRET_KEY }}
           AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          JWT_MEMBER_EXPIRE_LENGTH: ${{ secrets.JWT_MEMBER_EXPIRE_LENGTH }}
-          JWT_MEMBER_SECRET_KEY: ${{ secrets.JWT_MEMBER_SECRET_KEY }}
-          JWT_SIGN_EXPIRE_LENGTH: ${{ secrets.JWT_SIGN_EXPIRE_LENGTH }}
-          JWT_SIGN_SECRET_KEY: ${{ secrets.JWT_SIGN_SECRET_KEY }}
           S3_IMAGES_BUCKET_NAME: ${{ secrets.S3_IMAGES_BUCKET_NAME }}
 
       - name: Configure AWS credentials
