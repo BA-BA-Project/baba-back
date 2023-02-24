@@ -2,6 +2,7 @@ package com.baba.back.fixture;
 
 import com.baba.back.baby.domain.Baby;
 import com.baba.back.content.domain.Like;
+import com.baba.back.content.domain.content.CardStyle;
 import com.baba.back.content.domain.content.Content;
 import com.baba.back.oauth.domain.JoinedMember;
 import com.baba.back.oauth.domain.member.IconColor;
@@ -55,7 +56,7 @@ public class DomainFixture {
             .title("제목")
             .contentDate(LocalDate.now())
             .now(LocalDate.now())
-            .cardStyle("card_basic_1")
+            .cardStyle(CardStyle.CARD_BASIC_1.toString())
             .baby(아기1)
             .owner(멤버1)
             .build();

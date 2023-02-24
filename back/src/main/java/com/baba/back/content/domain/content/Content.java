@@ -4,6 +4,8 @@ import com.baba.back.baby.domain.Baby;
 import com.baba.back.oauth.domain.member.Member;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -28,7 +30,7 @@ public class Content {
     @Embedded
     private ContentDate contentDate;
 
-    @Embedded
+    @Enumerated(EnumType.STRING)
     private CardStyle cardStyle;
 
     @Embedded
@@ -44,7 +46,7 @@ public class Content {
     public Content(String title, LocalDate contentDate, LocalDate now, String cardStyle, Baby baby, Member owner) {
         this.title = new Title(title);
         this.contentDate = ContentDate.of(contentDate, now, baby.getBirthday());
-        this.cardStyle = new CardStyle(cardStyle);
+        this.cardStyle = CardStyle.from(cardStyle);
         this.imageSource = new ImageSource("");
         this.baby = baby;
         this.owner = owner;
