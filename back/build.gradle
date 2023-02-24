@@ -97,8 +97,9 @@ jacocoTestCoverageVerification {
                     '**.*Interceptor*',
                     '**.*Resolver*',
                     '**.*Exception*',
-                    '**.*Builder*',
-                    '**.*Extractor*'
+                    '**.*Extractor*',
+                    '**.*Picker*',
+                    '**.*ControllerAdvice*'
             ]
         }
 
