@@ -99,7 +99,7 @@ public class ContentAcceptanceTest extends AcceptanceTest {
                         .multiPart("photo", "test_file.jpg", "Something".getBytes(), MediaType.IMAGE_PNG_VALUE)
                         .multiPart("date", LocalDate.of(2023, 1, 25).toString())
                         .multiPart("title", "제목")
-                        .multiPart("cardStyle", "card_basic_1")
+                        .multiPart("cardStyle", "CARD_BASIC_1")
                         .when()
                         .post(Paths.get(BASE_PATH, 아기1.getId()).toString())
         );
@@ -126,7 +126,7 @@ public class ContentAcceptanceTest extends AcceptanceTest {
                         .multiPart("photo", "test_file.jpg", "Something".getBytes(), MediaType.IMAGE_PNG_VALUE)
                         .multiPart("date", LocalDate.of(2023, 1, 25).toString())
                         .multiPart("title", "제목")
-                        .multiPart("cardStyle", "card_basic_1")
+                        .multiPart("cardStyle", "CARD_BASIC_1")
                         .when()
                         .post(Paths.get(BASE_PATH, 아기1.getId()).toString())
         );

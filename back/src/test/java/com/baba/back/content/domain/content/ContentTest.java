@@ -15,7 +15,7 @@ class ContentTest {
     public static final LocalDate CONTENT_DATE = LocalDate.of(2023, 1, 27);
     public static final LocalDate NOW = LocalDate.of(2023, 1, 27);
     public static final LocalDate BIRTHDAY = LocalDate.of(2023, 2, 28);
-    public static final String CARD_STYLE = "card_basic_1";
+    public static final String CARD_STYLE = "CARD_BASIC_1";
     public static final String BABY_ID = UUID.randomUUID().toString();
     public static final String BABY_NAME = "앙쥬";
     public static final String IMAGE_SOURCE = "1234";

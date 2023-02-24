@@ -37,7 +37,7 @@ class LikeRepositoryTest {
         final Member savedMember = memberRepository.save(멤버1);
         final Baby savedBaby = babyRepository.save(아기1);
         final Content savedContent = contentRepository.save(
-                new Content("제목", now, now, "card_basic_1", savedBaby, savedMember));
+                new Content("제목", now, now, "CARD_BASIC_1", savedBaby, savedMember));
         final Like savedLike = likeRepository.save(new Like(savedMember, savedContent));
 
         // when

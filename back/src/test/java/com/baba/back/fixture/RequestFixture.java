@@ -1,5 +1,7 @@
 package com.baba.back.fixture;
 
+import static com.baba.back.content.domain.content.CardStyle.CARD_BASIC_1;
+
 import com.baba.back.baby.dto.BabyRequest;
 import com.baba.back.content.dto.CreateContentRequest;
 import com.baba.back.oauth.dto.MemberJoinRequest;
@@ -16,5 +18,5 @@ public class RequestFixture {
     );
     public static final CreateContentRequest 컨텐츠_생성_요청 = new CreateContentRequest(LocalDate.now(), "제목",
             new MockMultipartFile("photo", "file.png", "image/png",
-                    "Mock File".getBytes()), "card_basic_1");
+                    "Mock File".getBytes()), CARD_BASIC_1.toString());
 }
