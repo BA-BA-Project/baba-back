@@ -38,7 +38,9 @@ class FileHandlerS3Test {
         given(amazonS3.putObject(any(PutObjectRequest.class))).willThrow(AmazonServiceException.class);
 
         // when & then
-        Assertions.assertThatThrownBy(() -> fileHandlerS3.upload(new ImageFile(mockFile)))
+        final ImageFile imageFile = new ImageFile(mockFile);
+
+        Assertions.assertThatThrownBy(() -> fileHandlerS3.upload(imageFile))
                 .isInstanceOf(FileHandlerServerException.class);
     }
 

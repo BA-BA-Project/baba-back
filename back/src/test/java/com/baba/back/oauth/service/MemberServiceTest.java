@@ -62,7 +62,9 @@ class MemberServiceTest {
         given(joinedMemberRepository.findById(invalidMemberId)).willReturn(Optional.empty());
 
         // when & then
-        Assertions.assertThatThrownBy(() -> memberService.join(new MemberJoinRequest(), invalidMemberId))
+        final MemberJoinRequest request = new MemberJoinRequest();
+
+        Assertions.assertThatThrownBy(() -> memberService.join(request, invalidMemberId))
                 .isInstanceOf(JoinedMemberNotFoundException.class);
     }
 
@@ -72,7 +74,9 @@ class MemberServiceTest {
         given(joinedMemberRepository.findById(anyString())).willReturn(Optional.of(이미_회원가입한_유저1));
 
         // when & then
-        Assertions.assertThatThrownBy(() -> memberService.join(new MemberJoinRequest(), "memberId"))
+        final MemberJoinRequest request = new MemberJoinRequest();
+
+        Assertions.assertThatThrownBy(() -> memberService.join(request, "memberId"))
                 .isInstanceOf(JoinedMemberBadRequestException.class);
     }
 

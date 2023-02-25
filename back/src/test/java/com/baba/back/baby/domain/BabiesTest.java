@@ -50,7 +50,7 @@ class BabiesTest {
         List<Baby> notDefaultBabies = babies.getNotDefaultBabies();
 
         // then
-        assertThat(notDefaultBabies.size()).isZero();
+        assertThat(notDefaultBabies).isEmpty();
     }
 
     @Test

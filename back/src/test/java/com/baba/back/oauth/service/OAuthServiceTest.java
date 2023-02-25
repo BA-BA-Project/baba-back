@@ -49,7 +49,9 @@ class OAuthServiceTest {
         given(oAuthClient.getMemberId(invalidToken)).willThrow(HttpClientErrorException.class);
 
         // when & then
-        assertThatThrownBy(() -> oAuthService.signInKakao(new SocialTokenRequest(invalidToken)))
+        final SocialTokenRequest request = new SocialTokenRequest(invalidToken);
+
+        assertThatThrownBy(() -> oAuthService.signInKakao(request))
                 .isInstanceOf(HttpClientErrorException.class);
     }
 
