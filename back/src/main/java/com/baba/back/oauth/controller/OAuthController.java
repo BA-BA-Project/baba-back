@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class OAuthController {
 
-    private final OAuthService OAuthService;
+    private final OAuthService oauthService;
 
     @Operation(summary = "소셜 로그인 요청")
     @OkResponse
@@ -31,7 +31,7 @@ public class OAuthController {
     @IntervalServerErrorResponse
     @PostMapping("/auth/login")
     public ResponseEntity<TokenResponse> signInKakao(@RequestBody @Valid SocialTokenRequest tokenRequest) {
-        final SocialLoginResponse socialLoginResponse = OAuthService.signInKakao(tokenRequest);
+        final SocialLoginResponse socialLoginResponse = oauthService.signInKakao(tokenRequest);
         return ResponseEntity.status(socialLoginResponse.httpStatus()).body(socialLoginResponse.tokenResponse());
     }
 }

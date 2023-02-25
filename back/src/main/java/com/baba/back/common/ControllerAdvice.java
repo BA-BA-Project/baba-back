@@ -19,7 +19,33 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ControllerAdvice {
 
+    private static final String BAD_REQUEST_ERROR_MESSAGE = "잘못된 요청입니다.";
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getSimpleName());
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ExceptionResponse> handleBadRequestException(BadRequestException exception) {
+        logger.warn(exception.getMessage());
+        return ResponseEntity.badRequest().body(new ExceptionResponse(BAD_REQUEST_ERROR_MESSAGE));
+    }
+
+    @ExceptionHandler(BindException.class)
+    public ResponseEntity<ExceptionResponse> handleBindingExceptions(BindException exception) {
+        final String message = exception.getBindingResult()
+                .getAllErrors()
+                .stream()
+                .map(error -> String.format("%s: %s", ((FieldError) error).getField(), error.getDefaultMessage()))
+                .collect(Collectors.joining(", "));
+
+        logger.warn(message);
+
+        return ResponseEntity.badRequest().body(new ExceptionResponse(BAD_REQUEST_ERROR_MESSAGE));
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ExceptionResponse> handleRuntimeException(RuntimeException exception) {
+        logger.warn(exception.getMessage());
+        return ResponseEntity.badRequest().body(new ExceptionResponse(BAD_REQUEST_ERROR_MESSAGE));
+    }
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ExceptionResponse> handleAuthenticationException(AuthenticationException exception) {
@@ -33,12 +59,6 @@ public class ControllerAdvice {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ExceptionResponse("권한이 없습니다."));
     }
 
-    @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<ExceptionResponse> handleBadRequestException(BadRequestException exception) {
-        logger.warn(exception.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionResponse("잘못된 요청입니다."));
-    }
-
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ExceptionResponse> handleNotFoundException(NotFoundException exception) {
         logger.warn(exception.getMessage());
@@ -49,25 +69,6 @@ public class ControllerAdvice {
     public ResponseEntity<ExceptionResponse> handleServerException(ServerException exception) {
         logger.warn(exception.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ExceptionResponse("처리할 수 없는 예외입니다."));
-    }
-
-    @ExceptionHandler(BindException.class)
-    public ResponseEntity<ExceptionResponse> handleBindingExceptions(BindException exception) {
-        final String message = exception.getBindingResult()
-                .getAllErrors()
-                .stream()
-                .map(error -> String.format("%s: %s", ((FieldError) error).getField(), error.getDefaultMessage()))
-                .collect(Collectors.joining(", "));
-
-        logger.warn(message);
-
-        return ResponseEntity.badRequest().body(new ExceptionResponse("잘못된 요청입니다."));
-    }
-
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ExceptionResponse> handleRuntimeException(RuntimeException exception) {
-        logger.warn(exception.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionResponse("잘못된 요청입니다."));
     }
 
     @ExceptionHandler(Exception.class)

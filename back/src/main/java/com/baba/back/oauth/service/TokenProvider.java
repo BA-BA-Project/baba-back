@@ -16,7 +16,7 @@ public abstract class TokenProvider {
     private final SecretKey key;
     private final Long validityInMilliseconds;
 
-    public TokenProvider(String secretKey, Long validityInMilliseconds) {
+    protected TokenProvider(String secretKey, Long validityInMilliseconds) {
         this.key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
         this.validityInMilliseconds = validityInMilliseconds;
     }
