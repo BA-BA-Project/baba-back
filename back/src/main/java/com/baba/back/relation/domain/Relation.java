@@ -40,20 +40,12 @@ public class Relation {
     @Enumerated(EnumType.STRING)
     private RelationGroup relationGroup;
 
-    private boolean defaultRelation;
-
     @Builder
-    public Relation(Member member, Baby baby, String relationName, RelationGroup relationGroup,
-                    boolean defaultRelation) {
+    public Relation(Member member, Baby baby, String relationName, RelationGroup relationGroup) {
         this.member = member;
         this.baby = baby;
         this.relationName = new Name(relationName);
         this.relationGroup = relationGroup;
-        this.defaultRelation = defaultRelation;
-    }
-
-    public String searchBabyId() {
-        return baby.getId();
     }
 
     public boolean isFamily() {

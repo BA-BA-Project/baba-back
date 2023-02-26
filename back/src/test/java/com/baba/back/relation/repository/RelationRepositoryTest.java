@@ -2,7 +2,6 @@ package com.baba.back.relation.repository;
 
 import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.DomainFixture.아기1;
-import static com.baba.back.fixture.DomainFixture.아기2;
 
 import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.repository.BabyRepository;
@@ -28,39 +27,19 @@ class RelationRepositoryTest {
     private BabyRepository babyRepository;
 
     @Test
-    void 멤버의_기본설정된_아기를_조회할_수_있다() {
+    void 멤버와_아기의_관계를_조회한다() {
         // given
         final Member savedMember = memberRepository.save(멤버1);
         final Baby savedBaby = babyRepository.save(아기1);
-        final Relation relation = new Relation(savedMember, savedBaby, "삼촌", RelationGroup.FAMILY, true);
+        final Relation relation = new Relation(savedMember, savedBaby, "삼촌", RelationGroup.FAMILY);
 
         final Relation savedRelation = relationRepository.save(relation);
 
         // when
-        final Relation findRelation = relationRepository.findByMemberAndDefaultRelation(savedMember, true)
+        final Relation findRelation = relationRepository.findByMemberAndBaby(savedMember, savedBaby)
                 .orElseThrow();
 
         // then
         Assertions.assertThat(findRelation).isEqualTo(savedRelation);
-    }
-
-    @Test
-    void 멤버에_등록된_여러_아기_중_기본설정된_아기를_조회할_수_있다() {
-        // given
-        final Member savedMember = memberRepository.save(멤버1);
-        final Baby savedBaby1 = babyRepository.save(아기1);
-        final Baby savedBaby2 = babyRepository.save(아기2);
-        final Relation relation1 = new Relation(savedMember, savedBaby1, "삼촌", RelationGroup.FAMILY, false);
-        final Relation relation2 = new Relation(savedMember, savedBaby2, "삼촌", RelationGroup.FAMILY, true);
-
-        relationRepository.save(relation1);
-        final Relation savedRelation2 = relationRepository.save(relation2);
-
-        // when
-        final Relation findRelation = relationRepository.findByMemberAndDefaultRelation(savedMember, true)
-                .orElseThrow();
-
-        // then
-        Assertions.assertThat(findRelation).isEqualTo(savedRelation2);
     }
 }
