@@ -4,7 +4,6 @@ import com.baba.back.baby.domain.Baby;
 import com.baba.back.content.domain.Like;
 import com.baba.back.content.domain.content.CardStyle;
 import com.baba.back.content.domain.content.Content;
-import com.baba.back.oauth.domain.JoinedMember;
 import com.baba.back.oauth.domain.member.IconColor;
 import com.baba.back.oauth.domain.member.IconName;
 import com.baba.back.oauth.domain.member.Member;
@@ -40,7 +39,6 @@ public class DomainFixture {
             .member(멤버1)
             .baby(아기1)
             .relationName("아빠")
-            .defaultRelation(true)
             .relationGroup(RelationGroup.FAMILY)
             .build();
 
@@ -48,7 +46,6 @@ public class DomainFixture {
             .member(멤버1)
             .baby(아기1)
             .relationName("아빠")
-            .defaultRelation(true)
             .relationGroup(RelationGroup.FRIENDS)
             .build();
 
@@ -65,7 +62,4 @@ public class DomainFixture {
             .member(멤버1)
             .content(컨텐츠)
             .build();
-
-    public static final JoinedMember 회원가입_안한_유저1 = new JoinedMember(멤버1.getId(), false);
-    public static final JoinedMember 이미_회원가입한_유저1 = new JoinedMember(멤버1.getId(), true);
 }

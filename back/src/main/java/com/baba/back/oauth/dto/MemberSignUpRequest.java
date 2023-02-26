@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberJoinRequest {
+public class MemberSignUpRequest {
 
     @NotNull
     private String name;
