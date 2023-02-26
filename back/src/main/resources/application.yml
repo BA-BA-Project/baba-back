@@ -19,6 +19,9 @@ security:
       refresh:
         secret-key: ${JWT_REFRESH_SECRET_KEY}
         expire-length: ${JWT_REFRESH_EXPIRE_LENGTH}
+      sign:
+        secret-key: ${JWT_SIGN_SECRET_KEY}
+        expire-length: ${JWT_SIGN_EXPIRE_LENGTH}
 
 cloud:
   aws:

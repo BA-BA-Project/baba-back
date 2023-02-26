@@ -10,8 +10,9 @@ import static org.mockito.BDDMockito.given;
 
 import com.baba.back.AcceptanceTest;
 import com.baba.back.oauth.OAuthClient;
+import com.baba.back.oauth.dto.LoginTokenResponse;
+import com.baba.back.oauth.dto.SignTokenResponse;
 import com.baba.back.oauth.dto.SocialTokenRequest;
-import com.baba.back.oauth.dto.TokenResponse;
 import com.baba.back.oauth.repository.MemberRepository;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -31,7 +32,7 @@ public class OAuthAcceptanceTest extends AcceptanceTest {
     private MemberRepository memberRepository;
 
     @Test
-    void 가입되어_있으면_200을_응답한다() {
+    void 가입되어_있으면_access_token과_refresh_token_과_200을_응답한다() {
         // given
         final SocialTokenRequest request = new SocialTokenRequest("token");
         memberRepository.save(멤버1);
@@ -44,14 +45,15 @@ public class OAuthAcceptanceTest extends AcceptanceTest {
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(toObject(response, TokenResponse.class).accessToken()).isNotBlank(),
-                () -> assertThat(toObject(response, TokenResponse.class).refreshToken()).isNotBlank()
+                () -> assertThat(toObject(response, LoginTokenResponse.class).accessToken()).isNotBlank(),
+                () -> assertThat(toObject(response, LoginTokenResponse.class).refreshToken()).isNotBlank()
         );
 
     }
 
+    //정
     @Test
-    void 가입되어_있지_않으면_404를_응답한다() {
+    void 가입되어_있지_않으면_sign_token_과_404를_응답한다() {
         // given
         final SocialTokenRequest request = new SocialTokenRequest("invalidToken");
         given(oAuthClient.getMemberId(any())).willReturn("invalid member");
@@ -62,8 +64,7 @@ public class OAuthAcceptanceTest extends AcceptanceTest {
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value()),
-                () -> assertThat(toObject(response, TokenResponse.class).accessToken()).isNotNull(),
-                () -> assertThat(toObject(response, TokenResponse.class).refreshToken()).isNotNull()
+                () -> assertThat(toObject(response, SignTokenResponse.class).signToken()).isNotNull()
         );
     }
 }
