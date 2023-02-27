@@ -6,6 +6,11 @@ import com.baba.back.oauth.dto.LoginTokenResponse;
 import com.baba.back.oauth.dto.SignTokenResponse;
 import com.baba.back.oauth.dto.SocialLoginResponse;
 import com.baba.back.oauth.dto.SocialTokenRequest;
+import com.baba.back.oauth.dto.TokenRefreshRequest;
+import com.baba.back.oauth.dto.TokenRefreshResponse;
+import com.baba.back.oauth.exception.MemberNotFoundException;
+import com.baba.back.oauth.exception.TokenBadRequestException;
+import com.baba.back.oauth.exception.TokenNotFoundException;
 import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.oauth.repository.TokenRepository;
 import jakarta.transaction.Transactional;
@@ -46,5 +51,42 @@ public class OAuthService {
                 .id(memberId)
                 .token(refreshToken)
                 .build());
+    }
+
+    public TokenRefreshResponse refresh(TokenRefreshRequest request) {
+        final String refreshToken = request.getRefreshToken();
+        refreshTokenProvider.validateToken(refreshToken);
+
+        final String memberId = refreshTokenProvider.parseToken(refreshToken);
+        validateMember(memberId);
+
+        final Token token = findToken(memberId);
+        validateEqualToken(refreshToken, token);
+
+        final String newAccessToken = accessTokenProvider.createToken(memberId);
+
+        if(refreshTokenProvider.checkExpiration(refreshToken)) {
+            return new TokenRefreshResponse(newAccessToken, refreshToken);
+        }
+
+        final String newRefreshToken = refreshTokenProvider.createToken(memberId);
+        return new TokenRefreshResponse(newAccessToken, newRefreshToken);
+    }
+
+    private void validateMember(String memberId) {
+        if (!memberRepository.existsById(memberId)) {
+            throw new MemberNotFoundException(memberId + "에 해당하는 멤버가 존재하지 않습니다.");
+        }
+    }
+
+    private Token findToken(String memberId) {
+        return tokenRepository.findById(memberId)
+                .orElseThrow(() -> new TokenNotFoundException(memberId + "에 해당하는 refresh 토큰이 존재하지 않습니다."));
+    }
+
+    private static void validateEqualToken(String refreshToken, Token token) {
+        if (!token.hasEqualToken(refreshToken)) {
+            throw new TokenBadRequestException(refreshToken + "는 DB에 저장된 토큰과 일치하지 않습니다.");
+        }
     }
 }
