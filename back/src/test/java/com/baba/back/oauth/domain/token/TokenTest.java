@@ -24,7 +24,7 @@ class TokenTest {
 
     @Test
     void 같은_토큰인지_확인한다() {
-        assertThat(토큰.hasEqualToken(토큰.getValue())).isTrue();
+        assertThat(토큰.hasEqualToken(토큰.getToken())).isTrue();
     }
 
     @Test

@@ -2,6 +2,7 @@ package com.baba.back.oauth.service;
 
 import com.baba.back.oauth.exception.ExpiredTokenAuthenticationException;
 import com.baba.back.oauth.exception.InvalidTokenAuthenticationException;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -52,13 +53,16 @@ public abstract class TokenProvider {
     }
 
     public String parseToken(String token) {
+        return parseTokenBody(token).getSubject();
+    }
+
+    protected Claims parseTokenBody(String token) {
         try {
             return Jwts.parserBuilder()
                     .setSigningKey(key)
                     .build()
                     .parseClaimsJws(token)
-                    .getBody()
-                    .getSubject();
+                    .getBody();
         } catch (JwtException | IllegalArgumentException e) {
             throw new InvalidTokenAuthenticationException(String.format("%s 는 유효하지 않은 토큰입니다.", token));
         }

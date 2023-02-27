@@ -16,14 +16,14 @@ public class Token {
     @Id
     private String id;
 
-    private String value;
+    private String token;
 
     @Builder
     public Token(String id, String token) {
         validateNull(token);
 
         this.id = id;
-        this.value = token;
+        this.token = token;
     }
 
     private void validateNull(String token) {
@@ -33,6 +33,6 @@ public class Token {
     }
 
     public boolean hasEqualToken(String token) {
-        return this.value.equals(token);
+        return this.token.equals(token);
     }
 }
