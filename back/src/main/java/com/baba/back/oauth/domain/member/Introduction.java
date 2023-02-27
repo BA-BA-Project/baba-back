@@ -28,8 +28,7 @@ public class Introduction {
 
     private void validLength(String introduction) {
         if (introduction.length() > INTRODUCTION_MAX_LENGTH) {
-            throw new IntroductionLengthBadRequestException(
-                    String.format("{" + introduction + "}" + "의 길이가 올바르지 않습니다.", introduction.length()));
+            throw new IntroductionLengthBadRequestException("{ " + introduction + " }" + "의 길이가 올바르지 않습니다.");
         }
     }
 }

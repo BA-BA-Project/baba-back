@@ -28,8 +28,7 @@ public class Name {
 
     private void validName(String name) {
         if (name.isBlank() || name.length() > NAME_MAX_LENGTH) {
-            throw new NameLengthBadRequestException(
-                    String.format("{" + name + "}" + "은 올바르지 않은 이름입니다.", name.length()));
+            throw new NameLengthBadRequestException("{ " + name + " } 은 올바르지 않은 이름입니다.");
         }
     }
 }
