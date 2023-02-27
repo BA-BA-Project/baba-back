@@ -10,6 +10,7 @@ public class AuthorizationExtractor {
     public static final String BEARER_TYPE = "Bearer";
 
     private AuthorizationExtractor() {
+        throw new IllegalStateException(AuthorizationExtractor.class.getSimpleName() + " 기본 생성자 사용 불가");
     }
 
     /**
