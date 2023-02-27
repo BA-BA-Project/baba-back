@@ -26,6 +26,7 @@ import com.baba.back.oauth.exception.MemberBadRequestException;
 import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.relation.domain.Relation;
 import com.baba.back.relation.repository.RelationRepository;
+import java.time.Clock;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,6 +52,9 @@ class MemberServiceTest {
 
     @Spy
     private Picker<IconColor> picker;
+
+    @Mock
+    private Clock clock;
 
     @Mock
     private IdConstructor idConstructor;
@@ -79,11 +83,14 @@ class MemberServiceTest {
         final String memberId = "memberId";
         final String accessToken = "accessToken";
         final String refreshToken = "refreshToken";
+        final Clock now = Clock.systemDefaultZone();
 
         given(memberRepository.existsById(memberId)).willReturn(false);
         given(picker.pick(anyList())).willReturn(IconColor.COLOR_1);
         given(memberRepository.save(any(Member.class))).willReturn(멤버1);
         given(idConstructor.createId()).willReturn(아기1.getId(), 아기2.getId());
+        given(clock.instant()).willReturn(now.instant());
+        given(clock.getZone()).willReturn(now.getZone());
         given(babyRepository.save(any(Baby.class))).willReturn(아기1, 아기2);
         given(relationRepository.save(any(Relation.class))).willReturn(관계1, 관계2);
         given(accessTokenProvider.createToken(memberId)).willReturn(accessToken);
