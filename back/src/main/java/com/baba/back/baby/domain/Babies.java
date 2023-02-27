@@ -2,9 +2,10 @@ package com.baba.back.baby.domain;
 
 import com.baba.back.baby.exception.BabiesBadRequestException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import lombok.Getter;
 
+@Getter
 public class Babies {
     private final List<Baby> babies;
 
@@ -17,14 +18,5 @@ public class Babies {
         if (babies.isEmpty()) {
             throw new BabiesBadRequestException("babies의 길이는 0일 수 없습니다.");
         }
-    }
-
-    public Baby getDefaultBaby() {
-        validateEmpty(babies);
-        return babies.get(0);
-    }
-
-    public List<Baby> getNotDefaultBabies() {
-        return Collections.unmodifiableList(babies.subList(1, babies.size()));
     }
 }

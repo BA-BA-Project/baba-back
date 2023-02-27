@@ -1,9 +1,9 @@
 package com.baba.back.oauth.controller;
 
-import com.baba.back.oauth.dto.MemberJoinRequest;
-import com.baba.back.oauth.dto.MemberJoinResponse;
+import com.baba.back.oauth.dto.MemberSignUpRequest;
+import com.baba.back.oauth.dto.MemberSignUpResponse;
 import com.baba.back.oauth.service.MemberService;
-import com.baba.back.oauth.support.Login;
+import com.baba.back.oauth.support.SignUp;
 import com.baba.back.swagger.BadRequestResponse;
 import com.baba.back.swagger.CreatedResponse;
 import com.baba.back.swagger.IntervalServerErrorResponse;
@@ -33,8 +33,8 @@ public class MemberController {
     @NotFoundResponse
     @IntervalServerErrorResponse
     @PostMapping("/members/baby")
-    public ResponseEntity<MemberJoinResponse> joinMember(@RequestBody @Valid MemberJoinRequest request,
-                                                         @Login String memberId) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(memberService.join(request, memberId));
+    public ResponseEntity<MemberSignUpResponse> joinMember(@RequestBody @Valid MemberSignUpRequest request,
+                                                           @SignUp String memberId) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(memberService.signUp(request, memberId));
     }
 }
