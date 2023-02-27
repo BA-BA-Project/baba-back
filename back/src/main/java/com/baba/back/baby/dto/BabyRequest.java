@@ -1,7 +1,6 @@
 package com.baba.back.baby.dto;
 
 import com.baba.back.baby.domain.Baby;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
@@ -14,7 +13,6 @@ import lombok.NoArgsConstructor;
 public class BabyRequest {
 
     @NotNull
-    @JsonProperty("baby_name")
     private String babyName;
 
     @NotNull

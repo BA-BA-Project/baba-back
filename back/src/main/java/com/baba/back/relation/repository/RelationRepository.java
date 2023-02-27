@@ -8,7 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RelationRepository extends JpaRepository<Relation, Long> {
 
-    Optional<Relation> findByMemberAndDefaultRelation(Member member, boolean defaultRelation);
-
     Optional<Relation> findByMemberAndBaby(Member member, Baby baby);
 }

@@ -3,15 +3,12 @@ package com.baba.back.oauth.service;
 import com.baba.back.baby.domain.Babies;
 import com.baba.back.baby.domain.IdConstructor;
 import com.baba.back.baby.repository.BabyRepository;
-import com.baba.back.oauth.domain.JoinedMember;
 import com.baba.back.oauth.domain.Picker;
 import com.baba.back.oauth.domain.member.IconColor;
 import com.baba.back.oauth.domain.member.Member;
-import com.baba.back.oauth.dto.MemberJoinRequest;
-import com.baba.back.oauth.dto.MemberJoinResponse;
-import com.baba.back.oauth.exception.JoinedMemberBadRequestException;
-import com.baba.back.oauth.exception.JoinedMemberNotFoundException;
-import com.baba.back.oauth.repository.JoinedMemberRepository;
+import com.baba.back.oauth.dto.MemberSignUpRequest;
+import com.baba.back.oauth.dto.MemberSignUpResponse;
+import com.baba.back.oauth.exception.MemberBadRequestException;
 import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.relation.domain.Relation;
 import com.baba.back.relation.domain.RelationGroup;
@@ -27,34 +24,35 @@ import org.springframework.stereotype.Service;
 public class MemberService {
 
     private final MemberRepository memberRepository;
-    private final JoinedMemberRepository joinedMemberRepository;
     private final BabyRepository babyRepository;
     private final RelationRepository relationRepository;
     private final Picker<IconColor> picker;
     private final IdConstructor idConstructor;
+    private final AccessTokenProvider accessTokenProvider;
+    private final RefreshTokenProvider refreshTokenProvider;
 
     private final LocalDate now = LocalDate.now();
 
-    public MemberJoinResponse join(MemberJoinRequest request, String memberId) {
-        final JoinedMember joinedMember = joinedMemberRepository.findById(memberId)
-                .orElseThrow(() -> new JoinedMemberNotFoundException(memberId + "는 로그인하지 않은 memberId 입니다."));
-        validateJoinedMember(joinedMember);
+    public MemberSignUpResponse signUp(MemberSignUpRequest request, String memberId) {
+        validateSignUp(memberId);
         final Member member = saveMember(memberId, request);
-        joinedMember.signUp();
 
-        Babies babies = saveBabies(request);
+        final Babies babies = saveBabies(request);
         saveRelations(babies, member, request.getRelationName());
 
-        return new MemberJoinResponse("OK");
+        final String accessToken = accessTokenProvider.createToken(memberId);
+        final String refreshToken = refreshTokenProvider.createToken(memberId);
+
+        return new MemberSignUpResponse(accessToken, refreshToken);
     }
 
-    private void validateJoinedMember(JoinedMember joinedMember) {
-        if (joinedMember.isSigned()) {
-            throw new JoinedMemberBadRequestException(joinedMember.getId() + "는 이미 회원가입한 memberId 입니다.");
+    private void validateSignUp(String memberId) {
+        if (memberRepository.existsById(memberId)) {
+            throw new MemberBadRequestException(memberId + "는 이미 가입한 멤버입니다.");
         }
     }
 
-    private Member saveMember(String memberId, MemberJoinRequest request) {
+    private Member saveMember(String memberId, MemberSignUpRequest request) {
         return memberRepository.save(Member.builder()
                 .id(memberId)
                 .name(request.getName())
@@ -64,38 +62,21 @@ public class MemberService {
                 .build());
     }
 
-    private Babies saveBabies(MemberJoinRequest request) {
-        String babyId = idConstructor.createId();
+    private Babies saveBabies(MemberSignUpRequest request) {
         return new Babies(request.getBabies().stream()
-                .map(babyRequest -> babyRequest.toEntity(babyId, now))
+                .map(babyRequest -> babyRequest.toEntity(idConstructor.createId(), now))
                 .map(babyRepository::save)
                 .toList());
     }
 
     private void saveRelations(Babies babies, Member member, String relationName) {
-        saveDefaultRelation(babies, member, relationName);
-        saveNotDefaultRelations(babies, member, relationName);
-    }
-
-    private void saveDefaultRelation(Babies babies, Member member, String relationName) {
-        relationRepository.save(Relation.builder()
-                .member(member)
-                .baby(babies.getDefaultBaby())
-                .relationName(relationName)
-                .relationGroup(RelationGroup.FAMILY)
-                .defaultRelation(true)
-                .build());
-    }
-
-    private void saveNotDefaultRelations(Babies babies, Member member, String relationName) {
-        babies.getNotDefaultBabies()
+        babies.getBabies()
                 .stream()
                 .map(baby -> Relation.builder()
                         .member(member)
                         .baby(baby)
                         .relationName(relationName)
                         .relationGroup(RelationGroup.FAMILY)
-                        .defaultRelation(false)
                         .build())
                 .forEach(relationRepository::save);
     }
