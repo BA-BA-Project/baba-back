@@ -6,10 +6,12 @@ import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.oauth.domain.Picker;
 import com.baba.back.oauth.domain.member.IconColor;
 import com.baba.back.oauth.domain.member.Member;
+import com.baba.back.oauth.domain.token.Token;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
 import com.baba.back.oauth.exception.MemberBadRequestException;
 import com.baba.back.oauth.repository.MemberRepository;
+import com.baba.back.oauth.repository.TokenRepository;
 import com.baba.back.relation.domain.Relation;
 import com.baba.back.relation.domain.RelationGroup;
 import com.baba.back.relation.repository.RelationRepository;
@@ -30,6 +32,7 @@ public class MemberService {
     private final IdConstructor idConstructor;
     private final AccessTokenProvider accessTokenProvider;
     private final RefreshTokenProvider refreshTokenProvider;
+    private final TokenRepository tokenRepository;
 
     private final LocalDate now = LocalDate.now();
 
@@ -42,6 +45,7 @@ public class MemberService {
 
         final String accessToken = accessTokenProvider.createToken(memberId);
         final String refreshToken = refreshTokenProvider.createToken(memberId);
+        saveRefreshToken(memberId, refreshToken);
 
         return new MemberSignUpResponse(accessToken, refreshToken);
     }
@@ -79,5 +83,12 @@ public class MemberService {
                         .relationGroup(RelationGroup.FAMILY)
                         .build())
                 .forEach(relationRepository::save);
+    }
+
+    private void saveRefreshToken(String memberId, String refreshToken) {
+        tokenRepository.save(Token.builder()
+                .id(memberId)
+                .token(refreshToken)
+                .build());
     }
 }

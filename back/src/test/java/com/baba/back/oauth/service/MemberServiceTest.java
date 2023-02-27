@@ -20,10 +20,12 @@ import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.oauth.domain.Picker;
 import com.baba.back.oauth.domain.member.IconColor;
 import com.baba.back.oauth.domain.member.Member;
+import com.baba.back.oauth.domain.token.Token;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
 import com.baba.back.oauth.exception.MemberBadRequestException;
 import com.baba.back.oauth.repository.MemberRepository;
+import com.baba.back.oauth.repository.TokenRepository;
 import com.baba.back.relation.domain.Relation;
 import com.baba.back.relation.repository.RelationRepository;
 import org.assertj.core.api.Assertions;
@@ -61,6 +63,9 @@ class MemberServiceTest {
     @Mock
     private RefreshTokenProvider refreshTokenProvider;
 
+    @Mock
+    private TokenRepository tokenRepository;
+
     @Test
     void 이미_회원가입한_멤버는_회원가입할_수_없다() {
         // given
@@ -88,6 +93,7 @@ class MemberServiceTest {
         given(relationRepository.save(any(Relation.class))).willReturn(관계1, 관계2);
         given(accessTokenProvider.createToken(memberId)).willReturn(accessToken);
         given(refreshTokenProvider.createToken(memberId)).willReturn(refreshToken);
+        given(tokenRepository.save(any(Token.class))).willReturn(any());
 
         // when
         final MemberSignUpResponse response = memberService.signUp(멤버_가입_요청, memberId);
