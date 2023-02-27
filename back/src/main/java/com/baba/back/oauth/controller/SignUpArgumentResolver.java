@@ -20,10 +20,10 @@ public class SignUpArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        boolean hasLoginAnnotation = parameter.hasParameterAnnotation(SignUp.class);
+        boolean hasSignUpAnnotation = parameter.hasParameterAnnotation(SignUp.class);
         boolean hasStringType = String.class.isAssignableFrom(parameter.getParameterType());
 
-        return hasLoginAnnotation && hasStringType;
+        return hasSignUpAnnotation && hasStringType;
     }
 
     @Override
