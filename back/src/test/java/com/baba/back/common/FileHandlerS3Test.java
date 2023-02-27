@@ -34,12 +34,11 @@ class FileHandlerS3Test {
         // given
         final MockMultipartFile mockFile = new MockMultipartFile("photo", "test_file.png", "image/png",
                 "Spring Framework".getBytes());
+        final ImageFile imageFile = new ImageFile(mockFile);
 
         given(amazonS3.putObject(any(PutObjectRequest.class))).willThrow(AmazonServiceException.class);
 
         // when & then
-        final ImageFile imageFile = new ImageFile(mockFile);
-
         Assertions.assertThatThrownBy(() -> fileHandlerS3.upload(imageFile))
                 .isInstanceOf(FileHandlerServerException.class);
     }
