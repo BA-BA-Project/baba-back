@@ -66,11 +66,11 @@ public class OAuthService {
         final String newAccessToken = accessTokenProvider.createToken(memberId);
 
         if(refreshTokenProvider.checkExpiration(refreshToken)) {
-            return new TokenRefreshResponse(newAccessToken, refreshToken);
+            final String newRefreshToken = refreshTokenProvider.createToken(memberId);
+            return new TokenRefreshResponse(newAccessToken, newRefreshToken);
         }
 
-        final String newRefreshToken = refreshTokenProvider.createToken(memberId);
-        return new TokenRefreshResponse(newAccessToken, newRefreshToken);
+        return new TokenRefreshResponse(newAccessToken, refreshToken);
     }
 
     private void validateMember(String memberId) {
