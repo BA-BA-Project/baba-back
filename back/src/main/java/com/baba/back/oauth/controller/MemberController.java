@@ -44,6 +44,7 @@ public class MemberController {
 
     @Operation(summary = "멤버 정보 조회 요청")
     @OkResponse
+    @UnAuthorizedResponse
     @NotFoundResponse
     @IntervalServerErrorResponse
     @GetMapping("/members")
