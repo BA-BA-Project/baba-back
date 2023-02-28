@@ -86,7 +86,7 @@ public class OAuthAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    void 토큰재발급시_access_토큰을_재발급하고_201을_응답한다() {
+    void 토큰재발급시_refresh토큰의_만료기간이_하루보다_많이_남았으면_access토큰을_재발급하고_201을_응답한다() {
         // given
         final String token = tokenProvider.createToken(MEMBER_ID);
         final ExtractableResponse<Response> signUpResponse = post(MEMBER_BASE_PATH,
@@ -111,7 +111,7 @@ public class OAuthAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    void 토큰재발급시_access_토큰과_refresh_토큰을_재발급하고_201을_응답한다() {
+    void 토큰재발급시_refresh토큰의_만료기간이_하루_이하로_남았으면_access토큰과_refresh토큰을_재발급하고_201을_응답한다() {
         // given
         final String token = tokenProvider.createToken(MEMBER_ID);
         final ExtractableResponse<Response> signUpResponse = post(MEMBER_BASE_PATH,

@@ -212,7 +212,7 @@ class OAuthServiceTest {
     }
 
     @Test
-    void 토큰재발급시_토큰의_만료기간이_하루보다_적게_남았으면_access토큰과_refresh토큰을_재발급한다() {
+    void 토큰재발급시_토큰의_만료기간이_하루_이하로_남았으면_access토큰과_refresh토큰을_재발급한다() {
         // given
         final String accessToken = "accessToken";
         final String refreshToken = "refreshToken";
