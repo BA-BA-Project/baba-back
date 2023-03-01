@@ -14,8 +14,8 @@ class TokenTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> Token.builder()
-                        .id(멤버1.getId())
-                        .token(invalidToken)
+                        .member(멤버1)
+                        .value(invalidToken)
                         .build())
                 .isInstanceOf(TokenBadRequestException.class);
     }

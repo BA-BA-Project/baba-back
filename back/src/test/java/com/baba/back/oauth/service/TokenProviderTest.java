@@ -5,13 +5,15 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.baba.back.oauth.exception.ExpiredTokenAuthenticationException;
 import com.baba.back.oauth.exception.InvalidTokenAuthenticationException;
+import java.time.Clock;
 import org.junit.jupiter.api.Test;
 
 class TokenProviderTest {
 
     private static final String SECRET_KEY = "a".repeat(100);
     private static final Long VALIDITY_MILLISECONDS = 3600000L;
-    private final TokenProvider tokenProvider = new AccessTokenProvider(SECRET_KEY, VALIDITY_MILLISECONDS);
+    private static final Clock CLOCK = Clock.systemDefaultZone();
+    private final TokenProvider tokenProvider = new AccessTokenProvider(SECRET_KEY, VALIDITY_MILLISECONDS, CLOCK);
 
     @Test
     void payLoad를_통해_토큰을_만든다() {
@@ -28,7 +30,7 @@ class TokenProviderTest {
     @Test
     void 만료된_토큰인지_확인한다() {
         // given
-        final AccessTokenProvider tokenProvider = new AccessTokenProvider(SECRET_KEY, 0L);
+        final AccessTokenProvider tokenProvider = new AccessTokenProvider(SECRET_KEY, 0L, CLOCK);
         final String expiredToken = tokenProvider.createToken("expiredToken");
 
         // when & then
@@ -72,11 +74,11 @@ class TokenProviderTest {
     @Test
     void 토큰을_파싱_시_만료된_토큰이라면_예외를_던진다() {
         // given
-        final AccessTokenProvider tokenProvider = new AccessTokenProvider(SECRET_KEY, 0L);
+        final AccessTokenProvider tokenProvider = new AccessTokenProvider(SECRET_KEY, 0L, CLOCK);
         final String expiredToken = tokenProvider.createToken("expiredToken");
 
         // when & then
-        assertThatThrownBy(() -> this.tokenProvider.parseToken(expiredToken))
+        assertThatThrownBy(() -> tokenProvider.parseToken(expiredToken))
                 .isInstanceOf(InvalidTokenAuthenticationException.class);
     }
 }

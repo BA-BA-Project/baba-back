@@ -7,6 +7,7 @@ import com.baba.back.content.domain.content.Content;
 import com.baba.back.oauth.domain.member.IconColor;
 import com.baba.back.oauth.domain.member.IconName;
 import com.baba.back.oauth.domain.member.Member;
+import com.baba.back.oauth.domain.token.Token;
 import com.baba.back.relation.domain.Relation;
 import com.baba.back.relation.domain.RelationGroup;
 import java.time.LocalDate;
@@ -61,5 +62,10 @@ public class DomainFixture {
     public static final Like 좋아요 = Like.builder()
             .member(멤버1)
             .content(컨텐츠)
+            .build();
+
+    public static final Token 토큰 = Token.builder()
+            .member(멤버1)
+            .value("토큰")
             .build();
 }
