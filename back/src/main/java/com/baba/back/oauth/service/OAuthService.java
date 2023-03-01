@@ -62,7 +62,7 @@ public class OAuthService {
         final String memberId = refreshTokenProvider.parseToken(refreshToken);
         final Member member = findMember(memberId);
 
-        validateEqualToken(member, refreshToken);
+        validateToken(member, refreshToken);
 
         final String newAccessToken = accessTokenProvider.createToken(memberId);
 
@@ -80,7 +80,7 @@ public class OAuthService {
         );
     }
 
-    private void validateEqualToken(Member member, String refreshToken) {
+    private void validateToken(Member member, String refreshToken) {
         if (!tokenRepository.existsByMemberAndValue(member, refreshToken)) {
             throw new TokenBadRequestException(refreshToken + "는 DB에 저장된 토큰과 일치하지 않습니다.");
         }
