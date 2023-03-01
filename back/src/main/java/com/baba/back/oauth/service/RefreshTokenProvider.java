@@ -19,8 +19,8 @@ public class RefreshTokenProvider extends TokenProvider {
 
     public boolean isExpiringSoon(String token) {
         final LocalDateTime expirationTime = parseTokenExpiration(token);
-        final LocalDateTime noMillisecondsTime = LocalDateTime.now(clock).withNano(0);
-        final long between = ChronoUnit.MILLIS.between(noMillisecondsTime, expirationTime);
+        final LocalDateTime now = LocalDateTime.now(clock).withNano(0);
+        final long between = ChronoUnit.MILLIS.between(now, expirationTime);
 
         return between <= MILLIS_TO_REFRESH;
     }
