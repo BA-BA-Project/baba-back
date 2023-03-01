@@ -1,8 +1,12 @@
 package com.baba.back.oauth.domain.token;
 
+import com.baba.back.oauth.domain.member.Member;
 import com.baba.back.oauth.exception.TokenBadRequestException;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.MapsId;
+import jakarta.persistence.OneToOne;
 import java.util.Objects;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,14 +20,19 @@ public class Token {
     @Id
     private String id;
 
-    private String token;
+    @OneToOne
+    @MapsId
+    private Member member;
+
+    @Column(name = "token")
+    private String value;
 
     @Builder
-    public Token(String id, String token) {
-        validateNull(token);
+    public Token(Member member, String value) {
+        validateNull(value);
 
-        this.id = id;
-        this.token = token;
+        this.member = member;
+        this.value = value;
     }
 
     private void validateNull(String token) {

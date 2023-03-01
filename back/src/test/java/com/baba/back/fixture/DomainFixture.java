@@ -65,7 +65,7 @@ public class DomainFixture {
             .build();
 
     public static final Token 토큰 = Token.builder()
-            .id(멤버1.getId())
-            .token("토큰")
+            .member(멤버1)
+            .value("토큰")
             .build();
 }

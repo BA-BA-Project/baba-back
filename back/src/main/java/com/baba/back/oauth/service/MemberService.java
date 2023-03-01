@@ -47,7 +47,7 @@ public class MemberService {
 
         final String accessToken = accessTokenProvider.createToken(memberId);
         final String refreshToken = refreshTokenProvider.createToken(memberId);
-        saveRefreshToken(memberId, refreshToken);
+        saveRefreshToken(member, refreshToken);
 
         return new MemberSignUpResponse(accessToken, refreshToken);
     }
@@ -87,10 +87,10 @@ public class MemberService {
                 .forEach(relationRepository::save);
     }
 
-    private void saveRefreshToken(String memberId, String refreshToken) {
+    private void saveRefreshToken(Member member, String refreshToken) {
         tokenRepository.save(Token.builder()
-                .id(memberId)
-                .token(refreshToken)
+                .member(member)
+                .value(refreshToken)
                 .build());
     }
 
