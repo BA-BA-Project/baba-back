@@ -33,7 +33,7 @@ class RefreshTokenProviderTest {
         final String refreshToken = refreshTokenProvider.createToken(memberId);
 
         // when & then
-        Assertions.assertThat(refreshTokenProvider.checkExpiration(refreshToken)).isTrue();
+        Assertions.assertThat(refreshTokenProvider.isExpiringSoon(refreshToken)).isTrue();
     }
 
     @Test
@@ -51,6 +51,6 @@ class RefreshTokenProviderTest {
         final String refreshToken = refreshTokenProvider.createToken(memberId);
 
         // when & then
-        Assertions.assertThat(refreshTokenProvider.checkExpiration(refreshToken)).isFalse();
+        Assertions.assertThat(refreshTokenProvider.isExpiringSoon(refreshToken)).isFalse();
     }
 }

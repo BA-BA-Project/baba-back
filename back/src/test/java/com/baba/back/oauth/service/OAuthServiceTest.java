@@ -181,7 +181,7 @@ class OAuthServiceTest {
         given(memberRepository.existsById(토큰.getId())).willReturn(true);
         given(tokenRepository.existsByIdAndToken(토큰.getId(), 토큰.getToken())).willReturn(true);
         given(accessTokenProvider.createToken(토큰.getId())).willReturn(accessToken);
-        given(refreshTokenProvider.checkExpiration(토큰.getToken())).willReturn(false);
+        given(refreshTokenProvider.isExpiringSoon(토큰.getToken())).willReturn(false);
 
         // when
         final TokenRefreshResponse response = oAuthService.refresh(new TokenRefreshRequest(토큰.getToken()));
@@ -204,7 +204,7 @@ class OAuthServiceTest {
         given(memberRepository.existsById(토큰.getId())).willReturn(true);
         given(tokenRepository.existsByIdAndToken(토큰.getId(), 토큰.getToken())).willReturn(true);
         given(accessTokenProvider.createToken(토큰.getId())).willReturn(accessToken);
-        given(refreshTokenProvider.checkExpiration(토큰.getToken())).willReturn(true);
+        given(refreshTokenProvider.isExpiringSoon(토큰.getToken())).willReturn(true);
         given(refreshTokenProvider.createToken(토큰.getId())).willReturn(refreshToken);
 
         // when

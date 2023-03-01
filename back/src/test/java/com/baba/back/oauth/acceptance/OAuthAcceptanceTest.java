@@ -93,7 +93,7 @@ public class OAuthAcceptanceTest extends AcceptanceTest {
                 Map.of("Authorization", "Bearer " + token), 멤버_가입_요청);
 
         final String refreshToken = toObject(signUpResponse, MemberSignUpResponse.class).refreshToken();
-        given(refreshTokenProvider.checkExpiration(refreshToken)).willReturn(false);
+        given(refreshTokenProvider.isExpiringSoon(refreshToken)).willReturn(false);
 
         final TokenRefreshRequest request = new TokenRefreshRequest(refreshToken);
 
@@ -118,7 +118,7 @@ public class OAuthAcceptanceTest extends AcceptanceTest {
                 Map.of("Authorization", "Bearer " + token), 멤버_가입_요청);
 
         final String refreshToken = toObject(signUpResponse, MemberSignUpResponse.class).refreshToken();
-        given(refreshTokenProvider.checkExpiration(refreshToken)).willReturn(true);
+        given(refreshTokenProvider.isExpiringSoon(refreshToken)).willReturn(true);
 
         final TokenRefreshRequest request = new TokenRefreshRequest(refreshToken);
 

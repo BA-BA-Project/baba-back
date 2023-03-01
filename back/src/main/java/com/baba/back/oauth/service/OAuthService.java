@@ -63,7 +63,7 @@ public class OAuthService {
 
         final String newAccessToken = accessTokenProvider.createToken(memberId);
 
-        if (refreshTokenProvider.checkExpiration(refreshToken)) {
+        if (refreshTokenProvider.isExpiringSoon(refreshToken)) {
             final String newRefreshToken = refreshTokenProvider.createToken(memberId);
             return new TokenRefreshResponse(newAccessToken, newRefreshToken);
         }
