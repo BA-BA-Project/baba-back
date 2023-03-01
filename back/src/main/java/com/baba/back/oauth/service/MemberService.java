@@ -6,9 +6,11 @@ import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.oauth.domain.Picker;
 import com.baba.back.oauth.domain.member.IconColor;
 import com.baba.back.oauth.domain.member.Member;
+import com.baba.back.oauth.dto.MemberResponse;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
 import com.baba.back.oauth.exception.MemberBadRequestException;
+import com.baba.back.oauth.exception.MemberNotFoundException;
 import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.relation.domain.Relation;
 import com.baba.back.relation.domain.RelationGroup;
@@ -79,5 +81,17 @@ public class MemberService {
                         .relationGroup(RelationGroup.FAMILY)
                         .build())
                 .forEach(relationRepository::save);
+    }
+
+    public MemberResponse findMember(String memberId) {
+        final Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberNotFoundException(memberId + "에 해당하는 멤버가 존재하지 않습니다."));
+
+        return new MemberResponse(
+                member.getName(),
+                member.getIntroduction(),
+                member.getIconName(),
+                member.getIconColor()
+        );
     }
 }

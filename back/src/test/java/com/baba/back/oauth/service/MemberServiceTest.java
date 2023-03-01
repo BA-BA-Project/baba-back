@@ -7,6 +7,7 @@ import static com.baba.back.fixture.DomainFixture.아기1;
 import static com.baba.back.fixture.DomainFixture.아기2;
 import static com.baba.back.fixture.RequestFixture.멤버_가입_요청;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -20,13 +21,16 @@ import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.oauth.domain.Picker;
 import com.baba.back.oauth.domain.member.IconColor;
 import com.baba.back.oauth.domain.member.Member;
+import com.baba.back.oauth.dto.MemberResponse;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
 import com.baba.back.oauth.exception.MemberBadRequestException;
+import com.baba.back.oauth.exception.MemberNotFoundException;
 import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.relation.domain.Relation;
 import com.baba.back.relation.repository.RelationRepository;
 import java.time.Clock;
+import java.util.Optional;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -109,5 +113,37 @@ class MemberServiceTest {
                 () -> assertThat(response.accessToken()).isEqualTo(accessToken),
                 () -> assertThat(response.refreshToken()).isEqualTo(refreshToken)
         );
+    }
+
+    @Test
+    void 멤버의_정보를_조회한다() {
+        final String memberId = "memberId";
+
+        // given
+        given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
+
+        // when
+        final MemberResponse response = memberService.findMember(memberId);
+
+        // then
+        assertThat(response).isEqualTo(
+                new MemberResponse(
+                        멤버1.getName(),
+                        멤버1.getIntroduction(),
+                        멤버1.getIconName(),
+                        멤버1.getIconColor()
+                )
+        );
+    }
+
+    @Test
+    void 존재하지_않는_멤버의_정보를_조회할_수_없다() {
+        final String invalidMemberId = "invalidMemberId";
+
+        // given
+        given(memberRepository.findById(invalidMemberId)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> memberService.findMember(invalidMemberId)).isInstanceOf(MemberNotFoundException.class);
     }
 }

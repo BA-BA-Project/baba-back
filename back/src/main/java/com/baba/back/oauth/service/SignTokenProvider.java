@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SignTokenProvider extends TokenProvider {
     public SignTokenProvider(@Value("${security.jwt.token.sign.secret-key}") String secretKey,
-                                @Value("${security.jwt.token.sign.expire-length}") Long validityInMilliseconds) {
+                             @Value("${security.jwt.token.sign.expire-length}") Long validityInMilliseconds) {
         super(secretKey, validityInMilliseconds);
     }
 }
