@@ -2,7 +2,6 @@ package com.baba.back.oauth.service;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -27,6 +26,6 @@ public class RefreshTokenProvider extends TokenProvider {
     }
 
     private LocalDateTime parseTokenExpiration(String token) {
-        return LocalDateTime.ofInstant(parseTokenBody(token).getExpiration().toInstant(), ZoneId.systemDefault());
+        return LocalDateTime.ofInstant(parseTokenBody(token).getExpiration().toInstant(), clock.getZone());
     }
 }
