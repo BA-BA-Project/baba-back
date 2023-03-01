@@ -30,6 +30,7 @@ import com.baba.back.oauth.exception.MemberNotFoundException;
 import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.relation.exception.RelationNotFoundException;
 import com.baba.back.relation.repository.RelationRepository;
+import java.time.Clock;
 import java.util.Optional;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -61,6 +62,9 @@ class ContentServiceTest {
 
     @Mock
     private FileHandler fileHandler;
+
+    @Mock
+    private Clock clock;
 
     @InjectMocks
     private ContentService contentService;
@@ -113,9 +117,12 @@ class ContentServiceTest {
     @Test
     void 해당_날짜에_이미_컨텐츠가_존재하면_예외를_던진다() {
         // given
+        final Clock now = Clock.systemDefaultZone();
         given(memberRepository.findById(any())).willReturn(Optional.of(멤버1));
         given(babyRepository.findById(any())).willReturn(Optional.of(아기1));
         given(relationRepository.findByMemberAndBaby(any(), any())).willReturn(Optional.of(관계1));
+        given(clock.instant()).willReturn(now.instant());
+        given(clock.getZone()).willReturn(now.getZone());
         given(contentRepository.existsByContentDateAndBaby(any(), any())).willReturn(true);
 
         // when & then
@@ -126,9 +133,13 @@ class ContentServiceTest {
     @Test
     void 새로운_컨텐츠를_만든다() {
         // given
+        final Clock now = Clock.systemDefaultZone();
+
         given(memberRepository.findById(any())).willReturn(Optional.of(멤버1));
         given(babyRepository.findById(any())).willReturn(Optional.of(아기1));
         given(relationRepository.findByMemberAndBaby(any(), any())).willReturn(Optional.of(관계1));
+        given(clock.instant()).willReturn(now.instant());
+        given(clock.getZone()).willReturn(now.getZone());
         given(contentRepository.existsByContentDateAndBaby(any(), any())).willReturn(false);
         given(fileHandler.upload(any())).willReturn("VALID_IMAGE_SOURCE");
 

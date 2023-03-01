@@ -16,6 +16,7 @@ import com.baba.back.relation.domain.Relation;
 import com.baba.back.relation.domain.RelationGroup;
 import com.baba.back.relation.repository.RelationRepository;
 import jakarta.transaction.Transactional;
+import java.time.Clock;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,8 +33,7 @@ public class MemberService {
     private final IdConstructor idConstructor;
     private final AccessTokenProvider accessTokenProvider;
     private final RefreshTokenProvider refreshTokenProvider;
-
-    private final LocalDate now = LocalDate.now();
+    private final Clock clock;
 
     public MemberSignUpResponse signUp(MemberSignUpRequest request, String memberId) {
         validateSignUp(memberId);
@@ -66,7 +66,7 @@ public class MemberService {
 
     private Babies saveBabies(MemberSignUpRequest request) {
         return new Babies(request.getBabies().stream()
-                .map(babyRequest -> babyRequest.toEntity(idConstructor.createId(), now))
+                .map(babyRequest -> babyRequest.toEntity(idConstructor.createId(), LocalDate.now(clock)))
                 .map(babyRepository::save)
                 .toList());
     }

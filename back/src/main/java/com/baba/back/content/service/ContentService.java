@@ -22,6 +22,7 @@ import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.relation.domain.Relation;
 import com.baba.back.relation.exception.RelationNotFoundException;
 import com.baba.back.relation.repository.RelationRepository;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,7 @@ public class ContentService {
     private final RelationRepository relationRepository;
     private final LikeRepository likeRepository;
     private final FileHandler fileHandler;
+    private final Clock clock;
 
     public CreateContentResponse createContent(CreateContentRequest request, String memberId, String babyId) {
         final Member member = findMember(memberId);
@@ -49,7 +51,7 @@ public class ContentService {
         final Content content = Content.builder()
                 .title(request.getTitle())
                 .contentDate(request.getDate())
-                .now(LocalDate.now())
+                .now(LocalDate.now(clock))
                 .cardStyle(request.getCardStyle())
                 .baby(baby)
                 .owner(member)
