@@ -1,6 +1,7 @@
 package com.baba.back.oauth.domain.member;
 
 import com.baba.back.oauth.exception.NameLengthBadRequestException;
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.util.Objects;
 import lombok.Getter;
@@ -12,12 +13,13 @@ import lombok.NoArgsConstructor;
 public class Name {
     public static final int NAME_MAX_LENGTH = 6;
 
-    private String name;
+    @Column(name = "name")
+    private String value;
 
-    public Name(String name) {
-        validNull(name);
-        validName(name);
-        this.name = name;
+    public Name(String value) {
+        validNull(value);
+        validName(value);
+        this.value = value;
     }
 
     private void validNull(String name) {

@@ -32,4 +32,20 @@ public class Member {
         this.introduction = new Introduction(introduction);
         this.icon = Icon.of(colorPicker, iconName);
     }
+
+    public String getName() {
+        return this.name.getValue();
+    }
+
+    public String getIntroduction() {
+        return this.introduction.getValue();
+    }
+
+    public String getIconColor() {
+        return this.icon.getIconColor();
+    }
+
+    public String getIconName() {
+        return this.icon.getIconName();
+    }
 }

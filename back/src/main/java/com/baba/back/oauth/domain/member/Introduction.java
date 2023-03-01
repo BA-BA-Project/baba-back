@@ -1,6 +1,7 @@
 package com.baba.back.oauth.domain.member;
 
 import com.baba.back.oauth.exception.IntroductionLengthBadRequestException;
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.util.Objects;
 import lombok.Getter;
@@ -12,12 +13,13 @@ import lombok.NoArgsConstructor;
 public class Introduction {
     public static final int INTRODUCTION_MAX_LENGTH = 100;
 
-    private String introduction;
+    @Column(name = "introduction")
+    private String value;
 
-    public Introduction(String introduction) {
-        validNull(introduction);
-        validLength(introduction);
-        this.introduction = introduction;
+    public Introduction(String value) {
+        validNull(value);
+        validLength(value);
+        this.value = value;
     }
 
     private void validNull(String introduction) {
