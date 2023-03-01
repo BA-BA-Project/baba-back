@@ -31,8 +31,4 @@ public class Token {
             throw new TokenBadRequestException("token은 null일 수 없습니다.");
         }
     }
-
-    public boolean hasEqualToken(String token) {
-        return this.token.equals(token);
-    }
 }

@@ -23,10 +23,8 @@ import com.baba.back.oauth.exception.ExpiredTokenAuthenticationException;
 import com.baba.back.oauth.exception.InvalidTokenAuthenticationException;
 import com.baba.back.oauth.exception.MemberNotFoundException;
 import com.baba.back.oauth.exception.TokenBadRequestException;
-import com.baba.back.oauth.exception.TokenNotFoundException;
 import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.oauth.repository.TokenRepository;
-import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -124,7 +122,7 @@ class OAuthServiceTest {
     void 토큰재발급시_토큰이_만료됐으면_예외를_던진다() {
         // given
         final String invalidToken = "invalidToken";
-        willThrow(ExpiredTokenAuthenticationException.class).given(refreshTokenProvider).validateToken(any());
+        willThrow(ExpiredTokenAuthenticationException.class).given(refreshTokenProvider).validateToken(invalidToken);
 
         // when & then
         assertThatThrownBy(() -> oAuthService.refresh(new TokenRefreshRequest(invalidToken)))
@@ -135,7 +133,7 @@ class OAuthServiceTest {
     void 토큰재발급시_토큰이_유효하지_않으면_예외를_던진다() {
         // given
         final String invalidToken = "invalidToken";
-        willThrow(InvalidTokenAuthenticationException.class).given(refreshTokenProvider).validateToken(any());
+        willThrow(InvalidTokenAuthenticationException.class).given(refreshTokenProvider).validateToken(invalidToken);
 
         // when & then
         assertThatThrownBy(() -> oAuthService.refresh(new TokenRefreshRequest(invalidToken)))
@@ -145,44 +143,28 @@ class OAuthServiceTest {
     @Test
     void 토큰재발급시_멤버가_없으면_예외를_던진다() {
         // given
-        final String invalidToken = "invalidToken";
+        final String validToken = "validToken";
         final String memberId = "memberId";
 
-        willDoNothing().given(refreshTokenProvider).validateToken(any());
-        given(refreshTokenProvider.parseToken(invalidToken)).willReturn(memberId);
+        willDoNothing().given(refreshTokenProvider).validateToken(validToken);
+        given(refreshTokenProvider.parseToken(validToken)).willReturn(memberId);
         given(memberRepository.existsById(memberId)).willReturn(false);
 
         // when & then
-        assertThatThrownBy(() -> oAuthService.refresh(new TokenRefreshRequest(invalidToken)))
+        assertThatThrownBy(() -> oAuthService.refresh(new TokenRefreshRequest(validToken)))
                 .isInstanceOf(MemberNotFoundException.class);
     }
 
     @Test
-    void 토큰재발급시_DB에_토큰이_없으면_예외를_던진다() {
+    void 토큰재발급시_DB에_토큰이_없거나_토큰이_일치하지_않으면_예외를_던진다() {
         // given
         final String invalidToken = "invalidToken";
         final String memberId = "memberId";
 
-        willDoNothing().given(refreshTokenProvider).validateToken(any());
+        willDoNothing().given(refreshTokenProvider).validateToken(invalidToken);
         given(refreshTokenProvider.parseToken(invalidToken)).willReturn(memberId);
         given(memberRepository.existsById(memberId)).willReturn(true);
-        given(tokenRepository.findById(memberId)).willReturn(Optional.empty());
-
-        // when & then
-        assertThatThrownBy(() -> oAuthService.refresh(new TokenRefreshRequest(invalidToken)))
-                .isInstanceOf(TokenNotFoundException.class);
-    }
-
-    @Test
-    void 토큰재발급시_토큰이_일치하지_않으면_예외를_던진다() {
-        // given
-        final String invalidToken = "invalidToken";
-        final String memberId = "memberId";
-
-        willDoNothing().given(refreshTokenProvider).validateToken(any());
-        given(refreshTokenProvider.parseToken(invalidToken)).willReturn(memberId);
-        given(memberRepository.existsById(memberId)).willReturn(true);
-        given(tokenRepository.findById(memberId)).willReturn(Optional.of(토큰));
+        given(tokenRepository.existsByIdAndToken(memberId, invalidToken)).willReturn(false);
 
         // when & then
         assertThatThrownBy(() -> oAuthService.refresh(new TokenRefreshRequest(invalidToken)))
@@ -194,10 +176,10 @@ class OAuthServiceTest {
         // given
         final String accessToken = "accessToken";
 
-        willDoNothing().given(refreshTokenProvider).validateToken(any());
+        willDoNothing().given(refreshTokenProvider).validateToken(토큰.getToken());
         given(refreshTokenProvider.parseToken(토큰.getToken())).willReturn(토큰.getId());
         given(memberRepository.existsById(토큰.getId())).willReturn(true);
-        given(tokenRepository.findById(토큰.getId())).willReturn(Optional.of(토큰));
+        given(tokenRepository.existsByIdAndToken(토큰.getId(), 토큰.getToken())).willReturn(true);
         given(accessTokenProvider.createToken(토큰.getId())).willReturn(accessToken);
         given(refreshTokenProvider.checkExpiration(토큰.getToken())).willReturn(false);
 
@@ -217,10 +199,10 @@ class OAuthServiceTest {
         final String accessToken = "accessToken";
         final String refreshToken = "refreshToken";
 
-        willDoNothing().given(refreshTokenProvider).validateToken(any());
+        willDoNothing().given(refreshTokenProvider).validateToken(토큰.getToken());
         given(refreshTokenProvider.parseToken(토큰.getToken())).willReturn(토큰.getId());
         given(memberRepository.existsById(토큰.getId())).willReturn(true);
-        given(tokenRepository.findById(토큰.getId())).willReturn(Optional.of(토큰));
+        given(tokenRepository.existsByIdAndToken(토큰.getId(), 토큰.getToken())).willReturn(true);
         given(accessTokenProvider.createToken(토큰.getId())).willReturn(accessToken);
         given(refreshTokenProvider.checkExpiration(토큰.getToken())).willReturn(true);
         given(refreshTokenProvider.createToken(토큰.getId())).willReturn(refreshToken);
