@@ -16,7 +16,7 @@ class RefreshTokenProviderTest {
     void 만료기간이_하루_이하로_남으면_true를_반환한다() {
         // given
         final String memberId = "memberId";
-        final LocalDateTime now = LocalDateTime.of(2023, 3, 1, 20, 20, 0);
+        final LocalDateTime now = LocalDateTime.now();
         final Clock clock = Clock.fixed(now.atZone(ZoneId.systemDefault()).toInstant(), ZoneId.systemDefault());
         refreshTokenProvider = new RefreshTokenProvider(SECRET_KEY, VALIDITY_MILLISECONDS, clock);
         final String refreshToken = refreshTokenProvider.createToken(memberId);
@@ -33,7 +33,7 @@ class RefreshTokenProviderTest {
     void 만료기간이_하루보다_많이_남으면_false를_반환한다() {
         // given
         final String memberId = "memberId";
-        final LocalDateTime now = LocalDateTime.of(2023, 3, 1, 20, 20, 0);
+        final LocalDateTime now = LocalDateTime.now();
         final Clock clock = Clock.fixed(now.atZone(ZoneId.systemDefault()).toInstant(), ZoneId.systemDefault());
         refreshTokenProvider = new RefreshTokenProvider(SECRET_KEY, VALIDITY_MILLISECONDS, clock);
         final String refreshToken = refreshTokenProvider.createToken(memberId);

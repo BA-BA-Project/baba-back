@@ -4,8 +4,10 @@ import static com.baba.back.SimpleRestAssured.get;
 import static com.baba.back.SimpleRestAssured.post;
 import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.RequestFixture.멤버_가입_요청;
+import static com.baba.back.fixture.RequestFixture.소셜_토큰_요청;
 
 import com.baba.back.oauth.dto.MemberSignUpRequest;
+import com.baba.back.oauth.dto.TokenRefreshRequest;
 import com.baba.back.oauth.service.SignTokenProvider;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -21,11 +23,11 @@ import org.springframework.test.context.jdbc.Sql;
 @Sql("/truncate.sql")
 public class AcceptanceTest {
 
-    @Autowired
-    protected SignTokenProvider signTokenProvider;
     private static final String BASE_PATH = "/api";
     private static final String MEMBER_BASE_PATH = BASE_PATH + "/members";
-
+    private static final String AUTH_BASE_PATH = BASE_PATH + "/auth";
+    @Autowired
+    protected SignTokenProvider signTokenProvider;
     @LocalServerPort
     int port;
 
@@ -40,6 +42,14 @@ public class AcceptanceTest {
 
     protected ExtractableResponse<Response> 사용자_정보_요청(String accessToken) {
         return get(MEMBER_BASE_PATH, Map.of("Authorization", "Bearer " + accessToken));
+    }
+
+    protected ExtractableResponse<Response> 소셜_로그인_요청() {
+        return post(AUTH_BASE_PATH + "/login", 소셜_토큰_요청);
+    }
+
+    protected ExtractableResponse<Response> 토큰_재발급_요청(TokenRefreshRequest request) {
+        return post(AUTH_BASE_PATH + "/refresh", request);
     }
 
     @BeforeEach

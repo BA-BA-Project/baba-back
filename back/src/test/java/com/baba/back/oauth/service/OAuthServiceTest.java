@@ -74,7 +74,7 @@ class OAuthServiceTest {
     }
 
     @Test
-    void 가입이_되어_있으면_access토큰과_refresh토큰을_발급한다() {
+    void 소셜_로그인시_가입이_되어_있고_refresh토큰이_이미_저장되어있다면_access토큰과_refresh토큰을_발급한다() {
         // given
         final String validToken = "validToken";
         final String accessToken = "accessToken";
@@ -84,7 +84,32 @@ class OAuthServiceTest {
         given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
         given(accessTokenProvider.createToken(멤버1.getId())).willReturn(accessToken);
         given(refreshTokenProvider.createToken(멤버1.getId())).willReturn(refreshToken);
-        given(tokenRepository.save(any(Token.class))).willReturn(any());
+        given(tokenRepository.findByMember(멤버1)).willReturn(Optional.of(new Token(멤버1, refreshToken)));
+
+        // when
+        final SocialLoginResponse response = oAuthService.signInKakao(new SocialTokenRequest(validToken));
+
+        // then
+        assertAll(
+                () -> assertThat(response.httpStatus()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.tokenResponse()).isEqualTo(new LoginTokenResponse(accessToken, refreshToken))
+        );
+
+        then(tokenRepository).should(times(1)).save(any());
+    }
+
+    @Test
+    void 소셜_로그인시_가입이_되어_있고_저장된_refresh토큰이_없어도_access토큰과_refresh토큰을_발급한다() {
+        // given
+        final String validToken = "validToken";
+        final String accessToken = "accessToken";
+        final String refreshToken = "refreshToken";
+
+        given(oAuthClient.getMemberId(any())).willReturn(멤버1.getId());
+        given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
+        given(accessTokenProvider.createToken(멤버1.getId())).willReturn(accessToken);
+        given(refreshTokenProvider.createToken(멤버1.getId())).willReturn(refreshToken);
+        given(tokenRepository.findByMember(멤버1)).willReturn(Optional.empty());
 
         // when
         final SocialLoginResponse response = oAuthService.signInKakao(new SocialTokenRequest(validToken));

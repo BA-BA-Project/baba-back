@@ -82,7 +82,7 @@ class MemberServiceTest {
         given(memberRepository.existsById(memberId)).willReturn(true);
 
         // when & then
-        Assertions.assertThatThrownBy(() -> memberService.signUp(new MemberSignUpRequest(), memberId))
+        assertThatThrownBy(() -> memberService.signUp(new MemberSignUpRequest(), memberId))
                 .isInstanceOf(MemberBadRequestException.class);
     }
 
