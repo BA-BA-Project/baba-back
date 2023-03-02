@@ -1,7 +1,5 @@
 package com.baba.back.oauth.acceptance;
 
-import static com.baba.back.SimpleRestAssured.get;
-import static com.baba.back.SimpleRestAssured.post;
 import static com.baba.back.SimpleRestAssured.toObject;
 import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.RequestFixture.멤버_가입_요청;
@@ -9,7 +7,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.baba.back.AcceptanceTest;
-import com.baba.back.SimpleRestAssured;
 import com.baba.back.baby.dto.BabyRequest;
 import com.baba.back.common.dto.ExceptionResponse;
 import com.baba.back.oauth.domain.Picker;
@@ -18,14 +15,15 @@ import com.baba.back.oauth.dto.MemberResponse;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
 import com.baba.back.oauth.service.AccessTokenProvider;
-import com.baba.back.oauth.service.SignTokenProvider;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -33,34 +31,17 @@ import org.springframework.http.HttpStatus;
 
 class MemberAcceptanceTest extends AcceptanceTest {
 
-    private static final String MEMBER_BASE_PATH = "/api/members";
     private static final String MEMBER_ID = "memberId";
-
-    @Autowired
-    private SignTokenProvider signTokenProvider;
 
     @Autowired
     private AccessTokenProvider accessTokenProvider;
 
-    @Test
-    void 요청에_sign_토큰이_존재하지않으면_400을_응답한다() {
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = "invalidToken")
+    void 아기_등록_회원가입_요청에_유효하지_않은_sign_토큰으로_요청_시_401을_응답한다(String invalidSignToken) {
         // given
-        final ExtractableResponse<Response> response = SimpleRestAssured.post(MEMBER_BASE_PATH + "/baby", 멤버_가입_요청);
-
-        // when & then
-        assertAll(
-                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
-                () -> assertThat(toObject(response, ExceptionResponse.class).message()).isNotBlank()
-        );
-    }
-
-    @Test
-    void 유효하지_않은_sign_토큰으로_요청_시_401을_응답한다() {
-        // given
-        final String invalidSignToken = "111";
-        final ExtractableResponse<Response> response = post(
-                MEMBER_BASE_PATH + "/baby", Map.of("Authorization", "Bearer " + invalidSignToken), 멤버_가입_요청
-        );
+        final ExtractableResponse<Response> response = 아기_등록_회원가입_요청(invalidSignToken, 멤버_가입_요청);
 
         // when & then
         assertAll(
@@ -70,17 +51,14 @@ class MemberAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    void body에_잘못된_값이_존재하면_400을_던진다() {
+    void 아기_등록_회원가입_요청에_body에_잘못된_값이_존재하면_400을_던진다() {
         // given
-        final MemberSignUpRequest INVALID_MEMBER_SIGN_UP_REQUEST = new MemberSignUpRequest(null, null, "엄마",
+        final MemberSignUpRequest invalidMemberSignUpRequest = new MemberSignUpRequest(null, null, "엄마",
                 List.of(new BabyRequest("아기1", LocalDate.of(2022, 1, 1)),
                         new BabyRequest("아기2", LocalDate.of(2023, 1, 1)))
         );
-        final String validToken = signTokenProvider.createToken(MEMBER_ID);
-        final ExtractableResponse<Response> response = post(
-                MEMBER_BASE_PATH + "/baby", Map.of("Authorization", "Bearer " + validToken),
-                INVALID_MEMBER_SIGN_UP_REQUEST
-        );
+        final String signToken = signTokenProvider.createToken(MEMBER_ID);
+        final ExtractableResponse<Response> response = 아기_등록_회원가입_요청(signToken, invalidMemberSignUpRequest);
 
         // when & then
         assertAll(
@@ -90,16 +68,12 @@ class MemberAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    void 이미_가입한_유저가_회원가입을_요청하면_400을_던진다() {
+    void 아기_등록_회원가입_요청_시_이미_가입한_유저가_회원가입을_요청하면_400을_던진다() {
         // given
-        final String invalidSignToken = signTokenProvider.createToken(멤버1.getId());
-
-        post(MEMBER_BASE_PATH + "/baby", Map.of("Authorization", "Bearer " + invalidSignToken), 멤버_가입_요청);
+        아기_등록_회원가입_요청_멤버_1();
 
         // when
-        final ExtractableResponse<Response> response = post(
-                MEMBER_BASE_PATH + "/baby", Map.of("Authorization", "Bearer " + invalidSignToken), 멤버_가입_요청
-        );
+        final ExtractableResponse<Response> response = 아기_등록_회원가입_요청_멤버_1();
 
         //  then
         assertAll(
@@ -109,14 +83,9 @@ class MemberAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    void 회원가입을_진행한다() {
-        // given
-        final String token = signTokenProvider.createToken(MEMBER_ID);
-
+    void 아기_등록_회원가입을_진행한다() {
         // when
-        final ExtractableResponse<Response> response = post(
-                MEMBER_BASE_PATH + "/baby", Map.of("Authorization", "Bearer " + token), 멤버_가입_요청
-        );
+        final ExtractableResponse<Response> response = 아기_등록_회원가입_요청_멤버_1();
 
         // then
         assertAll(
@@ -130,18 +99,18 @@ class MemberAcceptanceTest extends AcceptanceTest {
     void 사용자_정보를_조회한다() {
         // given
         final String signToken = signTokenProvider.createToken(멤버1.getId());
-        final String accessToken = toObject(post(MEMBER_BASE_PATH + "/baby",
-                Map.of("Authorization", "Bearer " + signToken), 멤버_가입_요청), MemberSignUpResponse.class).accessToken();
+        final ExtractableResponse<Response> 아기_등록_회원가입_응답 = 아기_등록_회원가입_요청(signToken, 멤버_가입_요청);
+        final String accessToken = toObject(아기_등록_회원가입_응답, MemberSignUpResponse.class).accessToken();
 
         // when
-        final ExtractableResponse<Response> response =
-                get(MEMBER_BASE_PATH, Map.of("Authorization", "Bearer " + accessToken));
+        final ExtractableResponse<Response> response = 사용자_정보_요청(accessToken);
 
         // then
         Assertions.assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(toObject(response, MemberResponse.class)).isEqualTo(
-                        new MemberResponse(멤버_가입_요청.getName(), "", 멤버_가입_요청.getIconName(), IconColor.COLOR_1.name()))
+                        new MemberResponse(멤버_가입_요청.getName(), "", 멤버_가입_요청.getIconName(), IconColor.COLOR_1.name())
+                )
         );
     }
 
@@ -151,8 +120,7 @@ class MemberAcceptanceTest extends AcceptanceTest {
         final String invalidAccessToken = accessTokenProvider.createToken("invalidMemberId");
 
         // when
-        final ExtractableResponse<Response> response =
-                get(MEMBER_BASE_PATH, Map.of("Authorization", "Bearer " + invalidAccessToken));
+        final ExtractableResponse<Response> response = 사용자_정보_요청(invalidAccessToken);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
