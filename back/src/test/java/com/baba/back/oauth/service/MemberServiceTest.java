@@ -2,6 +2,8 @@ package com.baba.back.oauth.service;
 
 import static com.baba.back.fixture.DomainFixture.관계1;
 import static com.baba.back.fixture.DomainFixture.관계2;
+import static com.baba.back.fixture.DomainFixture.관계그룹1;
+import static com.baba.back.fixture.DomainFixture.관계그룹2;
 import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.DomainFixture.아기1;
 import static com.baba.back.fixture.DomainFixture.아기2;
@@ -30,6 +32,8 @@ import com.baba.back.oauth.exception.MemberNotFoundException;
 import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.oauth.repository.TokenRepository;
 import com.baba.back.relation.domain.Relation;
+import com.baba.back.relation.domain.RelationGroup;
+import com.baba.back.relation.repository.RelationGroupRepository;
 import com.baba.back.relation.repository.RelationRepository;
 import java.time.Clock;
 import java.util.Optional;
@@ -52,6 +56,9 @@ class MemberServiceTest {
 
     @Mock
     private BabyRepository babyRepository;
+
+    @Mock
+    private RelationGroupRepository relationGroupRepository;
 
     @Mock
     private RelationRepository relationRepository;
@@ -101,6 +108,7 @@ class MemberServiceTest {
         given(clock.instant()).willReturn(now.instant());
         given(clock.getZone()).willReturn(now.getZone());
         given(babyRepository.save(any(Baby.class))).willReturn(아기1, 아기2);
+        given(relationGroupRepository.save(any(RelationGroup.class))).willReturn(관계그룹1, 관계그룹2);
         given(relationRepository.save(any(Relation.class))).willReturn(관계1, 관계2);
         given(accessTokenProvider.createToken(memberId)).willReturn(accessToken);
         given(refreshTokenProvider.createToken(memberId)).willReturn(refreshToken);
@@ -113,6 +121,7 @@ class MemberServiceTest {
         then(memberRepository).should(times(1)).save(any());
         then(idConstructor).should(times(2)).createId();
         then(babyRepository).should(times(2)).save(any());
+        then(relationGroupRepository).should(times(2)).save(any(RelationGroup.class));
         then(relationRepository).should(times(2)).save(any());
 
         assertAll(

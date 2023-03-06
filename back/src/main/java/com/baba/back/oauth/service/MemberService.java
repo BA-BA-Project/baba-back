@@ -1,6 +1,7 @@
 package com.baba.back.oauth.service;
 
 import com.baba.back.baby.domain.Babies;
+import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.domain.IdConstructor;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.oauth.domain.Picker;
@@ -16,6 +17,7 @@ import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.oauth.repository.TokenRepository;
 import com.baba.back.relation.domain.Relation;
 import com.baba.back.relation.domain.RelationGroup;
+import com.baba.back.relation.repository.RelationGroupRepository;
 import com.baba.back.relation.repository.RelationRepository;
 import jakarta.transaction.Transactional;
 import java.time.Clock;
@@ -30,6 +32,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final BabyRepository babyRepository;
+    private final RelationGroupRepository relationGroupRepository;
     private final RelationRepository relationRepository;
     private final Picker<IconColor> picker;
     private final IdConstructor idConstructor;
@@ -80,11 +83,18 @@ public class MemberService {
                 .stream()
                 .map(baby -> Relation.builder()
                         .member(member)
-                        .baby(baby)
                         .relationName(relationName)
-                        .relationGroup(RelationGroup.FAMILY)
+                        .relationGroup(saveRelationGroup(baby))
                         .build())
                 .forEach(relationRepository::save);
+    }
+
+    private RelationGroup saveRelationGroup(Baby baby) {
+        return relationGroupRepository.save(RelationGroup.builder()
+                .baby(baby)
+                .relationGroupName("가족")
+                .family(true)
+                .build());
     }
 
     private void saveRefreshToken(Member member, String refreshToken) {
