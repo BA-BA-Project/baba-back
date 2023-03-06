@@ -105,7 +105,7 @@ class OAuthServiceTest {
         final String accessToken = "accessToken";
         final String refreshToken = "refreshToken";
 
-        given(oAuthClient.getMemberId(any())).willReturn(멤버1.getId());
+        given(oAuthClient.getMemberId(validToken)).willReturn(멤버1.getId());
         given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
         given(accessTokenProvider.createToken(멤버1.getId())).willReturn(accessToken);
         given(refreshTokenProvider.createToken(멤버1.getId())).willReturn(refreshToken);
