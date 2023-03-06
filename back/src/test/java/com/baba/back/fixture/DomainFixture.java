@@ -36,18 +36,28 @@ public class DomainFixture {
             .now(LocalDate.now())
             .build();
 
+    public static final RelationGroup 관계그룹1 = RelationGroup.builder()
+            .baby(아기1)
+            .relationGroupName("가족")
+            .family(true)
+            .build();
+
+    public static final RelationGroup 관계그룹2 = RelationGroup.builder()
+            .baby(아기1)
+            .relationGroupName("친구")
+            .family(false)
+            .build();
+
     public static final Relation 관계1 = Relation.builder()
             .member(멤버1)
-            .baby(아기1)
             .relationName("아빠")
-            .relationGroup(RelationGroup.FAMILY)
+            .relationGroup(관계그룹1)
             .build();
 
     public static final Relation 관계2 = Relation.builder()
             .member(멤버1)
-            .baby(아기1)
             .relationName("아빠")
-            .relationGroup(RelationGroup.FRIENDS)
+            .relationGroup(관계그룹2)
             .build();
 
     public static final Content 컨텐츠 = Content.builder()
