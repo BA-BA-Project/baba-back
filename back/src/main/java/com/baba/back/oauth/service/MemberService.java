@@ -81,11 +81,14 @@ public class MemberService {
     private void saveRelations(Babies babies, Member member, String relationName) {
         babies.getBabies()
                 .stream()
-                .map(baby -> Relation.builder()
-                        .member(member)
-                        .relationName(relationName)
-                        .relationGroup(saveRelationGroup(baby))
-                        .build())
+                .map(baby -> {
+                    final RelationGroup relationGroup = saveRelationGroup(baby);
+                    return Relation.builder()
+                            .member(member)
+                            .relationName(relationName)
+                            .relationGroup(relationGroup)
+                            .build();
+                })
                 .forEach(relationRepository::save);
     }
 
