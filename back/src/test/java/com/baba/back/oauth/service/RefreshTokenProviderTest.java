@@ -17,6 +17,7 @@ class RefreshTokenProviderTest {
         // given
         final String memberId = "memberId";
         final LocalDateTime now = LocalDateTime.now();
+
         final Clock clock = Clock.fixed(now.atZone(ZoneId.systemDefault()).toInstant(), ZoneId.systemDefault());
         refreshTokenProvider = new RefreshTokenProvider(SECRET_KEY, VALIDITY_MILLISECONDS, clock);
         final String refreshToken = refreshTokenProvider.createToken(memberId);
@@ -34,6 +35,7 @@ class RefreshTokenProviderTest {
         // given
         final String memberId = "memberId";
         final LocalDateTime now = LocalDateTime.now();
+
         final Clock clock = Clock.fixed(now.atZone(ZoneId.systemDefault()).toInstant(), ZoneId.systemDefault());
         refreshTokenProvider = new RefreshTokenProvider(SECRET_KEY, VALIDITY_MILLISECONDS, clock);
         final String refreshToken = refreshTokenProvider.createToken(memberId);
