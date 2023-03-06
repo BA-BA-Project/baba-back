@@ -6,7 +6,7 @@ import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.DomainFixture.아기1;
 import static com.baba.back.fixture.DomainFixture.좋아요;
 import static com.baba.back.fixture.DomainFixture.컨텐츠;
-import static com.baba.back.fixture.RequestFixture.컨텐츠_생성_요청;
+import static com.baba.back.fixture.RequestFixture.컨텐츠_생성_요청_데이터;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -75,7 +75,7 @@ class ContentServiceTest {
         given(memberRepository.findById(any())).willReturn(Optional.empty());
 
         // when & then
-        Assertions.assertThatThrownBy(() -> contentService.createContent(컨텐츠_생성_요청, MEMBER_ID, BABY_ID))
+        Assertions.assertThatThrownBy(() -> contentService.createContent(컨텐츠_생성_요청_데이터, MEMBER_ID, BABY_ID))
                 .isInstanceOf(MemberNotFoundException.class);
     }
 
@@ -86,7 +86,7 @@ class ContentServiceTest {
         given(babyRepository.findById(any())).willReturn(Optional.empty());
 
         // when & then
-        Assertions.assertThatThrownBy(() -> contentService.createContent(컨텐츠_생성_요청, MEMBER_ID, BABY_ID))
+        Assertions.assertThatThrownBy(() -> contentService.createContent(컨텐츠_생성_요청_데이터, MEMBER_ID, BABY_ID))
                 .isInstanceOf(BabyNotFoundException.class);
     }
 
@@ -98,7 +98,7 @@ class ContentServiceTest {
         given(relationRepository.findByMemberAndBaby(any(), any())).willReturn(Optional.empty());
 
         // when & then
-        Assertions.assertThatThrownBy(() -> contentService.createContent(컨텐츠_생성_요청, MEMBER_ID, BABY_ID))
+        Assertions.assertThatThrownBy(() -> contentService.createContent(컨텐츠_생성_요청_데이터, MEMBER_ID, BABY_ID))
                 .isInstanceOf(RelationNotFoundException.class);
     }
 
@@ -110,7 +110,7 @@ class ContentServiceTest {
         given(relationRepository.findByMemberAndBaby(any(), any())).willReturn(Optional.of(관계2));
 
         // when & then
-        Assertions.assertThatThrownBy(() -> contentService.createContent(컨텐츠_생성_요청, MEMBER_ID, BABY_ID))
+        Assertions.assertThatThrownBy(() -> contentService.createContent(컨텐츠_생성_요청_데이터, MEMBER_ID, BABY_ID))
                 .isInstanceOf(ContentAuthorizationException.class);
     }
 
@@ -126,7 +126,7 @@ class ContentServiceTest {
         given(contentRepository.existsByContentDateAndBaby(any(), any())).willReturn(true);
 
         // when & then
-        Assertions.assertThatThrownBy(() -> contentService.createContent(컨텐츠_생성_요청, MEMBER_ID, BABY_ID))
+        Assertions.assertThatThrownBy(() -> contentService.createContent(컨텐츠_생성_요청_데이터, MEMBER_ID, BABY_ID))
                 .isInstanceOf(ContentBadRequestException.class);
     }
 
@@ -144,7 +144,7 @@ class ContentServiceTest {
         given(fileHandler.upload(any())).willReturn("VALID_IMAGE_SOURCE");
 
         // when
-        final CreateContentResponse response = contentService.createContent(컨텐츠_생성_요청, MEMBER_ID, BABY_ID);
+        final CreateContentResponse response = contentService.createContent(컨텐츠_생성_요청_데이터, MEMBER_ID, BABY_ID);
 
         // then
         then(contentRepository).should(times(1)).save(any());
