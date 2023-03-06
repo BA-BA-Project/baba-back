@@ -3,7 +3,6 @@ package com.baba.back.content.acceptance;
 import static com.baba.back.SimpleRestAssured.post;
 import static com.baba.back.SimpleRestAssured.thenExtract;
 import static com.baba.back.SimpleRestAssured.toObject;
-import static com.baba.back.fixture.DomainFixture.관계1;
 import static com.baba.back.fixture.DomainFixture.관계그룹1;
 import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.DomainFixture.아기1;
@@ -24,6 +23,8 @@ import com.baba.back.content.dto.LikeContentResponse;
 import com.baba.back.content.repository.ContentRepository;
 import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.oauth.service.AccessTokenProvider;
+import com.baba.back.relation.domain.Relation;
+import com.baba.back.relation.domain.RelationGroup;
 import com.baba.back.relation.repository.RelationGroupRepository;
 import com.baba.back.relation.repository.RelationRepository;
 import io.restassured.RestAssured;
@@ -93,8 +94,12 @@ public class ContentAcceptanceTest extends AcceptanceTest {
 
         memberRepository.save(멤버1);
         babyRepository.save(아기1);
-        relationGroupRepository.save(관계그룹1);
-        relationRepository.save(관계1);
+        final RelationGroup relationGroup = relationGroupRepository.save(관계그룹1);
+        relationRepository.save(Relation.builder()
+                .member(멤버1)
+                .relationName("아빠")
+                .relationGroup(relationGroup)
+                .build());
 
         given(amazonS3.putObject(any())).willThrow(AmazonServiceException.class);
 
@@ -121,7 +126,12 @@ public class ContentAcceptanceTest extends AcceptanceTest {
 
         memberRepository.save(멤버1);
         babyRepository.save(아기1);
-        relationRepository.save(관계1);
+        final RelationGroup relationGroup = relationGroupRepository.save(관계그룹1);
+        relationRepository.save(Relation.builder()
+                .member(멤버1)
+                .relationName("아빠")
+                .relationGroup(relationGroup)
+                .build());
 
         given(amazonS3.getUrl(any(String.class), any(String.class))).willReturn(new URL(VALID_URL));
 
@@ -151,8 +161,12 @@ public class ContentAcceptanceTest extends AcceptanceTest {
 
         memberRepository.save(멤버1);
         final Baby baby = babyRepository.save(아기1);
-        relationGroupRepository.save(관계그룹1);
-        relationRepository.save(관계1);
+        final RelationGroup relationGroup = relationGroupRepository.save(관계그룹1);
+        relationRepository.save(Relation.builder()
+                .member(멤버1)
+                .relationName("아빠")
+                .relationGroup(relationGroup)
+                .build());
         final Content content = contentRepository.save(컨텐츠);
 
         // when
@@ -175,8 +189,13 @@ public class ContentAcceptanceTest extends AcceptanceTest {
 
         memberRepository.save(멤버1);
         final Baby baby = babyRepository.save(아기1);
-        relationGroupRepository.save(관계그룹1);
-        relationRepository.save(관계1);
+
+        final RelationGroup relationGroup = relationGroupRepository.save(관계그룹1);
+        relationRepository.save(Relation.builder()
+                .member(멤버1)
+                .relationName("아빠")
+                .relationGroup(relationGroup)
+                .build());
         final Content content = contentRepository.save(컨텐츠);
 
         // when
@@ -204,8 +223,13 @@ public class ContentAcceptanceTest extends AcceptanceTest {
 
         memberRepository.save(멤버1);
         final Baby baby = babyRepository.save(아기1);
-        relationGroupRepository.save(관계그룹1);
-        relationRepository.save(관계1);
+
+        final RelationGroup relationGroup = relationGroupRepository.save(관계그룹1);
+        relationRepository.save(Relation.builder()
+                .member(멤버1)
+                .relationName("아빠")
+                .relationGroup(relationGroup)
+                .build());
         final Content content = contentRepository.save(컨텐츠);
 
         // when
