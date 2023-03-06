@@ -18,6 +18,9 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 class RelationRepositoryTest {
 
     @Autowired
+    private RelationGroupRepository relationGroupRepository;
+
+    @Autowired
     private RelationRepository relationRepository;
 
     @Autowired
@@ -27,19 +30,26 @@ class RelationRepositoryTest {
     private BabyRepository babyRepository;
 
     @Test
-    void 멤버와_아기의_관계를_조회한다() {
+    void findByMemberAndBaby메소드_호출시_멤버와_아기의_relation_객체를_반환한다() {
         // given
         final Member savedMember = memberRepository.save(멤버1);
         final Baby savedBaby = babyRepository.save(아기1);
-        final Relation relation = new Relation(savedMember, savedBaby, "삼촌", RelationGroup.FAMILY);
+        final RelationGroup savedRelationGroup = relationGroupRepository.save(RelationGroup.builder()
+                .baby(savedBaby)
+                .relationGroupName("가족")
+                .family(true)
+                .build());
 
-        final Relation savedRelation = relationRepository.save(relation);
+        final Relation savedRelation = relationRepository.save(Relation.builder()
+                .member(savedMember)
+                .relationName("아빠")
+                .relationGroup(savedRelationGroup)
+                .build());
 
         // when
-        final Relation findRelation = relationRepository.findByMemberAndBaby(savedMember, savedBaby)
-                .orElseThrow();
+        final Relation relation = relationRepository.findByMemberAndBaby(savedMember, savedBaby).orElseThrow();
 
         // then
-        Assertions.assertThat(findRelation).isEqualTo(savedRelation);
+        Assertions.assertThat(relation).isEqualTo(savedRelation);
     }
 }
