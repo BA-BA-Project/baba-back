@@ -9,6 +9,7 @@ springdoc:
 server:
   servlet:
     context-path: "/api"
+  forward-headers-strategy: framework
 
 security:
   jwt:
