@@ -2,7 +2,7 @@ package com.baba.back.oauth.acceptance;
 
 import static com.baba.back.SimpleRestAssured.toObject;
 import static com.baba.back.fixture.DomainFixture.멤버1;
-import static com.baba.back.fixture.RequestFixture.멤버_가입_요청;
+import static com.baba.back.fixture.RequestFixture.멤버_가입_요청_데이터;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -41,7 +41,7 @@ class MemberAcceptanceTest extends AcceptanceTest {
     @ValueSource(strings = "invalidToken")
     void 아기_등록_회원가입_요청에_유효하지_않은_sign_토큰으로_요청_시_401을_응답한다(String invalidSignToken) {
         // given
-        final ExtractableResponse<Response> response = 아기_등록_회원가입_요청(invalidSignToken, 멤버_가입_요청);
+        final ExtractableResponse<Response> response = 아기_등록_회원가입_요청(invalidSignToken, 멤버_가입_요청_데이터);
 
         // when & then
         assertAll(
@@ -99,7 +99,7 @@ class MemberAcceptanceTest extends AcceptanceTest {
     void 사용자_정보를_조회한다() {
         // given
         final String signToken = signTokenProvider.createToken(멤버1.getId());
-        final ExtractableResponse<Response> 아기_등록_회원가입_응답 = 아기_등록_회원가입_요청(signToken, 멤버_가입_요청);
+        final ExtractableResponse<Response> 아기_등록_회원가입_응답 = 아기_등록_회원가입_요청(signToken, 멤버_가입_요청_데이터);
         final String accessToken = toObject(아기_등록_회원가입_응답, MemberSignUpResponse.class).accessToken();
 
         // when
@@ -109,7 +109,7 @@ class MemberAcceptanceTest extends AcceptanceTest {
         Assertions.assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(toObject(response, MemberResponse.class)).isEqualTo(
-                        new MemberResponse(멤버_가입_요청.getName(), "", 멤버_가입_요청.getIconName(), IconColor.COLOR_1.name())
+                        new MemberResponse(멤버_가입_요청_데이터.getName(), "", 멤버_가입_요청_데이터.getIconName(), IconColor.COLOR_1.name())
                 )
         );
     }

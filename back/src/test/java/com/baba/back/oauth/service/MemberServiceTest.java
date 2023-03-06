@@ -5,7 +5,7 @@ import static com.baba.back.fixture.DomainFixture.관계2;
 import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.DomainFixture.아기1;
 import static com.baba.back.fixture.DomainFixture.아기2;
-import static com.baba.back.fixture.RequestFixture.멤버_가입_요청;
+import static com.baba.back.fixture.RequestFixture.멤버_가입_요청_데이터;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -33,7 +33,6 @@ import com.baba.back.relation.domain.Relation;
 import com.baba.back.relation.repository.RelationRepository;
 import java.time.Clock;
 import java.util.Optional;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -107,7 +106,7 @@ class MemberServiceTest {
         given(tokenRepository.save(any(Token.class))).willReturn(any());
 
         // when
-        final MemberSignUpResponse response = memberService.signUp(멤버_가입_요청, memberId);
+        final MemberSignUpResponse response = memberService.signUp(멤버_가입_요청_데이터, memberId);
 
         //then
         then(memberRepository).should(times(1)).save(any());
