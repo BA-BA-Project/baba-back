@@ -49,29 +49,35 @@ public class OAuthService {
     }
 
     private void saveRefreshToken(Member member, String refreshToken) {
-        tokenRepository.save(Token.builder()
-                .member(member)
-                .value(refreshToken)
-                .build());
+        final Token token = tokenRepository.findByMember(member)
+                .orElseGet(
+                        () -> Token.builder()
+                                .member(member)
+                                .value(refreshToken)
+                                .build()
+                );
+        token.update(refreshToken);
+        tokenRepository.save(token);
     }
 
     public TokenRefreshResponse refresh(TokenRefreshRequest request) {
-        final String refreshToken = request.getRefreshToken();
-        refreshTokenProvider.validateToken(refreshToken);
+        final String oldRefreshToken = request.getRefreshToken();
+        refreshTokenProvider.validateToken(oldRefreshToken);
 
-        final String memberId = refreshTokenProvider.parseToken(refreshToken);
+        final String memberId = refreshTokenProvider.parseToken(oldRefreshToken);
         final Member member = findMember(memberId);
 
-        validateToken(member, refreshToken);
+        validateToken(member, oldRefreshToken);
 
         final String newAccessToken = accessTokenProvider.createToken(memberId);
 
-        if (refreshTokenProvider.isExpiringSoon(refreshToken)) {
+        if (refreshTokenProvider.isExpiringSoon(oldRefreshToken)) {
             final String newRefreshToken = refreshTokenProvider.createToken(memberId);
+            saveRefreshToken(member, newRefreshToken);
             return new TokenRefreshResponse(newAccessToken, newRefreshToken);
         }
 
-        return new TokenRefreshResponse(newAccessToken, refreshToken);
+        return new TokenRefreshResponse(newAccessToken, oldRefreshToken);
     }
 
     private Member findMember(String memberId) {

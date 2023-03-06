@@ -40,4 +40,8 @@ public class Token {
             throw new TokenBadRequestException("token은 null일 수 없습니다.");
         }
     }
+
+    public void update(String value) {
+        this.value = value;
+    }
 }
