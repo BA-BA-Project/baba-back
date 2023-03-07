@@ -21,7 +21,7 @@ import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.domain.IdConstructor;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.oauth.domain.Picker;
-import com.baba.back.oauth.domain.member.IconColor;
+import com.baba.back.oauth.domain.member.Color;
 import com.baba.back.oauth.domain.member.Member;
 import com.baba.back.oauth.domain.token.Token;
 import com.baba.back.oauth.dto.MemberResponse;
@@ -63,7 +63,7 @@ class MemberServiceTest {
     private RelationRepository relationRepository;
 
     @Spy
-    private Picker<IconColor> picker;
+    private Picker<Color> picker;
 
     @Mock
     private Clock clock;
@@ -101,7 +101,7 @@ class MemberServiceTest {
         final Clock now = Clock.systemDefaultZone();
 
         given(memberRepository.existsById(memberId)).willReturn(false);
-        given(picker.pick(anyList())).willReturn(IconColor.COLOR_1);
+        given(picker.pick(anyList())).willReturn(Color.COLOR_1);
         given(memberRepository.save(any(Member.class))).willReturn(멤버1);
         given(idConstructor.createId()).willReturn(아기1.getId(), 아기2.getId());
         given(clock.instant()).willReturn(now.instant());

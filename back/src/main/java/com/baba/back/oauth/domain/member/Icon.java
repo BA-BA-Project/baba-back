@@ -16,13 +16,13 @@ import lombok.NoArgsConstructor;
 public class Icon {
 
     @Enumerated(EnumType.STRING)
-    private IconColor iconColor;
+    private Color iconColor;
 
     @Enumerated(EnumType.STRING)
     private IconName iconName;
 
-    public static Icon of(Picker<IconColor> picker, String iconName) {
-        return new Icon(IconColor.from(picker), IconName.from(iconName));
+    public static Icon of(Picker<Color> picker, String iconName) {
+        return new Icon(Color.from(picker), IconName.from(iconName));
     }
 
     public String getIconColor() {

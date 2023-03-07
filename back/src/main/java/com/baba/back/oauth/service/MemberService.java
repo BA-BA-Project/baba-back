@@ -5,7 +5,7 @@ import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.domain.IdConstructor;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.oauth.domain.Picker;
-import com.baba.back.oauth.domain.member.IconColor;
+import com.baba.back.oauth.domain.member.Color;
 import com.baba.back.oauth.domain.member.Member;
 import com.baba.back.oauth.domain.token.Token;
 import com.baba.back.oauth.dto.MemberResponse;
@@ -34,7 +34,7 @@ public class MemberService {
     private final BabyRepository babyRepository;
     private final RelationGroupRepository relationGroupRepository;
     private final RelationRepository relationRepository;
-    private final Picker<IconColor> picker;
+    private final Picker<Color> picker;
     private final IdConstructor idConstructor;
     private final AccessTokenProvider accessTokenProvider;
     private final RefreshTokenProvider refreshTokenProvider;
