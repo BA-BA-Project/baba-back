@@ -5,7 +5,7 @@ import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.domain.IdConstructor;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.oauth.domain.Picker;
-import com.baba.back.oauth.domain.member.IconColor;
+import com.baba.back.oauth.domain.member.Color;
 import com.baba.back.oauth.domain.member.Member;
 import com.baba.back.oauth.domain.token.Token;
 import com.baba.back.oauth.dto.MemberResponse;
@@ -34,7 +34,7 @@ public class MemberService {
     private final BabyRepository babyRepository;
     private final RelationGroupRepository relationGroupRepository;
     private final RelationRepository relationRepository;
-    private final Picker<IconColor> picker;
+    private final Picker<Color> picker;
     private final IdConstructor idConstructor;
     private final AccessTokenProvider accessTokenProvider;
     private final RefreshTokenProvider refreshTokenProvider;
@@ -67,7 +67,7 @@ public class MemberService {
                 .name(request.getName())
                 .introduction("")
                 .iconName(request.getIconName())
-                .colorPicker(picker)
+                .iconColor(Color.from(picker))
                 .build());
     }
 
@@ -79,10 +79,12 @@ public class MemberService {
     }
 
     private void saveRelations(Babies babies, Member member, String relationName) {
+        final Color groupColor = Color.from(picker);
+
         babies.getBabies()
                 .stream()
                 .map(baby -> {
-                    final RelationGroup relationGroup = saveRelationGroup(baby);
+                    final RelationGroup relationGroup = saveRelationGroup(baby, groupColor);
                     return Relation.builder()
                             .member(member)
                             .relationName(relationName)
@@ -92,12 +94,15 @@ public class MemberService {
                 .forEach(relationRepository::save);
     }
 
-    private RelationGroup saveRelationGroup(Baby baby) {
-        return relationGroupRepository.save(RelationGroup.builder()
-                .baby(baby)
-                .relationGroupName("가족")
-                .family(true)
-                .build());
+    private RelationGroup saveRelationGroup(Baby baby, Color groupColor) {
+        return relationGroupRepository.save(
+                RelationGroup.builder()
+                        .baby(baby)
+                        .relationGroupName("가족")
+                        .groupColor(groupColor)
+                        .family(true)
+                        .build()
+        );
     }
 
     private void saveRefreshToken(Member member, String refreshToken) {

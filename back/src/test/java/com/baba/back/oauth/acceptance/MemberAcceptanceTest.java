@@ -10,7 +10,7 @@ import com.baba.back.AcceptanceTest;
 import com.baba.back.baby.dto.BabyRequest;
 import com.baba.back.common.dto.ExceptionResponse;
 import com.baba.back.oauth.domain.Picker;
-import com.baba.back.oauth.domain.member.IconColor;
+import com.baba.back.oauth.domain.member.Color;
 import com.baba.back.oauth.dto.MemberResponse;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
@@ -109,7 +109,7 @@ class MemberAcceptanceTest extends AcceptanceTest {
         Assertions.assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(toObject(response, MemberResponse.class)).isEqualTo(
-                        new MemberResponse(멤버_가입_요청_데이터.getName(), "", 멤버_가입_요청_데이터.getIconName(), IconColor.COLOR_1.name())
+                        new MemberResponse(멤버_가입_요청_데이터.getName(), "", 멤버_가입_요청_데이터.getIconName(), Color.COLOR_1.name())
                 )
         );
     }
@@ -129,8 +129,8 @@ class MemberAcceptanceTest extends AcceptanceTest {
     @TestConfiguration
     static class TestConfig {
         @Bean
-        public Picker<IconColor> picker() {
-            return colors -> IconColor.COLOR_1;
+        public Picker<Color> picker() {
+            return colors -> Color.COLOR_1;
         }
     }
 }

@@ -1,6 +1,5 @@
 package com.baba.back.oauth.domain.member;
 
-import com.baba.back.oauth.domain.Picker;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -26,11 +25,11 @@ public class Member {
     private Icon icon;
 
     @Builder
-    public Member(String id, String name, String introduction, Picker<IconColor> colorPicker, String iconName) {
+    public Member(String id, String name, String introduction, Color iconColor, String iconName) {
         this.id = id;
         this.name = new Name(name);
         this.introduction = new Introduction(introduction);
-        this.icon = Icon.of(colorPicker, iconName);
+        this.icon = Icon.of(iconColor, iconName);
     }
 
     public String getName() {

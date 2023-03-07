@@ -1,6 +1,5 @@
 package com.baba.back.oauth.domain.member;
 
-import com.baba.back.oauth.domain.Picker;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -16,13 +15,13 @@ import lombok.NoArgsConstructor;
 public class Icon {
 
     @Enumerated(EnumType.STRING)
-    private IconColor iconColor;
+    private Color iconColor;
 
     @Enumerated(EnumType.STRING)
     private IconName iconName;
 
-    public static Icon of(Picker<IconColor> picker, String iconName) {
-        return new Icon(IconColor.from(picker), IconName.from(iconName));
+    public static Icon of(Color color, String iconName) {
+        return new Icon(color, IconName.from(iconName));
     }
 
     public String getIconColor() {
