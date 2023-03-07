@@ -79,10 +79,12 @@ public class MemberService {
     }
 
     private void saveRelations(Babies babies, Member member, String relationName) {
+        Color groupColor = Color.from(picker);
+
         babies.getBabies()
                 .stream()
                 .map(baby -> {
-                    final RelationGroup relationGroup = saveRelationGroup(baby);
+                    final RelationGroup relationGroup = saveRelationGroup(baby, groupColor);
                     return Relation.builder()
                             .member(member)
                             .relationName(relationName)
@@ -92,12 +94,15 @@ public class MemberService {
                 .forEach(relationRepository::save);
     }
 
-    private RelationGroup saveRelationGroup(Baby baby) {
-        return relationGroupRepository.save(RelationGroup.builder()
-                .baby(baby)
-                .relationGroupName("가족")
-                .family(true)
-                .build());
+    private RelationGroup saveRelationGroup(Baby baby, Color groupColor) {
+        return relationGroupRepository.save(
+                RelationGroup.builder()
+                        .baby(baby)
+                        .relationGroupName("가족")
+                        .groupColor(groupColor)
+                        .family(true)
+                        .build()
+        );
     }
 
     private void saveRefreshToken(Member member, String refreshToken) {

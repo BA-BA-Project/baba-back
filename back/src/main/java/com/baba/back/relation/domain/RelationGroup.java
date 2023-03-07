@@ -1,11 +1,14 @@
 package com.baba.back.relation.domain;
 
 import com.baba.back.baby.domain.Baby;
+import com.baba.back.oauth.domain.member.Color;
 import com.baba.back.oauth.domain.member.Name;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -30,12 +33,16 @@ public class RelationGroup {
     @AttributeOverride(name = "value", column = @Column(name = "relation_group_name"))
     private Name relationGroupName;
 
+    @Enumerated(EnumType.STRING)
+    private Color groupColor;
+
     private boolean family;
 
     @Builder
-    public RelationGroup(Baby baby, String relationGroupName, boolean family) {
+    public RelationGroup(Baby baby, String relationGroupName, Color groupColor, boolean family) {
         this.baby = baby;
         this.relationGroupName = new Name(relationGroupName);
+        this.groupColor = groupColor;
         this.family = family;
     }
 }
