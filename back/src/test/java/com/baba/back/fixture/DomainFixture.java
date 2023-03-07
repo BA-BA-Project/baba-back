@@ -36,6 +36,13 @@ public class DomainFixture {
             .now(LocalDate.now())
             .build();
 
+    public static final Baby 아기3 = Baby.builder()
+            .id("baby3")
+            .name("아기3")
+            .birthday(LocalDate.now())
+            .now(LocalDate.now())
+            .build();
+
     public static final RelationGroup 관계그룹1 = RelationGroup.builder()
             .baby(아기1)
             .relationGroupName("가족")
@@ -43,9 +50,15 @@ public class DomainFixture {
             .build();
 
     public static final RelationGroup 관계그룹2 = RelationGroup.builder()
-            .baby(아기1)
+            .baby(아기2)
             .relationGroupName("친구")
             .family(false)
+            .build();
+
+    public static final RelationGroup 관계그룹3 = RelationGroup.builder()
+            .baby(아기3)
+            .relationGroupName("가족")
+            .family(true)
             .build();
 
     public static final Relation 관계1 = Relation.builder()
@@ -56,8 +69,14 @@ public class DomainFixture {
 
     public static final Relation 관계2 = Relation.builder()
             .member(멤버1)
-            .relationName("아빠")
+            .relationName("아빠친구")
             .relationGroup(관계그룹2)
+            .build();
+
+    public static final Relation 관계3 = Relation.builder()
+            .member(멤버1)
+            .relationName("아빠")
+            .relationGroup(관계그룹3)
             .build();
 
     public static final Content 컨텐츠 = Content.builder()
