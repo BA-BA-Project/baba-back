@@ -79,7 +79,7 @@ public class MemberService {
     }
 
     private void saveRelations(Babies babies, Member member, String relationName) {
-        Color groupColor = Color.from(picker);
+        final Color groupColor = Color.from(picker);
 
         babies.getBabies()
                 .stream()
