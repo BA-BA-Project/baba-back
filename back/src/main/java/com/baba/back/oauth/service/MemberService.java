@@ -67,7 +67,7 @@ public class MemberService {
                 .name(request.getName())
                 .introduction("")
                 .iconName(request.getIconName())
-                .colorPicker(picker)
+                .iconColor(Color.from(picker))
                 .build());
     }
 

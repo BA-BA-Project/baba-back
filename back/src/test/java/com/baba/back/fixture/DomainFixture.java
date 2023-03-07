@@ -19,7 +19,7 @@ public class DomainFixture {
             .name("멤버1")
             .introduction("안녕하세요")
             .iconName(IconName.PROFILE_G_1.toString())
-            .colorPicker(colors -> Color.COLOR_1)
+            .iconColor(Color.COLOR_1)
             .build();
 
     public static final Baby 아기1 = Baby.builder()
