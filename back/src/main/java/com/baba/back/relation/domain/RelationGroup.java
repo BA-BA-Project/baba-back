@@ -45,4 +45,16 @@ public class RelationGroup {
         this.groupColor = groupColor;
         this.family = family;
     }
+
+    public String getBabyId() {
+        return this.baby.getId();
+    }
+
+    public String getBabyName() {
+        return this.baby.getName();
+    }
+
+    public String getGroupColor() {
+        return this.groupColor.name();
+    }
 }

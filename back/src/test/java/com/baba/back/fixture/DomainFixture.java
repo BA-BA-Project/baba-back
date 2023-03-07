@@ -47,18 +47,21 @@ public class DomainFixture {
             .baby(아기1)
             .relationGroupName("가족")
             .family(true)
+            .groupColor(Color.COLOR_1)
             .build();
 
     public static final RelationGroup 관계그룹2 = RelationGroup.builder()
             .baby(아기2)
             .relationGroupName("친구")
             .family(false)
+            .groupColor(Color.COLOR_1)
             .build();
 
     public static final RelationGroup 관계그룹3 = RelationGroup.builder()
             .baby(아기3)
             .relationGroupName("가족")
             .family(true)
+            .groupColor(Color.COLOR_1)
             .build();
 
     public static final Relation 관계1 = Relation.builder()

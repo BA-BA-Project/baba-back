@@ -33,4 +33,8 @@ public class Baby {
     public LocalDate getBirthday() {
         return birthday.getBirthday();
     }
+
+    public String getName() {
+        return this.name.getValue();
+    }
 }
