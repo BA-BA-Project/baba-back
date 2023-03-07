@@ -9,6 +9,7 @@ import com.baba.back.oauth.domain.member.Member;
 import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.relation.domain.Relation;
 import com.baba.back.relation.domain.RelationGroup;
+import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,5 +52,29 @@ class RelationRepositoryTest {
 
         // then
         Assertions.assertThat(relation).isEqualTo(savedRelation);
+    }
+
+    @Test
+    void findByMember메소드_호출시_멤버에_등록된_relation_객체들_반환한다() {
+        // given
+        final Member savedMember = memberRepository.save(멤버1);
+        final Baby savedBaby = babyRepository.save(아기1);
+        final RelationGroup savedRelationGroup = relationGroupRepository.save(RelationGroup.builder()
+                .baby(savedBaby)
+                .relationGroupName("가족")
+                .family(true)
+                .build());
+
+        final Relation savedRelation = relationRepository.save(Relation.builder()
+                .member(savedMember)
+                .relationName("아빠")
+                .relationGroup(savedRelationGroup)
+                .build());
+
+        // when
+        final List<Relation> relation = relationRepository.findByMember(savedMember);
+
+        // then
+        Assertions.assertThat(relation).containsExactly(savedRelation);
     }
 }

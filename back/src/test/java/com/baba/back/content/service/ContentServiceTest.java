@@ -1,7 +1,7 @@
 package com.baba.back.content.service;
 
 import static com.baba.back.fixture.DomainFixture.관계1;
-import static com.baba.back.fixture.DomainFixture.관계2;
+import static com.baba.back.fixture.DomainFixture.관계3;
 import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.DomainFixture.아기1;
 import static com.baba.back.fixture.DomainFixture.좋아요;
@@ -107,7 +107,7 @@ class ContentServiceTest {
         // given
         given(memberRepository.findById(any())).willReturn(Optional.of(멤버1));
         given(babyRepository.findById(any())).willReturn(Optional.of(아기1));
-        given(relationRepository.findByMemberAndBaby(any(), any())).willReturn(Optional.of(관계2));
+        given(relationRepository.findByMemberAndBaby(any(), any())).willReturn(Optional.of(관계3));
 
         // when & then
         Assertions.assertThatThrownBy(() -> contentService.createContent(컨텐츠_생성_요청_데이터, MEMBER_ID, BABY_ID))
