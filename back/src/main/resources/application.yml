@@ -9,7 +9,6 @@ springdoc:
 server:
   servlet:
     context-path: "/api"
-  forward-headers-strategy: framework
 
 security:
   jwt:
@@ -84,6 +83,7 @@ spring:
 
 server:
   port: 8081
+  forward-headers-strategy: framework
 
 ---
 
