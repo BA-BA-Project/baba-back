@@ -1,7 +1,5 @@
-package com.baba.back.baby.domain;
+package com.baba.back.relation.domain;
 
-import com.baba.back.relation.domain.Relation;
-import com.baba.back.relation.domain.RelationGroup;
 import java.util.ArrayList;
 import java.util.List;
 

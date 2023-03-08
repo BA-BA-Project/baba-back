@@ -1,6 +1,6 @@
 package com.baba.back.baby.service;
 
-import com.baba.back.baby.domain.Relations;
+import com.baba.back.relation.domain.Relations;
 import com.baba.back.baby.dto.BabiesResponse;
 import com.baba.back.baby.dto.BabyResponse;
 import com.baba.back.oauth.domain.member.Member;
