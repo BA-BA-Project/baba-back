@@ -19,7 +19,7 @@ class RelationGroupTest {
         assertAll(
                 () -> assertThat(relationGroup.getBabyId()).isEqualTo(아기1.getId()),
                 () -> assertThat(relationGroup.getBabyName()).isEqualTo(아기1.getName()),
-                () -> assertThat(relationGroup.getGroupColor()).isEqualTo(Color.COLOR_1.name())
+                () -> assertThat(relationGroup.getGroupColor()).isEqualTo(Color.COLOR_1.getValue())
         );
     }
 }

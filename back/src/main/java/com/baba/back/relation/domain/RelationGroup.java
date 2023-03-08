@@ -55,6 +55,6 @@ public class RelationGroup {
     }
 
     public String getGroupColor() {
-        return this.groupColor.name();
+        return this.groupColor.getValue();
     }
 }
