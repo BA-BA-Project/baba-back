@@ -38,11 +38,11 @@ public class Invitation {
     private RelationGroup relationGroup;
 
     @Builder
-    public Invitation(String inviteCode, String relationName, LocalDateTime now, LocalDateTime expiration,
+    public Invitation(String inviteCode, String relationName, LocalDateTime now,
                       RelationGroup relationGroup) {
         this.inviteCode = new InviteCode(inviteCode);
         this.relationName = new Name(relationName);
-        this.expiration = Expiration.of(now, expiration);
+        this.expiration = Expiration.from(now);
         this.relationGroup = relationGroup;
     }
 }

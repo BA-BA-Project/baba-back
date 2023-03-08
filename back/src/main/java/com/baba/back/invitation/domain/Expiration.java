@@ -11,27 +11,22 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class Expiration {
+    public static final int EXPIRATION_DAYS = 10;
+
     private LocalDateTime value;
 
     private Expiration(LocalDateTime value) {
         this.value = value;
     }
 
-    public static Expiration of(LocalDateTime now, LocalDateTime value) {
-        validateNull(now, value);
-        validateExpiration(now, value);
-        return new Expiration(value);
+    public static Expiration from(LocalDateTime now) {
+        validateNull(now);
+        return new Expiration(now.plusDays(EXPIRATION_DAYS));
     }
 
-    private static void validateNull(LocalDateTime now, LocalDateTime value) {
-        if(Objects.isNull(now) || Objects.isNull(value)) {
-            throw new ExpirationBadReqeustException("만료시간은 null일 수 없습니다.");
-        }
-    }
-
-    private static void validateExpiration(LocalDateTime now, LocalDateTime value) {
-        if(now.isAfter(value)) {
-            throw new ExpirationBadReqeustException("만료시간은 현재보다 미래여야 합니다.");
+    private static void validateNull(LocalDateTime now) {
+        if(Objects.isNull(now)) {
+            throw new ExpirationBadReqeustException("현재시각은 null일 수 없습니다.");
         }
     }
 }
