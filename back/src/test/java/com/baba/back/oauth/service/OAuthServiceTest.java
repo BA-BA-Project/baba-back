@@ -120,7 +120,7 @@ class OAuthServiceTest {
     }
 
     @Test
-    void 가입이_되어있지_않으면_sign토큰을_발급한다() {
+    void 가입이_되어있지_않으면_상태코드만_응답한다() {
         // given
         final String validToken = "validToken";
         final String memberId = "memberId";
