@@ -4,7 +4,6 @@ import com.baba.back.oauth.OAuthClient;
 import com.baba.back.oauth.domain.member.Member;
 import com.baba.back.oauth.domain.token.Token;
 import com.baba.back.oauth.dto.LoginTokenResponse;
-import com.baba.back.oauth.dto.SignTokenResponse;
 import com.baba.back.oauth.dto.SocialLoginResponse;
 import com.baba.back.oauth.dto.SocialTokenRequest;
 import com.baba.back.oauth.dto.TokenRefreshRequest;
@@ -29,7 +28,6 @@ public class OAuthService {
     private final OAuthClient oAuthClient;
     private final AccessTokenProvider accessTokenProvider;
     private final RefreshTokenProvider refreshTokenProvider;
-    private final SignTokenProvider signTokenProvider;
     private final MemberRepository memberRepository;
     private final TokenRepository tokenRepository;
 
@@ -44,8 +42,7 @@ public class OAuthService {
             return new SocialLoginResponse(HttpStatus.OK, new LoginTokenResponse(accessToken, refreshToken));
         }
 
-        final String signToken = signTokenProvider.createToken(memberId);
-        return new SocialLoginResponse(HttpStatus.NOT_FOUND, new SignTokenResponse(signToken));
+        return new SocialLoginResponse(HttpStatus.NOT_FOUND, null);
     }
 
     private void saveRefreshToken(Member member, String refreshToken) {

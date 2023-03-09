@@ -15,7 +15,6 @@ import static org.mockito.Mockito.times;
 import com.baba.back.oauth.OAuthClient;
 import com.baba.back.oauth.domain.token.Token;
 import com.baba.back.oauth.dto.LoginTokenResponse;
-import com.baba.back.oauth.dto.SignTokenResponse;
 import com.baba.back.oauth.dto.SocialLoginResponse;
 import com.baba.back.oauth.dto.SocialTokenRequest;
 import com.baba.back.oauth.dto.TokenRefreshRequest;
@@ -50,9 +49,6 @@ class OAuthServiceTest {
 
     @Mock
     private RefreshTokenProvider refreshTokenProvider;
-
-    @Mock
-    private SignTokenProvider signTokenProvider;
 
     @Mock
     private MemberRepository memberRepository;
@@ -128,11 +124,9 @@ class OAuthServiceTest {
         // given
         final String validToken = "validToken";
         final String memberId = "memberId";
-        final String signToken = "signToken";
 
         given(oAuthClient.getMemberId(validToken)).willReturn(memberId);
         given(memberRepository.findById(memberId)).willReturn(Optional.empty());
-        given(signTokenProvider.createToken(memberId)).willReturn(signToken);
 
         // when
         final SocialLoginResponse response = oAuthService.signInKakao(new SocialTokenRequest(validToken));
@@ -140,7 +134,7 @@ class OAuthServiceTest {
         // then
         assertAll(
                 () -> assertThat(response.httpStatus()).isEqualTo(HttpStatus.NOT_FOUND),
-                () -> assertThat(response.tokenResponse()).isEqualTo(new SignTokenResponse(signToken))
+                () -> assertThat(response.tokenResponse()).isNull()
         );
     }
 

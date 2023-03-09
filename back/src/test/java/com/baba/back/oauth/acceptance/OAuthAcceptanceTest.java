@@ -13,7 +13,6 @@ import com.baba.back.AcceptanceTest;
 import com.baba.back.oauth.OAuthClient;
 import com.baba.back.oauth.dto.LoginTokenResponse;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
-import com.baba.back.oauth.dto.SignTokenResponse;
 import com.baba.back.oauth.dto.TokenRefreshRequest;
 import com.baba.back.oauth.dto.TokenRefreshResponse;
 import com.baba.back.oauth.service.RefreshTokenProvider;
@@ -51,7 +50,7 @@ class OAuthAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    void 소셜_로그인_요청_시_가입되어_있지_않으면_sign_token_과_404를_응답한다() {
+    void 소셜_로그인_요청_시_가입되어_있지_않으면_404를_응답한다() {
         // given
         given(oAuthClient.getMemberId(any())).willReturn("not signed up member");
 
@@ -60,8 +59,7 @@ class OAuthAcceptanceTest extends AcceptanceTest {
 
         // then
         assertAll(
-                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value()),
-                () -> assertThat(toObject(response, SignTokenResponse.class).signToken()).isNotNull()
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value())
         );
     }
 
