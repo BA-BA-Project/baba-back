@@ -26,6 +26,7 @@ public class AcceptanceTest {
     private static final String BASE_PATH = "/api";
     private static final String MEMBER_BASE_PATH = BASE_PATH + "/members";
     private static final String AUTH_BASE_PATH = BASE_PATH + "/auth";
+    private static final String BABY_BASE_PATH = BASE_PATH + "/baby";
 
     @Autowired
     protected SignTokenProvider signTokenProvider;
@@ -51,6 +52,10 @@ public class AcceptanceTest {
 
     protected ExtractableResponse<Response> 토큰_재발급_요청(TokenRefreshRequest request) {
         return post(AUTH_BASE_PATH + "/refresh", request);
+    }
+
+    protected ExtractableResponse<Response> 아기_리스트_조회_요청(String accessToken) {
+        return get(BABY_BASE_PATH, Map.of("Authorization", "Bearer " + accessToken));
     }
 
     @BeforeEach

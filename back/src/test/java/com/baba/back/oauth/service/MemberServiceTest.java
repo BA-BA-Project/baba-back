@@ -1,9 +1,9 @@
 package com.baba.back.oauth.service;
 
 import static com.baba.back.fixture.DomainFixture.관계1;
-import static com.baba.back.fixture.DomainFixture.관계2;
+import static com.baba.back.fixture.DomainFixture.관계3;
 import static com.baba.back.fixture.DomainFixture.관계그룹1;
-import static com.baba.back.fixture.DomainFixture.관계그룹2;
+import static com.baba.back.fixture.DomainFixture.관계그룹3;
 import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.DomainFixture.아기1;
 import static com.baba.back.fixture.DomainFixture.아기2;
@@ -107,8 +107,8 @@ class MemberServiceTest {
         given(clock.instant()).willReturn(now.instant());
         given(clock.getZone()).willReturn(now.getZone());
         given(babyRepository.save(any(Baby.class))).willReturn(아기1, 아기2);
-        given(relationGroupRepository.save(any(RelationGroup.class))).willReturn(관계그룹1, 관계그룹2);
-        given(relationRepository.save(any(Relation.class))).willReturn(관계1, 관계2);
+        given(relationGroupRepository.save(any(RelationGroup.class))).willReturn(관계그룹1, 관계그룹3);
+        given(relationRepository.save(any(Relation.class))).willReturn(관계1, 관계3);
         given(accessTokenProvider.createToken(memberId)).willReturn(accessToken);
         given(refreshTokenProvider.createToken(memberId)).willReturn(refreshToken);
         given(tokenRepository.save(any(Token.class))).willReturn(any());

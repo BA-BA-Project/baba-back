@@ -36,16 +36,45 @@ public class DomainFixture {
             .now(LocalDate.now())
             .build();
 
+    public static final Baby 아기3 = Baby.builder()
+            .id("baby3")
+            .name("아기3")
+            .birthday(LocalDate.now())
+            .now(LocalDate.now())
+            .build();
+
+    public static final Baby 아기4 = Baby.builder()
+            .id("baby4")
+            .name("아기4")
+            .birthday(LocalDate.now())
+            .now(LocalDate.now())
+            .build();
+
     public static final RelationGroup 관계그룹1 = RelationGroup.builder()
             .baby(아기1)
             .relationGroupName("가족")
             .family(true)
+            .groupColor(Color.COLOR_1)
             .build();
 
     public static final RelationGroup 관계그룹2 = RelationGroup.builder()
-            .baby(아기1)
+            .baby(아기2)
+            .relationGroupName("가족")
+            .family(true)
+            .groupColor(Color.COLOR_1)
+            .build();
+    public static final RelationGroup 관계그룹3 = RelationGroup.builder()
+            .baby(아기3)
             .relationGroupName("친구")
             .family(false)
+            .groupColor(Color.COLOR_1)
+            .build();
+
+    public static final RelationGroup 관계그룹4 = RelationGroup.builder()
+            .baby(아기4)
+            .relationGroupName("외가")
+            .family(false)
+            .groupColor(Color.COLOR_1)
             .build();
 
     public static final Relation 관계1 = Relation.builder()
@@ -58,6 +87,18 @@ public class DomainFixture {
             .member(멤버1)
             .relationName("아빠")
             .relationGroup(관계그룹2)
+            .build();
+
+    public static final Relation 관계3 = Relation.builder()
+            .member(멤버1)
+            .relationName("아빠친구")
+            .relationGroup(관계그룹3)
+            .build();
+
+    public static final Relation 관계4 = Relation.builder()
+            .member(멤버1)
+            .relationName("외삼촌")
+            .relationGroup(관계그룹4)
             .build();
 
     public static final Content 컨텐츠 = Content.builder()

@@ -4,8 +4,10 @@ import com.baba.back.oauth.domain.Picker;
 import com.baba.back.oauth.exception.IconColorBadRequestException;
 import java.util.Arrays;
 import java.util.List;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+@Getter
 @RequiredArgsConstructor
 public enum Color {
     COLOR_1("FFAEBA"), COLOR_2("FF8698"), COLOR_3("FFE3C8"), COLOR_4("FFD2A7"), COLOR_5("FFD400"), COLOR_6("9ED883"),
