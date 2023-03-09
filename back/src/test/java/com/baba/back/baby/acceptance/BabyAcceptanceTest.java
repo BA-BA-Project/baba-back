@@ -21,9 +21,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 
 class BabyAcceptanceTest extends AcceptanceTest {
-    /**
-     * 아기 초대 API 생성 후 다른 아기 추가하여 테스트 진행
-     */
+
+    // TODO: 2023/03/09 아기 초대 API 생성 후 다른 아기 추가하여 테스트 진행한다.
     @Test
     void 아기_리스트_요청_시_등록된_아기가_조회된다() {
         // given
