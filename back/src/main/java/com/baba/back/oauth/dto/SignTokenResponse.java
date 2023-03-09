@@ -1,4 +1,4 @@
 package com.baba.back.oauth.dto;
 
-public record SignTokenResponse(String signToken) implements TokenResponse {
+public record SignTokenResponse(String signToken) {
 }

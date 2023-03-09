@@ -3,8 +3,6 @@ package com.baba.back.oauth.service;
 import com.baba.back.oauth.OAuthClient;
 import com.baba.back.oauth.domain.member.Member;
 import com.baba.back.oauth.domain.token.Token;
-import com.baba.back.oauth.dto.LoginTokenResponse;
-import com.baba.back.oauth.dto.SignTokenResponse;
 import com.baba.back.oauth.dto.SocialLoginResponse;
 import com.baba.back.oauth.dto.SocialTokenRequest;
 import com.baba.back.oauth.dto.TokenRefreshRequest;
@@ -14,10 +12,8 @@ import com.baba.back.oauth.exception.TokenBadRequestException;
 import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.oauth.repository.TokenRepository;
 import jakarta.transaction.Transactional;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -29,23 +25,18 @@ public class OAuthService {
     private final OAuthClient oAuthClient;
     private final AccessTokenProvider accessTokenProvider;
     private final RefreshTokenProvider refreshTokenProvider;
-    private final SignTokenProvider signTokenProvider;
     private final MemberRepository memberRepository;
     private final TokenRepository tokenRepository;
 
     public SocialLoginResponse signInKakao(SocialTokenRequest request) {
         final String memberId = oAuthClient.getMemberId(request.getSocialToken());
-        final Optional<Member> member = memberRepository.findById(memberId);
+        final Member member = findMember(memberId);
 
-        if (member.isPresent()) {
-            final String accessToken = accessTokenProvider.createToken(memberId);
-            final String refreshToken = refreshTokenProvider.createToken(memberId);
-            saveRefreshToken(member.get(), refreshToken);
-            return new SocialLoginResponse(HttpStatus.OK, new LoginTokenResponse(accessToken, refreshToken));
-        }
+        final String accessToken = accessTokenProvider.createToken(memberId);
+        final String refreshToken = refreshTokenProvider.createToken(memberId);
+        saveRefreshToken(member, refreshToken);
 
-        final String signToken = signTokenProvider.createToken(memberId);
-        return new SocialLoginResponse(HttpStatus.NOT_FOUND, new SignTokenResponse(signToken));
+        return new SocialLoginResponse(accessToken, refreshToken);
     }
 
     private void saveRefreshToken(Member member, String refreshToken) {
