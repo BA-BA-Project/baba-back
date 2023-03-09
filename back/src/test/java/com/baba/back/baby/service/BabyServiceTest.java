@@ -58,7 +58,7 @@ class BabyServiceTest {
     void 등록된_아기_리스트를_조회하면_가족_그룹에_해당하는_아이들과_가족_그룹이_아닌_아이들이_반환된다() {
         // given
         given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
-        given(relationRepository.findByMember(멤버1)).willReturn(List.of(관계2, 관계4, 관계1, 관계3));
+        given(relationRepository.findAllByMember(멤버1)).willReturn(List.of(관계2, 관계4, 관계1, 관계3));
 
        // when
         final BabiesResponse babies = babyService.findBabies(멤버1.getId());

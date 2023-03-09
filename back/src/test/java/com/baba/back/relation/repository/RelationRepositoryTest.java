@@ -88,7 +88,7 @@ class RelationRepositoryTest {
 
 
         // when
-        final List<Relation> relation = relationRepository.findByMember(savedMember);
+        final List<Relation> relation = relationRepository.findAllByMember(savedMember);
 
         // then
         Assertions.assertThat(relation).containsExactly(savedRelation1, savedRelation2);

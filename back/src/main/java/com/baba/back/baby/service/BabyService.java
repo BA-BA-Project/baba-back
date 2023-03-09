@@ -23,7 +23,7 @@ public class BabyService {
 
     public BabiesResponse findBabies(String memberId) {
         final Member member = findMember(memberId);
-        final Relations relations = new Relations(relationRepository.findByMember(member));
+        final Relations relations = new Relations(relationRepository.findAllByMember(member));
         final List<RelationGroup> myFamilyGroups = relations.getMyFamilyGroup();
         final List<RelationGroup> othersFamilyGroups = relations.getOthersFamilyGroup();
 
