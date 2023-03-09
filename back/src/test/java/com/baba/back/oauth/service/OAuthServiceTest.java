@@ -14,7 +14,6 @@ import static org.mockito.Mockito.times;
 
 import com.baba.back.oauth.OAuthClient;
 import com.baba.back.oauth.domain.token.Token;
-import com.baba.back.oauth.dto.LoginTokenResponse;
 import com.baba.back.oauth.dto.SocialLoginResponse;
 import com.baba.back.oauth.dto.SocialTokenRequest;
 import com.baba.back.oauth.dto.TokenRefreshRequest;
@@ -32,7 +31,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 
 @ExtendWith(MockitoExtension.class)
@@ -57,7 +55,7 @@ class OAuthServiceTest {
     private TokenRepository tokenRepository;
 
     @Test
-    void 소셜_토큰이_유효하지_않다면_400을_반환한다() {
+    void 소셜_토큰이_유효하지_않다면_예외를_던진다() {
         // given
         final String invalidToken = "invalidToken";
         given(oAuthClient.getMemberId(invalidToken)).willThrow(HttpClientErrorException.class);
@@ -67,6 +65,21 @@ class OAuthServiceTest {
 
         assertThatThrownBy(() -> oAuthService.signInKakao(request))
                 .isInstanceOf(HttpClientErrorException.class);
+    }
+
+    @Test
+    void 가입이_되어있지_않으면_예외를_던진다() {
+        // given
+        final String validToken = "validToken";
+        final String memberId = "memberId";
+        final SocialTokenRequest request = new SocialTokenRequest(validToken);
+
+        given(oAuthClient.getMemberId(validToken)).willReturn(memberId);
+        given(memberRepository.findById(memberId)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> oAuthService.signInKakao(request))
+                .isInstanceOf(MemberNotFoundException.class);
     }
 
     @Test
@@ -87,8 +100,8 @@ class OAuthServiceTest {
 
         // then
         assertAll(
-                () -> assertThat(response.httpStatus()).isEqualTo(HttpStatus.OK),
-                () -> assertThat(response.tokenResponse()).isEqualTo(new LoginTokenResponse(accessToken, refreshToken))
+                () -> assertThat(response.accessToken()).isEqualTo(accessToken),
+                () -> assertThat(response.refreshToken()).isEqualTo(refreshToken)
         );
 
         then(tokenRepository).should(times(1)).save(any());
@@ -112,30 +125,11 @@ class OAuthServiceTest {
 
         // then
         assertAll(
-                () -> assertThat(response.httpStatus()).isEqualTo(HttpStatus.OK),
-                () -> assertThat(response.tokenResponse()).isEqualTo(new LoginTokenResponse(accessToken, refreshToken))
+                () -> assertThat(response.accessToken()).isEqualTo(accessToken),
+                () -> assertThat(response.refreshToken()).isEqualTo(refreshToken)
         );
 
         then(tokenRepository).should(times(1)).save(any());
-    }
-
-    @Test
-    void 가입이_되어있지_않으면_상태코드만_응답한다() {
-        // given
-        final String validToken = "validToken";
-        final String memberId = "memberId";
-
-        given(oAuthClient.getMemberId(validToken)).willReturn(memberId);
-        given(memberRepository.findById(memberId)).willReturn(Optional.empty());
-
-        // when
-        final SocialLoginResponse response = oAuthService.signInKakao(new SocialTokenRequest(validToken));
-
-        // then
-        assertAll(
-                () -> assertThat(response.httpStatus()).isEqualTo(HttpStatus.NOT_FOUND),
-                () -> assertThat(response.tokenResponse()).isNull()
-        );
     }
 
     @Test
