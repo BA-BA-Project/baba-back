@@ -2,6 +2,7 @@ package com.baba.back.relation.repository;
 
 import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.DomainFixture.아기1;
+import static com.baba.back.fixture.DomainFixture.아기2;
 
 import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.repository.BabyRepository;
@@ -58,23 +59,38 @@ class RelationRepositoryTest {
     void findByMember메소드_호출시_멤버에_등록된_relation_객체들_반환한다() {
         // given
         final Member savedMember = memberRepository.save(멤버1);
-        final Baby savedBaby = babyRepository.save(아기1);
-        final RelationGroup savedRelationGroup = relationGroupRepository.save(RelationGroup.builder()
-                .baby(savedBaby)
+        final Baby savedBaby1 = babyRepository.save(아기1);
+        final RelationGroup savedRelationGroup1 = relationGroupRepository.save(RelationGroup.builder()
+                .baby(savedBaby1)
                 .relationGroupName("가족")
                 .family(true)
                 .build());
-
-        final Relation savedRelation = relationRepository.save(Relation.builder()
+        final Relation savedRelation1 = relationRepository.save(Relation.builder()
                 .member(savedMember)
                 .relationName("아빠")
-                .relationGroup(savedRelationGroup)
+                .relationGroup(savedRelationGroup1)
                 .build());
+
+
+        final Baby savedBaby2 = babyRepository.save(아기2);
+        final RelationGroup savedRelationGroup2 = relationGroupRepository.save(RelationGroup.builder()
+                .baby(savedBaby2)
+                .relationGroupName("친구")
+                .family(false)
+                .build());
+
+        final Relation savedRelation2 = relationRepository.save(Relation.builder()
+                .member(savedMember)
+                .relationName("아빠 친구")
+                .relationGroup(savedRelationGroup2)
+                .build());
+
+
 
         // when
         final List<Relation> relation = relationRepository.findByMember(savedMember);
 
         // then
-        Assertions.assertThat(relation).containsExactly(savedRelation);
+        Assertions.assertThat(relation).containsExactly(savedRelation1, savedRelation2);
     }
 }
