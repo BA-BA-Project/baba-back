@@ -1,6 +1,5 @@
 package com.baba.back.oauth.domain;
 
-import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -15,8 +14,4 @@ public enum Terms {
     private final boolean required;
     private final String name;
     private final String url;
-
-    public static List<Terms> get() {
-        return List.of(Terms.values());
-    }
 }
