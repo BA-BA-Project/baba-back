@@ -13,13 +13,17 @@ import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.times;
 
 import com.baba.back.oauth.OAuthClient;
+import com.baba.back.oauth.domain.Terms;
 import com.baba.back.oauth.domain.token.Token;
+import com.baba.back.oauth.dto.SearchTermsResponse;
 import com.baba.back.oauth.dto.SocialLoginResponse;
 import com.baba.back.oauth.dto.SocialTokenRequest;
+import com.baba.back.oauth.dto.TermsResponse;
 import com.baba.back.oauth.dto.TokenRefreshRequest;
 import com.baba.back.oauth.dto.TokenRefreshResponse;
 import com.baba.back.oauth.exception.ExpiredTokenAuthenticationException;
 import com.baba.back.oauth.exception.InvalidTokenAuthenticationException;
+import com.baba.back.oauth.exception.MemberBadRequestException;
 import com.baba.back.oauth.exception.MemberNotFoundException;
 import com.baba.back.oauth.exception.TokenBadRequestException;
 import com.baba.back.oauth.repository.MemberRepository;
@@ -130,6 +134,49 @@ class OAuthServiceTest {
         );
 
         then(tokenRepository).should(times(1)).save(any());
+    }
+
+    @Test
+    void 약관_조회_요청시_소셜_토큰이_유효하지_않다면_예외를_던진다() {
+        // given
+        final String invalidToken = "invalidToken";
+        final SocialTokenRequest request = new SocialTokenRequest(invalidToken);
+        given(oAuthClient.getMemberId(invalidToken)).willThrow(HttpClientErrorException.class);
+
+        // when & then
+        assertThatThrownBy(() -> oAuthService.searchTerms(request))
+                .isInstanceOf(HttpClientErrorException.class);
+    }
+
+    @Test
+    void 약관_조회_요청시_이미_회원되어있으면_예외를_던진다() {
+        // given
+        final String validToken = "validToken";
+        final SocialTokenRequest request = new SocialTokenRequest(validToken);
+        given(oAuthClient.getMemberId(any())).willReturn(멤버1.getId());
+        given(memberRepository.existsById(멤버1.getId())).willReturn(true);
+
+        // when & then
+        assertThatThrownBy(() -> oAuthService.searchTerms(request))
+                .isInstanceOf(MemberBadRequestException.class);
+    }
+
+    @Test
+    void 약관_조회_요청시_약관을_응답한다() {
+        // given
+        final String validToken = "invalidToken";
+        final SocialTokenRequest request = new SocialTokenRequest(validToken);
+        given(oAuthClient.getMemberId(any())).willReturn(멤버1.getId());
+        given(memberRepository.existsById(멤버1.getId())).willReturn(false);
+
+        // when
+        final SearchTermsResponse response = oAuthService.searchTerms(request);
+
+        // then
+        assertThat(response.terms()).containsExactly(
+                new TermsResponse(Terms.TERMS_1.isRequired(), Terms.TERMS_1.getName(), Terms.TERMS_1.getUrl()),
+                new TermsResponse(Terms.TERMS_2.isRequired(), Terms.TERMS_2.getName(), Terms.TERMS_2.getUrl())
+        );
     }
 
     @Test

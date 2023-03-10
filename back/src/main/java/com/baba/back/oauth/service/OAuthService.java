@@ -1,17 +1,22 @@
 package com.baba.back.oauth.service;
 
 import com.baba.back.oauth.OAuthClient;
+import com.baba.back.oauth.domain.Terms;
 import com.baba.back.oauth.domain.member.Member;
 import com.baba.back.oauth.domain.token.Token;
+import com.baba.back.oauth.dto.SearchTermsResponse;
 import com.baba.back.oauth.dto.SocialLoginResponse;
 import com.baba.back.oauth.dto.SocialTokenRequest;
+import com.baba.back.oauth.dto.TermsResponse;
 import com.baba.back.oauth.dto.TokenRefreshRequest;
 import com.baba.back.oauth.dto.TokenRefreshResponse;
+import com.baba.back.oauth.exception.MemberBadRequestException;
 import com.baba.back.oauth.exception.MemberNotFoundException;
 import com.baba.back.oauth.exception.TokenBadRequestException;
 import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.oauth.repository.TokenRepository;
 import jakarta.transaction.Transactional;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -49,6 +54,30 @@ public class OAuthService {
                 );
         token.update(refreshToken);
         tokenRepository.save(token);
+    }
+
+    public SearchTermsResponse searchTerms(SocialTokenRequest request) {
+        final String memberId = oAuthClient.getMemberId(request.getSocialToken());
+        validateMember(memberId);
+
+        return getSearchTermsResponse();
+    }
+
+    private void validateMember(String memberId) {
+        if (memberRepository.existsById(memberId)) {
+            throw new MemberBadRequestException("이미 회원가입된 유저는 약관을 조회할 수 없습니다.");
+        }
+    }
+
+    private SearchTermsResponse getSearchTermsResponse() {
+        return new SearchTermsResponse(getTermsResponses());
+    }
+
+    private List<TermsResponse> getTermsResponses() {
+        return Terms.get()
+                .stream()
+                .map(terms -> new TermsResponse(terms.isRequired(), terms.getName(), terms.getUrl()))
+                .toList();
     }
 
     public TokenRefreshResponse refresh(TokenRefreshRequest request) {
