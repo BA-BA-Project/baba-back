@@ -37,7 +37,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,7 +45,7 @@ class ContentServiceTest {
     public static final String MEMBER_ID = "1234";
     public static final String BABY_ID = "1234";
 
-    @Spy
+    @Mock
     private ContentRepository contentRepository;
 
     @Mock
