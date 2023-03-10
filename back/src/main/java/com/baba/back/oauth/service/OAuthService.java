@@ -16,7 +16,7 @@ import com.baba.back.oauth.exception.TokenBadRequestException;
 import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.oauth.repository.TokenRepository;
 import jakarta.transaction.Transactional;
-import java.util.List;
+import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -60,7 +60,7 @@ public class OAuthService {
         final String memberId = oAuthClient.getMemberId(request.getSocialToken());
         validateMember(memberId);
 
-        return getSearchTermsResponse();
+        return SEARCH_TERMS_RESPONSE;
     }
 
     private void validateMember(String memberId) {
@@ -69,16 +69,11 @@ public class OAuthService {
         }
     }
 
-    private SearchTermsResponse getSearchTermsResponse() {
-        return new SearchTermsResponse(getTermsResponses());
-    }
-
-    private List<TermsResponse> getTermsResponses() {
-        return Terms.get()
-                .stream()
-                .map(terms -> new TermsResponse(terms.isRequired(), terms.getName(), terms.getUrl()))
-                .toList();
-    }
+    private static final SearchTermsResponse SEARCH_TERMS_RESPONSE = new SearchTermsResponse(
+            Arrays.stream(Terms.values())
+                    .map(terms -> new TermsResponse(terms.isRequired(), terms.getName(), terms.getUrl()))
+                    .toList()
+    );
 
     public TokenRefreshResponse refresh(TokenRefreshRequest request) {
         final String oldRefreshToken = request.getRefreshToken();
