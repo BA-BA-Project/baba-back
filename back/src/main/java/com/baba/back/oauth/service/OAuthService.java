@@ -27,6 +27,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class OAuthService {
 
+    private static final SearchTermsResponse SEARCH_TERMS_RESPONSE = new SearchTermsResponse(
+            Arrays.stream(Terms.values())
+                    .map(terms -> new TermsResponse(terms.isRequired(), terms.getName(), terms.getUrl()))
+                    .toList());
+
     private final OAuthClient oAuthClient;
     private final AccessTokenProvider accessTokenProvider;
     private final RefreshTokenProvider refreshTokenProvider;
@@ -63,11 +68,6 @@ public class OAuthService {
             throw new MemberBadRequestException("이미 회원가입된 유저는 약관을 조회할 수 없습니다.");
         }
     }
-
-    private static final SearchTermsResponse SEARCH_TERMS_RESPONSE = new SearchTermsResponse(
-            Arrays.stream(Terms.values())
-                    .map(terms -> new TermsResponse(terms.isRequired(), terms.getName(), terms.getUrl()))
-                    .toList());
 
     public TokenRefreshResponse refresh(TokenRefreshRequest request) {
         final String oldRefreshToken = request.getRefreshToken();
