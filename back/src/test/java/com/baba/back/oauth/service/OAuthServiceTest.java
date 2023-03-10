@@ -149,7 +149,7 @@ class OAuthServiceTest {
     }
 
     @Test
-    void 약관_조회_요청시_이미_회원되어있으면_예외를_던진다() {
+    void 약관_조회_요청시_이미_가입_되어있으면_예외를_던진다() {
         // given
         final String validToken = "validToken";
         final SocialTokenRequest request = new SocialTokenRequest(validToken);
