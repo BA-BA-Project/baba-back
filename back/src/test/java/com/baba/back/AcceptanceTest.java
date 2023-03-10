@@ -50,6 +50,10 @@ public class AcceptanceTest {
         return post(AUTH_BASE_PATH + "/login", 소셜_토큰_요청_데이터);
     }
 
+    protected ExtractableResponse<Response> 약관_조회_요청() {
+        return post(AUTH_BASE_PATH + "/login/terms", 소셜_토큰_요청_데이터);
+    }
+
     protected ExtractableResponse<Response> 토큰_재발급_요청(TokenRefreshRequest request) {
         return post(AUTH_BASE_PATH + "/refresh", request);
     }

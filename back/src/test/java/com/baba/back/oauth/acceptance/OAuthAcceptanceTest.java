@@ -12,6 +12,7 @@ import static org.mockito.Mockito.times;
 import com.baba.back.AcceptanceTest;
 import com.baba.back.oauth.OAuthClient;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
+import com.baba.back.oauth.dto.SearchTermsResponse;
 import com.baba.back.oauth.dto.SocialLoginResponse;
 import com.baba.back.oauth.dto.TokenRefreshRequest;
 import com.baba.back.oauth.dto.TokenRefreshResponse;
@@ -24,6 +25,8 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpStatus;
 
 class OAuthAcceptanceTest extends AcceptanceTest {
+
+    public static final int NUMBER_OF_TERMS = 2;
 
     @MockBean
     private OAuthClient oAuthClient;
@@ -59,6 +62,34 @@ class OAuthAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+    }
+
+    @Test
+    void 약관_조회_요청_시_이미_가입되어_있으면_400을_응답한다() {
+        // given
+        아기_등록_회원가입_요청_멤버_1();
+        given(oAuthClient.getMemberId(any())).willReturn(멤버1.getId());
+
+        // when
+        final ExtractableResponse<Response> response = 약관_조회_요청();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    void 약관_조회_요청_시_약관과_200을_응답한다() {
+        // given
+        given(oAuthClient.getMemberId(any())).willReturn("not signed up member");
+
+        // when
+        final ExtractableResponse<Response> response = 약관_조회_요청();
+
+        // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(toObject(response, SearchTermsResponse.class).terms()).hasSize(NUMBER_OF_TERMS)
+        );
     }
 
     @Test
