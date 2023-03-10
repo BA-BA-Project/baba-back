@@ -30,7 +30,7 @@ public class ContentController {
 
     private final ContentService contentService;
 
-    @Operation(summary = "컨텐츠 생성 요청")
+    @Operation(summary = "성장 앨범 생성 요청")
     @CreatedResponse
     @BadRequestResponse
     @UnAuthorizedResponse
