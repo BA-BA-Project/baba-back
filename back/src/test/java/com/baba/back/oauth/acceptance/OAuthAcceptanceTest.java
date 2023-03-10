@@ -11,6 +11,7 @@ import static org.mockito.Mockito.times;
 
 import com.baba.back.AcceptanceTest;
 import com.baba.back.oauth.OAuthClient;
+import com.baba.back.oauth.domain.Terms;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
 import com.baba.back.oauth.dto.SearchTermsResponse;
 import com.baba.back.oauth.dto.SocialLoginResponse;
@@ -25,8 +26,6 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpStatus;
 
 class OAuthAcceptanceTest extends AcceptanceTest {
-
-    public static final int NUMBER_OF_TERMS = 2;
 
     @MockBean
     private OAuthClient oAuthClient;
@@ -88,7 +87,7 @@ class OAuthAcceptanceTest extends AcceptanceTest {
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(toObject(response, SearchTermsResponse.class).terms()).hasSize(NUMBER_OF_TERMS)
+                () -> assertThat(toObject(response, SearchTermsResponse.class).terms()).hasSize(Terms.values().length)
         );
     }
 
