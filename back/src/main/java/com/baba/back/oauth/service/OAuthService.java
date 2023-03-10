@@ -46,12 +46,7 @@ public class OAuthService {
 
     private void saveRefreshToken(Member member, String refreshToken) {
         final Token token = tokenRepository.findByMember(member)
-                .orElseGet(
-                        () -> Token.builder()
-                                .member(member)
-                                .value(refreshToken)
-                                .build()
-                );
+                .orElseGet(() -> Token.builder().member(member).value(refreshToken).build());
         token.update(refreshToken);
         tokenRepository.save(token);
     }
@@ -72,8 +67,7 @@ public class OAuthService {
     private static final SearchTermsResponse SEARCH_TERMS_RESPONSE = new SearchTermsResponse(
             Arrays.stream(Terms.values())
                     .map(terms -> new TermsResponse(terms.isRequired(), terms.getName(), terms.getUrl()))
-                    .toList()
-    );
+                    .toList());
 
     public TokenRefreshResponse refresh(TokenRefreshRequest request) {
         final String oldRefreshToken = request.getRefreshToken();
@@ -96,9 +90,8 @@ public class OAuthService {
     }
 
     private Member findMember(String memberId) {
-        return memberRepository.findById(memberId).orElseThrow(
-                () -> new MemberNotFoundException(memberId + "에 해당하는 멤버가 존재하지 않습니다.")
-        );
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberNotFoundException(memberId + "에 해당하는 멤버가 존재하지 않습니다."));
     }
 
     private void validateToken(Member member, String refreshToken) {
