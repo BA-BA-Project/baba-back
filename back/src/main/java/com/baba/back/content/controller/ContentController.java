@@ -1,7 +1,6 @@
 package com.baba.back.content.controller;
 
 import com.baba.back.content.dto.CreateContentRequest;
-import com.baba.back.content.dto.CreateContentResponse;
 import com.baba.back.content.dto.LikeContentResponse;
 import com.baba.back.content.service.ContentService;
 import com.baba.back.oauth.support.Login;
@@ -14,6 +13,7 @@ import com.baba.back.swagger.UnAuthorizedResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -38,10 +38,11 @@ public class ContentController {
     @NotFoundResponse
     @IntervalServerErrorResponse
     @PostMapping(value = "/album/{babyId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<CreateContentResponse> createContent(@ModelAttribute @Valid CreateContentRequest request,
+    public ResponseEntity<Void> createContent(@ModelAttribute @Valid CreateContentRequest request,
                                                                @Login String memberId,
                                                                @PathVariable("babyId") String babyId) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(contentService.createContent(request, memberId, babyId));
+        final Long contentId = contentService.createContent(request, memberId, babyId);
+        return ResponseEntity.created(URI.create("/api/album/" + babyId + "/" + contentId)).build();
     }
 
     @Operation(summary = "좋아요 추가 요청")
