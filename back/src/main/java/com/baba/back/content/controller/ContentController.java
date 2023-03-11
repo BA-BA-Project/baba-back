@@ -42,7 +42,7 @@ public class ContentController {
                                               @Login String memberId,
                                               @PathVariable("babyId") String babyId) {
         final Long contentId = contentService.createContent(request, memberId, babyId);
-        return ResponseEntity.created(URI.create("/api/album/" + babyId + "/" + contentId)).build();
+        return ResponseEntity.created(URI.create("/album/" + babyId + "/" + contentId)).build();
     }
 
     @Operation(summary = "좋아요 추가 요청")

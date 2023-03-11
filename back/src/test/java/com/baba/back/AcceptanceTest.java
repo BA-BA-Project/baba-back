@@ -89,13 +89,13 @@ public class AcceptanceTest {
 
     protected Long getContentId(ExtractableResponse<Response> response) {
         final String location = getLocation(response);
-        final String id = location.split("/")[4];
+        final String id = location.split("/")[3];
         return Long.parseLong(id);
     }
 
     protected String getBabyId(ExtractableResponse<Response> response) {
         final String location = getLocation(response);
-        return location.split("/")[3];
+        return location.split("/")[2];
     }
 
     protected String getLocation(ExtractableResponse<Response> response) {

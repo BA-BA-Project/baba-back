@@ -41,7 +41,7 @@ public class MemberController {
     public ResponseEntity<MemberSignUpResponse> joinMember(@RequestBody @Valid MemberSignUpRequest request,
                                                            @SignUp String memberId) {
         final SignUpWithBabyResponse response = memberService.signUpWithBaby(request, memberId);
-        return ResponseEntity.created(URI.create("/api/baby/" + response.babyId()))
+        return ResponseEntity.created(URI.create("/baby/" + response.babyId()))
                 .body(response.memberSignUpResponse());
     }
 
