@@ -1,8 +1,8 @@
 package com.baba.back.baby.domain;
 
 import static com.baba.back.fixture.DomainFixture.관계1;
-import static com.baba.back.fixture.DomainFixture.관계3;
 import static com.baba.back.fixture.DomainFixture.관계2;
+import static com.baba.back.fixture.DomainFixture.관계3;
 import static com.baba.back.fixture.DomainFixture.관계4;
 import static org.assertj.core.api.Assertions.assertThat;
 

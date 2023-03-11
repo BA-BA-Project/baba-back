@@ -39,8 +39,8 @@ public class ContentController {
     @IntervalServerErrorResponse
     @PostMapping(value = "/album/{babyId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> createContent(@ModelAttribute @Valid CreateContentRequest request,
-                                                               @Login String memberId,
-                                                               @PathVariable("babyId") String babyId) {
+                                              @Login String memberId,
+                                              @PathVariable("babyId") String babyId) {
         final Long contentId = contentService.createContent(request, memberId, babyId);
         return ResponseEntity.created(URI.create("/api/album/" + babyId + "/" + contentId)).build();
     }

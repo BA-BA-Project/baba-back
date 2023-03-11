@@ -71,7 +71,6 @@ class RelationRepositoryTest {
                 .relationGroup(savedRelationGroup1)
                 .build());
 
-
         final Baby savedBaby2 = babyRepository.save(아기2);
         final RelationGroup savedRelationGroup2 = relationGroupRepository.save(RelationGroup.builder()
                 .baby(savedBaby2)
@@ -84,8 +83,6 @@ class RelationRepositoryTest {
                 .relationName("아빠 친구")
                 .relationGroup(savedRelationGroup2)
                 .build());
-
-
 
         // when
         final List<Relation> relation = relationRepository.findAllByMember(savedMember);
