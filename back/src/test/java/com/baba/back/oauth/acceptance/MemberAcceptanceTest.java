@@ -90,6 +90,7 @@ class MemberAcceptanceTest extends AcceptanceTest {
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                () -> assertThat(getBabyId(response)).isNotBlank(),
                 () -> assertThat(response.as(MemberSignUpResponse.class).accessToken()).isNotBlank(),
                 () -> assertThat(response.as(MemberSignUpResponse.class).refreshToken()).isNotBlank()
         );

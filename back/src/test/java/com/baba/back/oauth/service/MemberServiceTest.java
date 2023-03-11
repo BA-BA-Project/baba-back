@@ -27,6 +27,7 @@ import com.baba.back.oauth.domain.token.Token;
 import com.baba.back.oauth.dto.MemberResponse;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
+import com.baba.back.oauth.dto.SignUpWithBabyResponse;
 import com.baba.back.oauth.exception.MemberBadRequestException;
 import com.baba.back.oauth.exception.MemberNotFoundException;
 import com.baba.back.oauth.repository.MemberRepository;
@@ -88,7 +89,7 @@ class MemberServiceTest {
         given(memberRepository.existsById(memberId)).willReturn(true);
 
         // when & then
-        assertThatThrownBy(() -> memberService.signUp(new MemberSignUpRequest(), memberId))
+        assertThatThrownBy(() -> memberService.signUpWithBaby(new MemberSignUpRequest(), memberId))
                 .isInstanceOf(MemberBadRequestException.class);
     }
 
@@ -114,7 +115,7 @@ class MemberServiceTest {
         given(tokenRepository.save(any(Token.class))).willReturn(any());
 
         // when
-        final MemberSignUpResponse response = memberService.signUp(멤버_가입_요청_데이터, memberId);
+        final SignUpWithBabyResponse response = memberService.signUpWithBaby(멤버_가입_요청_데이터, memberId);
 
         //then
         then(memberRepository).should(times(1)).save(any());
@@ -123,9 +124,10 @@ class MemberServiceTest {
         then(relationGroupRepository).should(times(2)).save(any(RelationGroup.class));
         then(relationRepository).should(times(2)).save(any());
 
+        final MemberSignUpResponse memberSignUpResponse = response.memberSignUpResponse();
         assertAll(
-                () -> assertThat(response.accessToken()).isEqualTo(accessToken),
-                () -> assertThat(response.refreshToken()).isEqualTo(refreshToken)
+                () -> assertThat(memberSignUpResponse.accessToken()).isEqualTo(accessToken),
+                () -> assertThat(memberSignUpResponse.refreshToken()).isEqualTo(refreshToken)
         );
     }
 

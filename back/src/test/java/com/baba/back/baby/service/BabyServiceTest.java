@@ -60,7 +60,7 @@ class BabyServiceTest {
         given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
         given(relationRepository.findAllByMember(멤버1)).willReturn(List.of(관계2, 관계4, 관계1, 관계3));
 
-       // when
+        // when
         final BabiesResponse babies = babyService.findBabies(멤버1.getId());
 
         // then

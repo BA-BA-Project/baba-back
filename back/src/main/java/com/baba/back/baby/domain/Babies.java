@@ -7,16 +7,20 @@ import lombok.Getter;
 
 @Getter
 public class Babies {
-    private final List<Baby> babies;
+    private final List<Baby> values;
 
-    public Babies(List<Baby> babies) {
-        validateEmpty(babies);
-        this.babies = new ArrayList<>(babies);
+    public Babies(List<Baby> values) {
+        validateEmpty(values);
+        this.values = new ArrayList<>(values);
     }
 
     private void validateEmpty(List<Baby> babies) {
         if (babies.isEmpty()) {
             throw new BabiesBadRequestException("babies의 길이는 0일 수 없습니다.");
         }
+    }
+
+    public String getFirstBabyId() {
+        return values.get(0).getId();
     }
 }

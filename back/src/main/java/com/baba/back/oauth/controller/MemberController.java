@@ -3,6 +3,7 @@ package com.baba.back.oauth.controller;
 import com.baba.back.oauth.dto.MemberResponse;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
+import com.baba.back.oauth.dto.SignUpWithBabyResponse;
 import com.baba.back.oauth.service.MemberService;
 import com.baba.back.oauth.support.Login;
 import com.baba.back.oauth.support.SignUp;
@@ -15,8 +16,8 @@ import com.baba.back.swagger.UnAuthorizedResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.net.URI;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,7 +40,9 @@ public class MemberController {
     @PostMapping("/members/baby")
     public ResponseEntity<MemberSignUpResponse> joinMember(@RequestBody @Valid MemberSignUpRequest request,
                                                            @SignUp String memberId) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(memberService.signUp(request, memberId));
+        final SignUpWithBabyResponse response = memberService.signUpWithBaby(request, memberId);
+        return ResponseEntity.created(URI.create("/baby/" + response.babyId()))
+                .body(response.memberSignUpResponse());
     }
 
     @Operation(summary = "멤버 정보 조회 요청")

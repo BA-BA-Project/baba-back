@@ -18,7 +18,7 @@ import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.exception.BabyNotFoundException;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.content.domain.FileHandler;
-import com.baba.back.content.dto.CreateContentResponse;
+import com.baba.back.content.domain.content.Content;
 import com.baba.back.content.dto.LikeContentResponse;
 import com.baba.back.content.exception.ContentAuthorizationException;
 import com.baba.back.content.exception.ContentBadRequestException;
@@ -142,13 +142,13 @@ class ContentServiceTest {
         given(clock.getZone()).willReturn(now.getZone());
         given(contentRepository.existsByContentDateAndBaby(any(), any())).willReturn(false);
         given(fileHandler.upload(any())).willReturn("VALID_IMAGE_SOURCE");
+        given(contentRepository.save(any(Content.class))).willReturn(컨텐츠);
 
         // when
-        final CreateContentResponse response = contentService.createContent(컨텐츠_생성_요청_데이터, MEMBER_ID, BABY_ID);
+        final Long contentId = contentService.createContent(컨텐츠_생성_요청_데이터, MEMBER_ID, BABY_ID);
 
         // then
-        then(contentRepository).should(times(1)).save(any());
-        assertThat(response.isSuccess()).isTrue();
+        assertThat(contentId).isEqualTo(컨텐츠.getId());
     }
 
     @Test

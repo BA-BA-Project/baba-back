@@ -9,7 +9,6 @@ import com.baba.back.content.domain.Like;
 import com.baba.back.content.domain.content.Content;
 import com.baba.back.content.domain.content.ContentDate;
 import com.baba.back.content.dto.CreateContentRequest;
-import com.baba.back.content.dto.CreateContentResponse;
 import com.baba.back.content.dto.LikeContentResponse;
 import com.baba.back.content.exception.ContentAuthorizationException;
 import com.baba.back.content.exception.ContentBadRequestException;
@@ -42,7 +41,7 @@ public class ContentService {
     private final FileHandler fileHandler;
     private final Clock clock;
 
-    public CreateContentResponse createContent(CreateContentRequest request, String memberId, String babyId) {
+    public Long createContent(CreateContentRequest request, String memberId, String babyId) {
         final Member member = findMember(memberId);
         final Baby baby = findBaby(babyId);
         final Relation relation = findRelation(member, baby);
@@ -62,9 +61,9 @@ public class ContentService {
         final ImageFile imageFile = new ImageFile(request.getPhoto());
         final String imageSource = fileHandler.upload(imageFile);
         content.updateURL(imageSource);
-        contentRepository.save(content);
+        final Content savedContent = contentRepository.save(content);
 
-        return new CreateContentResponse(true);
+        return savedContent.getId();
     }
 
     private Member findMember(String memberId) {
