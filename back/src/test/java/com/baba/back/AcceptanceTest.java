@@ -93,6 +93,11 @@ public class AcceptanceTest {
         return Long.parseLong(id);
     }
 
+    protected String getBabyId(ExtractableResponse<Response> response) {
+        final String location = getLocation(response);
+        return location.split("/")[3];
+    }
+
     protected String getLocation(ExtractableResponse<Response> response) {
         return response.header("Location");
     }

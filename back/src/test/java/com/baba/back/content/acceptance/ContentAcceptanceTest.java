@@ -33,21 +33,18 @@ public class ContentAcceptanceTest extends AcceptanceTest {
 
     public static final String VALID_URL = "http://test";
 
-    @Autowired
-    private AccessTokenProvider tokenProvider;
-
     @MockBean
     private AmazonS3 amazonS3;
 
     @Test
     void 요청_body에_null값이_있으면_400을_던진다() {
         // given
-        final String token = tokenProvider.createToken(멤버1.getId());
+        final String accessToken = toObject(아기_등록_회원가입_요청_멤버_1(), MemberSignUpResponse.class).accessToken();
 
         // when
         final ExtractableResponse<Response> response = thenExtract(
                 RestAssured.given()
-                        .headers(Map.of("Authorization", "Bearer " + token))
+                        .headers(Map.of("Authorization", "Bearer " + accessToken))
                         .multiPart("photo", "test_file.jpg", "Something".getBytes(), MediaType.IMAGE_PNG_VALUE)
                         .multiPart("date", LocalDate.now())
                         .multiPart("cardStyle", "card_basic_1")
@@ -62,8 +59,9 @@ public class ContentAcceptanceTest extends AcceptanceTest {
     @Test
     void AWS_자체_오류로_S3에_파일_업로드_실패시_500을_던진다() {
         // given
-        final String accessToken = toObject(아기_등록_회원가입_요청_멤버_1(), MemberSignUpResponse.class).accessToken();
-        final String babyId = toObject(아기_리스트_조회_요청(accessToken), BabiesResponse.class).myBaby().get(0).babyId();
+        final ExtractableResponse<Response> signUpResponse = 아기_등록_회원가입_요청_멤버_1();
+        final String accessToken = toObject(signUpResponse, MemberSignUpResponse.class).accessToken();
+        final String babyId = getBabyId(signUpResponse);
         given(amazonS3.putObject(any())).willThrow(AmazonServiceException.class);
 
         // when
@@ -76,8 +74,9 @@ public class ContentAcceptanceTest extends AcceptanceTest {
     @Test
     void 컨텐츠를_생성한다() throws MalformedURLException {
         // given
-        final String accessToken = toObject(아기_등록_회원가입_요청_멤버_1(), MemberSignUpResponse.class).accessToken();
-        final String babyId = toObject(아기_리스트_조회_요청(accessToken), BabiesResponse.class).myBaby().get(0).babyId();
+        final ExtractableResponse<Response> signUpResponse = 아기_등록_회원가입_요청_멤버_1();
+        final String accessToken = toObject(signUpResponse, MemberSignUpResponse.class).accessToken();
+        final String babyId = getBabyId(signUpResponse);
         given(amazonS3.getUrl(any(String.class), any(String.class))).willReturn(new URL(VALID_URL));
 
         // when
@@ -94,8 +93,10 @@ public class ContentAcceptanceTest extends AcceptanceTest {
     @Test
     void 좋아요를_처음_누르면_좋아요가_추가된다() throws MalformedURLException {
         // given
-        final String accessToken = toObject(아기_등록_회원가입_요청_멤버_1(), MemberSignUpResponse.class).accessToken();
-        final String babyId = toObject(아기_리스트_조회_요청(accessToken), BabiesResponse.class).myBaby().get(0).babyId();
+        final ExtractableResponse<Response> signUpResponse = 아기_등록_회원가입_요청_멤버_1();
+        final String accessToken = toObject(signUpResponse, MemberSignUpResponse.class).accessToken();
+        final String babyId = getBabyId(signUpResponse);
+
         given(amazonS3.getUrl(any(String.class), any(String.class))).willReturn(new URL(VALID_URL));
         final Long contentId = getContentId(성장앨범_생성_요청(accessToken, babyId));
 
@@ -112,8 +113,9 @@ public class ContentAcceptanceTest extends AcceptanceTest {
     @Test
     void 좋아요를_처음_누르고_한번_더_누르면_기존의_좋아요가_취소된다() throws MalformedURLException {
         // given
-        final String accessToken = toObject(아기_등록_회원가입_요청_멤버_1(), MemberSignUpResponse.class).accessToken();
-        final String babyId = toObject(아기_리스트_조회_요청(accessToken), BabiesResponse.class).myBaby().get(0).babyId();
+        final ExtractableResponse<Response> signUpResponse = 아기_등록_회원가입_요청_멤버_1();
+        final String accessToken = toObject(signUpResponse, MemberSignUpResponse.class).accessToken();
+        final String babyId = getBabyId(signUpResponse);
         given(amazonS3.getUrl(any(String.class), any(String.class))).willReturn(new URL(VALID_URL));
         final Long contentId = getContentId(성장앨범_생성_요청(accessToken, babyId));
         좋아요_요청(accessToken, babyId, contentId);
@@ -131,8 +133,9 @@ public class ContentAcceptanceTest extends AcceptanceTest {
     @Test
     void 좋아요를_취소하고_한번_더_누르면_다시_좋아요가_된다() throws MalformedURLException {
         // given
-        final String accessToken = toObject(아기_등록_회원가입_요청_멤버_1(), MemberSignUpResponse.class).accessToken();
-        final String babyId = toObject(아기_리스트_조회_요청(accessToken), BabiesResponse.class).myBaby().get(0).babyId();
+        final ExtractableResponse<Response> signUpResponse = 아기_등록_회원가입_요청_멤버_1();
+        final String accessToken = toObject(signUpResponse, MemberSignUpResponse.class).accessToken();
+        final String babyId = getBabyId(signUpResponse);
         given(amazonS3.getUrl(any(String.class), any(String.class))).willReturn(new URL(VALID_URL));
         final Long contentId = getContentId(성장앨범_생성_요청(accessToken, babyId));
         좋아요_요청(accessToken, babyId, contentId);
