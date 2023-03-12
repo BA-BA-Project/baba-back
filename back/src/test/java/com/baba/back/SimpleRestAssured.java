@@ -14,8 +14,21 @@ public class SimpleRestAssured {
         return get(path, null);
     }
 
+    public static ExtractableResponse<Response> get(String path, Object request) {
+        return get(path, null, request);
+    }
+
     public static ExtractableResponse<Response> get(String path, Map<String, String> headers) {
-        return thenExtract(givenWithHeaders(headers).when().get(path));
+        return get(path, headers, null);
+    }
+
+    public static ExtractableResponse<Response> get(String path, Map<String, String> headers, Object request) {
+        final RequestSpecification given = givenWithHeaders(headers);
+        if (request != null) {
+            given.body(request);
+        }
+
+        return thenExtract(given.contentType(MediaType.APPLICATION_JSON_VALUE).when().get(path));
     }
 
     public static ExtractableResponse<Response> post(String path, Object request) {
