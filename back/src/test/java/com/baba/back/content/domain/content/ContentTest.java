@@ -4,6 +4,7 @@ import static com.baba.back.fixture.DomainFixture.아기1;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.baba.back.baby.domain.Baby;
+import com.baba.back.common.domain.Name;
 import java.time.LocalDate;
 import java.util.UUID;
 import org.assertj.core.api.Assertions;
@@ -22,7 +23,7 @@ class ContentTest {
 
 
     @Test
-    void 컨텐츠를_생성해야_한다() {
+    void 컨텐츠를_생성할_수_있다() {
         // given
         Baby baby = Baby.builder()
                 .id(BABY_ID)
@@ -38,6 +39,7 @@ class ContentTest {
                         .now(NOW)
                         .cardStyle(CARD_STYLE)
                         .baby(baby)
+                        .relation(new Name("엄마"))
                         .build())
                 .doesNotThrowAnyException();
     }
@@ -51,6 +53,7 @@ class ContentTest {
                 .now(NOW)
                 .cardStyle(CARD_STYLE)
                 .baby(아기1)
+                .relation(new Name("엄마"))
                 .build();
 
         // when

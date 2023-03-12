@@ -5,14 +5,12 @@ import static com.baba.back.fixture.DomainFixture.아기1;
 import static com.baba.back.fixture.DomainFixture.컨텐츠1;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.content.domain.content.Content;
 import com.baba.back.content.repository.ContentRepository;
 import com.baba.back.content.repository.LikeRepository;
 import com.baba.back.oauth.domain.member.Member;
 import com.baba.back.oauth.repository.MemberRepository;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -34,14 +32,12 @@ class LikeTest {
     private LikeRepository likeRepository;
 
     @Test
-    void 생성시간과_업데이트시간을_확인한다() {
+    void 좋아요의_생성시간과_업데이트시간을_확인한다() {
         // given
         final LocalDateTime now = LocalDateTime.now();
-        final LocalDate today = now.toLocalDate();
         final Member savedMember = memberRepository.save(멤버1);
-        final Baby savedBaby = babyRepository.save(아기1);
-        final Content savedContent = contentRepository.save(
-                new Content("제목", today, today, "CARD_BASIC_1", savedBaby, savedMember));
+        babyRepository.save(아기1);
+        final Content savedContent = contentRepository.save(컨텐츠1);
 
         // when
         final Like like = likeRepository.save(new Like(savedMember, savedContent));
@@ -54,7 +50,7 @@ class LikeTest {
     }
 
     @Test
-    void deleted가_바뀌는지_확인한다() {
+    void 좋아요의_상태가_바뀌는지_확인한다() {
         // given
         final Like like = Like.builder()
                 .member(멤버1)

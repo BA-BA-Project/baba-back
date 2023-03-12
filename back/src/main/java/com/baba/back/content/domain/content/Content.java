@@ -1,7 +1,10 @@
 package com.baba.back.content.domain.content;
 
 import com.baba.back.baby.domain.Baby;
+import com.baba.back.common.domain.Name;
 import com.baba.back.oauth.domain.member.Member;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -42,14 +45,19 @@ public class Content {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member owner;
 
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "relation"))
+    private Name relation;
+
     @Builder
-    public Content(String title, LocalDate contentDate, LocalDate now, String cardStyle, Baby baby, Member owner) {
+    public Content(String title, LocalDate contentDate, LocalDate now, String cardStyle, Baby baby, Member owner, Name relation) {
         this.title = new Title(title);
         this.contentDate = ContentDate.of(contentDate, now, baby.getBirthday());
         this.cardStyle = CardStyle.from(cardStyle);
         this.imageSource = new ImageSource("");
         this.baby = baby;
         this.owner = owner;
+        this.relation = relation;
     }
 
     public void updateURL(String imageSource) {

@@ -54,6 +54,7 @@ public class ContentService {
                 .cardStyle(request.getCardStyle())
                 .baby(baby)
                 .owner(member)
+                .relation(relation.getRelationName())
                 .build();
 
         checkDuplication(content.getContentDate(), baby);
