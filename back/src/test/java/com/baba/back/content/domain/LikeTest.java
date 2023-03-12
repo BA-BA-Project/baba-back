@@ -2,7 +2,7 @@ package com.baba.back.content.domain;
 
 import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.DomainFixture.아기1;
-import static com.baba.back.fixture.DomainFixture.컨텐츠;
+import static com.baba.back.fixture.DomainFixture.컨텐츠1;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.baba.back.baby.domain.Baby;
@@ -58,7 +58,7 @@ class LikeTest {
         // given
         final Like like = Like.builder()
                 .member(멤버1)
-                .content(컨텐츠)
+                .content(컨텐츠1)
                 .build();
 
         // when

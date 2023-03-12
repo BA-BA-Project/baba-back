@@ -5,7 +5,7 @@ import static com.baba.back.fixture.DomainFixture.관계3;
 import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.DomainFixture.아기1;
 import static com.baba.back.fixture.DomainFixture.좋아요;
-import static com.baba.back.fixture.DomainFixture.컨텐츠;
+import static com.baba.back.fixture.DomainFixture.컨텐츠1;
 import static com.baba.back.fixture.RequestFixture.컨텐츠_생성_요청_데이터;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -142,13 +142,13 @@ class ContentServiceTest {
         given(clock.getZone()).willReturn(now.getZone());
         given(contentRepository.existsByContentDateAndBaby(any(), any())).willReturn(false);
         given(fileHandler.upload(any())).willReturn("VALID_IMAGE_SOURCE");
-        given(contentRepository.save(any(Content.class))).willReturn(컨텐츠);
+        given(contentRepository.save(any(Content.class))).willReturn(컨텐츠1);
 
         // when
         final Long contentId = contentService.createContent(컨텐츠_생성_요청_데이터, MEMBER_ID, BABY_ID);
 
         // then
-        assertThat(contentId).isEqualTo(컨텐츠.getId());
+        assertThat(contentId).isEqualTo(컨텐츠1.getId());
     }
 
     @Test
@@ -157,7 +157,7 @@ class ContentServiceTest {
         given(memberRepository.findById(any())).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> contentService.likeContent(멤버1.getId(), 아기1.getId(), 컨텐츠.getId()))
+        assertThatThrownBy(() -> contentService.likeContent(멤버1.getId(), 아기1.getId(), 컨텐츠1.getId()))
                 .isInstanceOf(MemberNotFoundException.class);
     }
 
@@ -168,7 +168,7 @@ class ContentServiceTest {
         given(babyRepository.findById(any())).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> contentService.likeContent(멤버1.getId(), 아기1.getId(), 컨텐츠.getId()))
+        assertThatThrownBy(() -> contentService.likeContent(멤버1.getId(), 아기1.getId(), 컨텐츠1.getId()))
                 .isInstanceOf(BabyNotFoundException.class);
     }
 
@@ -180,7 +180,7 @@ class ContentServiceTest {
         given(relationRepository.findByMemberAndBaby(any(), any())).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> contentService.likeContent(멤버1.getId(), 아기1.getId(), 컨텐츠.getId()))
+        assertThatThrownBy(() -> contentService.likeContent(멤버1.getId(), 아기1.getId(), 컨텐츠1.getId()))
                 .isInstanceOf(RelationNotFoundException.class);
     }
 
@@ -193,7 +193,7 @@ class ContentServiceTest {
         given(contentRepository.findById(any())).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> contentService.likeContent(멤버1.getId(), 아기1.getId(), 컨텐츠.getId()))
+        assertThatThrownBy(() -> contentService.likeContent(멤버1.getId(), 아기1.getId(), 컨텐츠1.getId()))
                 .isInstanceOf(ContentNotFountException.class);
     }
 
@@ -203,12 +203,12 @@ class ContentServiceTest {
         given(memberRepository.findById(any())).willReturn(Optional.of(멤버1));
         given(babyRepository.findById(any())).willReturn(Optional.of(아기1));
         given(relationRepository.findByMemberAndBaby(any(), any())).willReturn(Optional.of(관계1));
-        given(contentRepository.findById(any())).willReturn(Optional.of(컨텐츠));
+        given(contentRepository.findById(any())).willReturn(Optional.of(컨텐츠1));
         given(likeRepository.findByMemberAndContent(any(), any())).willReturn(Optional.empty());
 
         // when
         final LikeContentResponse likeContentResponse = contentService.likeContent(멤버1.getId(), 아기1.getId(),
-                컨텐츠.getId());
+                컨텐츠1.getId());
 
         // then
         then(likeRepository).should(times(1)).save(any());
@@ -222,12 +222,12 @@ class ContentServiceTest {
         given(memberRepository.findById(any())).willReturn(Optional.of(멤버1));
         given(babyRepository.findById(any())).willReturn(Optional.of(아기1));
         given(relationRepository.findByMemberAndBaby(any(), any())).willReturn(Optional.of(관계1));
-        given(contentRepository.findById(any())).willReturn(Optional.of(컨텐츠));
+        given(contentRepository.findById(any())).willReturn(Optional.of(컨텐츠1));
         given(likeRepository.findByMemberAndContent(any(), any())).willReturn(Optional.of(좋아요));
 
         // when
         final LikeContentResponse likeContentResponse = contentService.likeContent(멤버1.getId(), 아기1.getId(),
-                컨텐츠.getId());
+                컨텐츠1.getId());
 
         // then
         then(likeRepository).should(times(1)).save(any());
@@ -241,13 +241,13 @@ class ContentServiceTest {
         given(memberRepository.findById(any())).willReturn(Optional.of(멤버1));
         given(babyRepository.findById(any())).willReturn(Optional.of(아기1));
         given(relationRepository.findByMemberAndBaby(any(), any())).willReturn(Optional.of(관계1));
-        given(contentRepository.findById(any())).willReturn(Optional.of(컨텐츠));
+        given(contentRepository.findById(any())).willReturn(Optional.of(컨텐츠1));
         given(likeRepository.findByMemberAndContent(any(), any())).willReturn(Optional.of(좋아요));
 
         // when
-        contentService.likeContent(멤버1.getId(), 아기1.getId(), 컨텐츠.getId());
+        contentService.likeContent(멤버1.getId(), 아기1.getId(), 컨텐츠1.getId());
         final LikeContentResponse likeContentResponse = contentService.likeContent(멤버1.getId(), 아기1.getId(),
-                컨텐츠.getId());
+                컨텐츠1.getId());
 
         // then
         then(likeRepository).should(times(2)).save(any());
