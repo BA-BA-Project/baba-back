@@ -38,7 +38,7 @@ class ContentRepositoryTest {
         contentRepository.save(컨텐츠1);
 
         // when
-        final boolean exists = contentRepository.existsByContentDateAndBaby(컨텐츠1.getContentDate(), baby);
+        final boolean exists = contentRepository.existsByBabyAndContentDateValue(baby, 컨텐츠1.getContentDate());
 
         // then
         assertThat(exists).isTrue();
@@ -51,7 +51,7 @@ class ContentRepositoryTest {
         final Baby baby = babyRepository.save(아기1);
 
         // when
-        final boolean exists = contentRepository.existsByContentDateAndBaby(컨텐츠1.getContentDate(), baby);
+        final boolean exists = contentRepository.existsByBabyAndContentDateValue(baby, 컨텐츠1.getContentDate());
 
         // then
         assertThat(exists).isFalse();
@@ -67,7 +67,7 @@ class ContentRepositoryTest {
         contentRepository.save(컨텐츠3);
         contentRepository.save(컨텐츠4);
 
-        final LocalDate now = 컨텐츠1.getContentDate().getValue();
+        final LocalDate now = 컨텐츠1.getContentDate();
 
         // when
         final List<Content> contents = contentRepository.findByBabyYearAndMonth(

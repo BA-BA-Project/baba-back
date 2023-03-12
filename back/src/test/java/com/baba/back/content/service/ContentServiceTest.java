@@ -123,7 +123,7 @@ class ContentServiceTest {
         given(relationRepository.findByMemberAndBaby(any(), any())).willReturn(Optional.of(관계1));
         given(clock.instant()).willReturn(now.instant());
         given(clock.getZone()).willReturn(now.getZone());
-        given(contentRepository.existsByContentDateAndBaby(any(), any())).willReturn(true);
+        given(contentRepository.existsByBabyAndContentDateValue(any(), any())).willReturn(true);
 
         // when & then
         Assertions.assertThatThrownBy(() -> contentService.createContent(컨텐츠_생성_요청_데이터, MEMBER_ID, BABY_ID))
@@ -140,7 +140,7 @@ class ContentServiceTest {
         given(relationRepository.findByMemberAndBaby(any(), any())).willReturn(Optional.of(관계1));
         given(clock.instant()).willReturn(now.instant());
         given(clock.getZone()).willReturn(now.getZone());
-        given(contentRepository.existsByContentDateAndBaby(any(), any())).willReturn(false);
+        given(contentRepository.existsByBabyAndContentDateValue(any(), any())).willReturn(false);
         given(fileHandler.upload(any())).willReturn("VALID_IMAGE_SOURCE");
         given(contentRepository.save(any(Content.class))).willReturn(컨텐츠1);
 
@@ -204,7 +204,7 @@ class ContentServiceTest {
         given(babyRepository.findById(any())).willReturn(Optional.of(아기1));
         given(relationRepository.findByMemberAndBaby(any(), any())).willReturn(Optional.of(관계1));
         given(contentRepository.findById(any())).willReturn(Optional.of(컨텐츠1));
-        given(likeRepository.findByMemberAndContent(any(), any())).willReturn(Optional.empty());
+        given(likeRepository.findByContentAndMember(any(), any())).willReturn(Optional.empty());
 
         // when
         final LikeContentResponse likeContentResponse = contentService.likeContent(멤버1.getId(), 아기1.getId(),
@@ -223,7 +223,7 @@ class ContentServiceTest {
         given(babyRepository.findById(any())).willReturn(Optional.of(아기1));
         given(relationRepository.findByMemberAndBaby(any(), any())).willReturn(Optional.of(관계1));
         given(contentRepository.findById(any())).willReturn(Optional.of(컨텐츠1));
-        given(likeRepository.findByMemberAndContent(any(), any())).willReturn(Optional.of(좋아요));
+        given(likeRepository.findByContentAndMember(any(), any())).willReturn(Optional.of(좋아요));
 
         // when
         final LikeContentResponse likeContentResponse = contentService.likeContent(멤버1.getId(), 아기1.getId(),
@@ -242,7 +242,7 @@ class ContentServiceTest {
         given(babyRepository.findById(any())).willReturn(Optional.of(아기1));
         given(relationRepository.findByMemberAndBaby(any(), any())).willReturn(Optional.of(관계1));
         given(contentRepository.findById(any())).willReturn(Optional.of(컨텐츠1));
-        given(likeRepository.findByMemberAndContent(any(), any())).willReturn(Optional.of(좋아요));
+        given(likeRepository.findByContentAndMember(any(), any())).willReturn(Optional.of(좋아요));
 
         // when
         contentService.likeContent(멤버1.getId(), 아기1.getId(), 컨텐츠1.getId());

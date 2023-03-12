@@ -1,5 +1,6 @@
 package com.baba.back.content.controller;
 
+import com.baba.back.content.dto.ContentsResponse;
 import com.baba.back.content.dto.CreateContentRequest;
 import com.baba.back.content.dto.LikeContentResponse;
 import com.baba.back.content.service.ContentService;
@@ -18,9 +19,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "컨텐츠 관련 API")
@@ -56,5 +59,14 @@ public class ContentController {
                                                            @PathVariable("babyId") String babyId,
                                                            @PathVariable("contentId") Long contentId) {
         return ResponseEntity.status(HttpStatus.OK).body(contentService.likeContent(memberId, babyId, contentId));
+    }
+
+    @Operation(summary = "성장 앨범 메인 페이지 조회 요청")
+    @GetMapping()
+    public ResponseEntity<ContentsResponse> getContents(@Login String memberId,
+                                                        @PathVariable("babyId") String babyId,
+                                                        @RequestParam("year") int year,
+                                                        @RequestParam("month") int month) {
+        return ResponseEntity.ok(contentService.getContents(memberId, babyId, year, month));
     }
 }

@@ -38,9 +38,38 @@ class LikeRepositoryTest {
         final Like savedLike = likeRepository.save(new Like(savedMember, savedContent));
 
         // when
-        final Like findLike = likeRepository.findByMemberAndContent(savedMember, savedContent).orElseThrow();
+        final Like findLike = likeRepository.findByContentAndMember(savedContent, savedMember).orElseThrow();
 
         // then
         assertThat(savedLike).isEqualTo(findLike);
+    }
+
+    @Test
+    void 멤버가_컨텐츠에_좋아요를_눌렀는지_확인한다() {
+        // given
+        final Member savedMember = memberRepository.save(멤버1);
+        babyRepository.save(아기1);
+        final Content savedContent = contentRepository.save(컨텐츠1);
+        likeRepository.save(new Like(savedMember, savedContent));
+
+        // when
+        final boolean result = likeRepository.existsByContentAndMember(savedContent, savedMember);
+
+        // then
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    void 멤버가_컨텐츠에_좋아요를_안_눌렀는지_확인한다() {
+        // given
+        final Member savedMember = memberRepository.save(멤버1);
+        babyRepository.save(아기1);
+        final Content savedContent = contentRepository.save(컨텐츠1);
+
+        // when
+        final boolean result = likeRepository.existsByContentAndMember(savedContent, savedMember);
+
+        // then
+        assertThat(result).isFalse();
     }
 }

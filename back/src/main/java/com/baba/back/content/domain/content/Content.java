@@ -63,4 +63,28 @@ public class Content {
     public void updateURL(String imageSource) {
         this.imageSource = new ImageSource(imageSource);
     }
+
+    public String getOwnerName() {
+        return this.owner.getName();
+    }
+
+    public String getRelationName() {
+        return this.relation.getValue();
+    }
+
+    public LocalDate getContentDate() {
+        return this.contentDate.getValue();
+    }
+
+    public String getTitle() {
+        return this.title.getValue();
+    }
+
+    public String getImageSource() {
+        return this.imageSource.getValue();
+    }
+
+    public String getCardStyle() {
+        return this.cardStyle.name();
+    }
 }
