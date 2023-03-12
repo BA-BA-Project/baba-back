@@ -62,7 +62,7 @@ public class ContentController {
     }
 
     @Operation(summary = "성장 앨범 메인 페이지 조회 요청")
-    @GetMapping()
+    @GetMapping("/album/{babyId}")
     public ResponseEntity<ContentsResponse> getContents(@Login String memberId,
                                                         @PathVariable("babyId") String babyId,
                                                         @RequestParam("year") int year,
