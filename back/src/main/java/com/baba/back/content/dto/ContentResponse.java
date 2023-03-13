@@ -10,5 +10,9 @@ public record ContentResponse(
         String title,
         boolean like,
         String photo,
-        String cardStyle) {
+        String cardStyle) implements Comparable<ContentResponse> {
+    @Override
+    public int compareTo(ContentResponse o) {
+        return this.date.compareTo(o.date);
+    }
 }

@@ -144,7 +144,9 @@ public class ContentService {
                                 likeRepository.existsByContentAndMember(content, member),
                                 content.getImageSource(),
                                 content.getCardStyle()
-                        )).toList()
+                        ))
+                        .sorted()
+                        .toList()
         );
     }
 }

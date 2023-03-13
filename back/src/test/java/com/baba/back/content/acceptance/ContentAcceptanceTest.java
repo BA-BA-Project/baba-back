@@ -172,7 +172,14 @@ public class ContentAcceptanceTest extends AcceptanceTest {
         final List<ContentResponse> album = toObject(response, ContentsResponse.class).album();
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(album).hasSize(4)
+                () -> assertThat(album).hasSize(4),
+                () -> assertThat(album.stream().map(ContentResponse::date).toList())
+                        .containsExactly(
+                                now.minusDays(3),
+                                now.minusDays(2),
+                                now.minusDays(1),
+                                now
+                        )
         );
     }
 

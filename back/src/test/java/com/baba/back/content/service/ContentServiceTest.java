@@ -277,16 +277,6 @@ class ContentServiceTest {
                 () -> assertThat(response.album()).hasSize(2),
                 () -> assertThat(response.album()).containsExactly(
                         new ContentResponse(
-                                컨텐츠1.getId(),
-                                컨텐츠1.getOwnerName(),
-                                컨텐츠1.getRelationName(),
-                                컨텐츠1.getContentDate(),
-                                컨텐츠1.getTitle(),
-                                true,
-                                컨텐츠1.getImageSource(),
-                                컨텐츠1.getCardStyle()
-                        ),
-                        new ContentResponse(
                                 컨텐츠2.getId(),
                                 컨텐츠2.getOwnerName(),
                                 컨텐츠2.getRelationName(),
@@ -295,6 +285,16 @@ class ContentServiceTest {
                                 false,
                                 컨텐츠2.getImageSource(),
                                 컨텐츠2.getCardStyle()
+                        ),
+                        new ContentResponse(
+                                컨텐츠1.getId(),
+                                컨텐츠1.getOwnerName(),
+                                컨텐츠1.getRelationName(),
+                                컨텐츠1.getContentDate(),
+                                컨텐츠1.getTitle(),
+                                true,
+                                컨텐츠1.getImageSource(),
+                                컨텐츠1.getCardStyle()
                         )
                 )
         );
