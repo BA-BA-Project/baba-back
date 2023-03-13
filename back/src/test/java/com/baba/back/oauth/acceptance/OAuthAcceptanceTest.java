@@ -14,6 +14,7 @@ import com.baba.back.oauth.OAuthClient;
 import com.baba.back.oauth.domain.Terms;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
 import com.baba.back.oauth.dto.SearchTermsResponse;
+import com.baba.back.oauth.dto.SignTokenResponse;
 import com.baba.back.oauth.dto.SocialLoginResponse;
 import com.baba.back.oauth.dto.TokenRefreshRequest;
 import com.baba.back.oauth.dto.TokenRefreshResponse;
@@ -102,6 +103,21 @@ class OAuthAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    void 약관_동의_요청_시_sign_token과_201을_응답한다() {
+        // given
+        given(oAuthClient.getMemberId(any())).willReturn(멤버1.getId());
+
+        // when
+        final ExtractableResponse<Response> response = 약관_동의_요청();
+
+        // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                () -> assertThat(toObject(response, SignTokenResponse.class).signToken()).isNotBlank()
+        );
     }
 
     @Test
