@@ -29,7 +29,8 @@
                 <pattern>[%d{yyyy-MM-dd HH:mm:ss}:%-3relative][%thread] %-5level %logger{35} - %msg%n</pattern>
             </encoder>
             <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                <fileNamePattern>${LOGS_ABSOLUTE_PATH}/${PROFILE}/logs/was-logs/info.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+                <fileNamePattern>${LOGS_ABSOLUTE_PATH}/${PROFILE}/logs/was-logs/info.%d{yyyy-MM-dd}.%i.log.gz
+                </fileNamePattern>
                 <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                     <maxFileSize>100MB</maxFileSize>
                 </timeBasedFileNamingAndTriggeringPolicy>
@@ -48,7 +49,8 @@
                 <pattern>[%d{yyyy-MM-dd HH:mm:ss}:%-3relative][%thread] %-5level %logger{35} - %msg%n</pattern>
             </encoder>
             <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                <fileNamePattern>${LOGS_ABSOLUTE_PATH}/${PROFILE}/logs/was-logs/warn.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+                <fileNamePattern>${LOGS_ABSOLUTE_PATH}/${PROFILE}/logs/was-logs/warn.%d{yyyy-MM-dd}.%i.log.gz
+                </fileNamePattern>
                 <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                     <maxFileSize>100MB</maxFileSize>
                 </timeBasedFileNamingAndTriggeringPolicy>
@@ -67,7 +69,8 @@
                 <pattern>[%d{yyyy-MM-dd HH:mm:ss}:%-3relative][%thread] %-5level %logger{35} - %msg%n</pattern>
             </encoder>
             <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                <fileNamePattern>${LOGS_ABSOLUTE_PATH}/${PROFILE}/logs/was-logs/error.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+                <fileNamePattern>${LOGS_ABSOLUTE_PATH}/${PROFILE}/logs/was-logs/error.%d{yyyy-MM-dd}.%i.log.gz
+                </fileNamePattern>
                 <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                     <maxFileSize>100MB</maxFileSize>
                 </timeBasedFileNamingAndTriggeringPolicy>

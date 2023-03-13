@@ -14,6 +14,7 @@ import com.baba.back.oauth.OAuthClient;
 import com.baba.back.oauth.domain.Terms;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
 import com.baba.back.oauth.dto.SearchTermsResponse;
+import com.baba.back.oauth.dto.SignTokenResponse;
 import com.baba.back.oauth.dto.SocialLoginResponse;
 import com.baba.back.oauth.dto.TokenRefreshRequest;
 import com.baba.back.oauth.dto.TokenRefreshResponse;
@@ -88,6 +89,34 @@ class OAuthAcceptanceTest extends AcceptanceTest {
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(toObject(response, SearchTermsResponse.class).terms()).hasSize(Terms.values().length)
+        );
+    }
+
+    @Test
+    void 약관_동의_요청_시_이미_가입되어_있으면_400을_응답한다() {
+        // given
+        아기_등록_회원가입_요청_멤버_1();
+        given(oAuthClient.getMemberId(any())).willReturn(멤버1.getId());
+
+        // when
+        final ExtractableResponse<Response> response = 약관_동의_요청();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    void 약관_동의_요청_시_sign_token과_201을_응답한다() {
+        // given
+        given(oAuthClient.getMemberId(any())).willReturn(멤버1.getId());
+
+        // when
+        final ExtractableResponse<Response> response = 약관_동의_요청();
+
+        // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                () -> assertThat(toObject(response, SignTokenResponse.class).signToken()).isNotBlank()
         );
     }
 
