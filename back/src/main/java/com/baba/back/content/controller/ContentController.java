@@ -10,6 +10,7 @@ import com.baba.back.swagger.CreatedResponse;
 import com.baba.back.swagger.ForbiddenResponse;
 import com.baba.back.swagger.IntervalServerErrorResponse;
 import com.baba.back.swagger.NotFoundResponse;
+import com.baba.back.swagger.OkResponse;
 import com.baba.back.swagger.UnAuthorizedResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -62,6 +63,10 @@ public class ContentController {
     }
 
     @Operation(summary = "성장 앨범 메인 페이지 조회 요청")
+    @OkResponse
+    @UnAuthorizedResponse
+    @NotFoundResponse
+    @IntervalServerErrorResponse
     @GetMapping("/album/{babyId}")
     public ResponseEntity<ContentsResponse> getContents(@Login String memberId,
                                                         @PathVariable("babyId") String babyId,
