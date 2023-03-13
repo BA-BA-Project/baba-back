@@ -92,6 +92,19 @@ class OAuthAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
+    void 약관_동의_요청_시_이미_가입되어_있으면_400을_응답한다() {
+        // given
+        아기_등록_회원가입_요청_멤버_1();
+        given(oAuthClient.getMemberId(any())).willReturn(멤버1.getId());
+
+        // when
+        final ExtractableResponse<Response> response = 약관_동의_요청();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
     void 토큰_재발급_요청_시_refresh토큰의_만료기간이_하루보다_많이_남았으면_access토큰을_재발급하고_201을_응답한다() {
         // given
         final ExtractableResponse<Response> 회원가입_응답 = 아기_등록_회원가입_요청_멤버_1();
