@@ -52,8 +52,8 @@ public class OAuthController {
         return ResponseEntity.ok().body(oauthService.searchTerms(tokenRequest));
     }
 
-    @Operation(summary = "약관 조회 요청")
-    @OkResponse
+    @Operation(summary = "약관 동의 요청")
+    @CreatedResponse
     @BadRequestResponse
     @IntervalServerErrorResponse
     @PostMapping("/auth/login/terms")
