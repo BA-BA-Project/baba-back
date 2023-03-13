@@ -4,6 +4,7 @@ import static com.baba.back.content.domain.content.CardStyle.CARD_BASIC_1;
 
 import com.baba.back.baby.dto.BabyRequest;
 import com.baba.back.content.dto.CreateContentRequest;
+import com.baba.back.oauth.domain.Terms;
 import com.baba.back.oauth.dto.AgreeTermsRequest;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
 import com.baba.back.oauth.dto.SocialTokenRequest;
@@ -14,10 +15,11 @@ import org.springframework.mock.web.MockMultipartFile;
 
 public class RequestFixture {
 
-    public static final TermsRequest 약관_요청_데이터1 = new TermsRequest("이용약관 동의", true);
-    public static final TermsRequest 약관_요청_데이터2 = new TermsRequest("개인정보 수집 및 이용 동의", true);
+    public static final TermsRequest 약관_요청_데이터1 = new TermsRequest(Terms.TERMS_1.getName(), true);
+    public static final TermsRequest 약관_요청_데이터2 = new TermsRequest(Terms.TERMS_2.getName(), true);
+    public static final TermsRequest 약관_요청_데이터3 = new TermsRequest(Terms.TERMS_3.getName(), true);
     public static final AgreeTermsRequest 약관_동의_요청_데이터 = new AgreeTermsRequest(
-            "socialToken", List.of(약관_요청_데이터1, 약관_요청_데이터2)
+            "socialToken", List.of(약관_요청_데이터1, 약관_요청_데이터2, 약관_요청_데이터3)
     );
 
     public static final BabyRequest 아기_생성_요청_데이터_1 = new BabyRequest("아기1", LocalDate.now());
