@@ -1,5 +1,6 @@
 package com.baba.back.oauth.domain.member;
 
+import com.baba.back.common.domain.Name;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

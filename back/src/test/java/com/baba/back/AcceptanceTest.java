@@ -3,7 +3,6 @@ package com.baba.back;
 import static com.baba.back.SimpleRestAssured.get;
 import static com.baba.back.SimpleRestAssured.post;
 import static com.baba.back.SimpleRestAssured.thenExtract;
-import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.RequestFixture.멤버_가입_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.소셜_토큰_요청_데이터;
 
@@ -38,12 +37,12 @@ public class AcceptanceTest {
     @LocalServerPort
     int port;
 
-    protected ExtractableResponse<Response> 아기_등록_회원가입_요청_멤버_1() {
-        final String signToken = signTokenProvider.createToken(멤버1.getId());
-        return 아기_등록_회원가입_요청(signToken, 멤버_가입_요청_데이터);
+    protected ExtractableResponse<Response> 아기_등록_회원가입_요청() {
+        return 아기_등록_회원가입_요청(멤버_가입_요청_데이터);
     }
-
-    protected ExtractableResponse<Response> 아기_등록_회원가입_요청(String signToken, MemberSignUpRequest request) {
+    
+    protected ExtractableResponse<Response> 아기_등록_회원가입_요청(MemberSignUpRequest request) {
+        final String signToken = signTokenProvider.createToken("member");
         return post(MEMBER_BASE_PATH + "/baby", Map.of("Authorization", "Bearer " + signToken), request);
     }
 
@@ -67,13 +66,13 @@ public class AcceptanceTest {
         return get(BABY_BASE_PATH, Map.of("Authorization", "Bearer " + accessToken));
     }
 
-    protected ExtractableResponse<Response> 성장앨범_생성_요청(String accessToken, String babyId) {
+    protected ExtractableResponse<Response> 성장앨범_생성_요청(String accessToken, String babyId, LocalDate now) {
         return thenExtract(
                 RestAssured.given()
                         .headers(Map.of("Authorization", "Bearer " + accessToken))
                         .multiPart("photo", "test_file.jpg", "Something".getBytes(), MediaType.IMAGE_PNG_VALUE)
-                        .multiPart("date", LocalDate.now().toString())
-                        .multiPart("title", "제목")
+                        .multiPart("date", now.toString())
+                        .multiPart("title", "title")
                         .multiPart("cardStyle", "CARD_BASIC_1")
                         .when()
                         .post(CONTENT_BASE_PATH + "/" + babyId)
@@ -83,6 +82,13 @@ public class AcceptanceTest {
     protected ExtractableResponse<Response> 좋아요_요청(String accessToken, String babyId, Long contentId) {
         return post(
                 Paths.get(CONTENT_BASE_PATH, babyId, contentId.toString(), "like").toString(),
+                Map.of("Authorization", "Bearer " + accessToken)
+        );
+    }
+
+    protected ExtractableResponse<Response> 성장_앨범_메인_요청(String accessToken, String babyId, int year, int month) {
+        return get(
+                CONTENT_BASE_PATH + "/" + babyId + "?year=" + year + "&month=" + month,
                 Map.of("Authorization", "Bearer " + accessToken)
         );
     }

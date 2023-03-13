@@ -1,4 +1,4 @@
-package com.baba.back.oauth.domain.member;
+package com.baba.back.common.domain;
 
 import com.baba.back.oauth.exception.NameLengthBadRequestException;
 import jakarta.persistence.Column;

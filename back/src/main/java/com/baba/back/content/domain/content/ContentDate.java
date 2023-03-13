@@ -1,6 +1,7 @@
 package com.baba.back.content.domain.content;
 
 import com.baba.back.content.exception.ContentDateBadRequestException;
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -12,10 +13,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ContentDate {
     public static final int LIMIT_YEARS = 2;
-    private LocalDate contentDate;
 
-    private ContentDate(LocalDate contentDate) {
-        this.contentDate = contentDate;
+    @Column(name = "content_date")
+    private LocalDate value;
+
+    private ContentDate(LocalDate value) {
+        this.value = value;
     }
 
     public static ContentDate of(LocalDate contentDate, LocalDate now, LocalDate baseDate) {
