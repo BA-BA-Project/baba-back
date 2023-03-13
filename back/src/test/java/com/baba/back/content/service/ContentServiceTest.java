@@ -299,4 +299,44 @@ class ContentServiceTest {
                 )
         );
     }
+
+    @Test
+    void 없는_멤버가_성장_앨범을_조회_시_예외를_던진다() {
+        // given
+        final int year = 2023;
+        final int month = 1;
+        given(memberRepository.findById(멤버1.getId())).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> contentService.getContents(멤버1.getId(), 아기1.getId(), year, month))
+                .isInstanceOf(MemberNotFoundException.class);
+    }
+
+    @Test
+    void 없는_아기의_성장_앨범을_조회_시_예외를_던진다() {
+        // given
+        final int year = 2023;
+        final int month = 1;
+        given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
+        given(babyRepository.findById(아기1.getId())).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> contentService.getContents(멤버1.getId(), 아기1.getId(), year, month))
+                .isInstanceOf(BabyNotFoundException.class);
+    }
+
+    @Test
+    void 관계가_없는_아기의_성장_앨범을_조회_시_예외를_던진다() {
+        // given
+        final int year = 2023;
+        final int month = 1;
+        given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
+        given(babyRepository.findById(아기1.getId())).willReturn(Optional.of(아기1));
+        given(relationRepository.findByMemberAndBaby(멤버1, 아기1)).willReturn(Optional.empty());
+
+
+        // when & then
+        assertThatThrownBy(() -> contentService.getContents(멤버1.getId(), 아기1.getId(), year, month))
+                .isInstanceOf(RelationNotFoundException.class);
+    }
 }
