@@ -281,10 +281,10 @@ class OAuthServiceTest {
             final String signToken = "signToken";
             given(oAuthClient.getMemberId(any())).willReturn(멤버1.getId());
             given(memberRepository.existsById(멤버1.getId())).willReturn(false);
-            mockedTerms.when(Terms::values).thenReturn(values);
-            mockedTerms.when(() -> Terms.isSameSize(values.length)).thenReturn(true);
-            mockedTerms.when(() -> Terms.isRequiredTermsBy(0, Terms.TERMS_1.getName())).thenReturn(true);
-            mockedTerms.when(() -> Terms.isRequiredTermsBy(1, Terms.TERMS_2.getName())).thenReturn(false);
+            given(Terms.values()).willReturn(values);
+            given(Terms.isSameSize(values.length)).willReturn(true);
+            given(Terms.isRequiredTermsBy(0, Terms.TERMS_1.getName())).willReturn(true);
+            given(Terms.isRequiredTermsBy(0, Terms.TERMS_2.getName())).willReturn(false);
             given(signTokenProvider.createToken(멤버1.getId())).willReturn(signToken);
 
             // when
