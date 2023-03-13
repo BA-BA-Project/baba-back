@@ -22,6 +22,8 @@ import com.baba.back.oauth.repository.TokenRepository;
 import jakarta.transaction.Transactional;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -79,27 +81,42 @@ public class OAuthService {
         final String memberId = oAuthClient.getMemberId(request.getSocialToken());
         validateMember(memberId);
 
-        validateRequestTermsLength(request.getTerms().size());
-        validateRequestTerms(request.getTerms());
+        final Set<Terms> selectedTerms = findValidTerms(request.getTerms());
+        validateDuplicate(request.getTerms().size(), selectedTerms.size());
+        validateSelectedTerms(selectedTerms.size());
 
         final String signToken = signTokenProvider.createToken(memberId);
 
         return new SignTokenResponse(signToken);
     }
 
-    private void validateRequestTermsLength(int size) {
-        if (!Terms.isSameSize(size)) {
-            throw new TermsBadRequestException("요청받은 약관의 개수가 존재하는 약관의 개수와 다릅니다.");
+    private Set<Terms> findValidTerms(List<TermsRequest> requestTerms) {
+        return requestTerms
+                .stream()
+                .map(termsRequest -> {
+                    final Terms terms = Terms.findByName(termsRequest.getName());
+                    validateRequiredTerms(terms.isRequired(), termsRequest.isSelected());
+
+                    return terms;
+                })
+                .collect(Collectors.toSet());
+    }
+
+    private void validateRequiredTerms(boolean isRequired, boolean isSelected) {
+        if (isRequired && !isSelected) {
+            throw new TermsBadRequestException("필수 동의 약관을 동의하지 않았습니다.");
         }
     }
 
-    private void validateRequestTerms(List<TermsRequest> requestTerms) {
-        for (int i = 0; i < Terms.values().length; i++) {
-            final TermsRequest termsRequest = requestTerms.get(i);
-            final boolean isRequiredTerms = Terms.isRequiredTermsBy(i, termsRequest.getName());
-            if (isRequiredTerms && !termsRequest.isSelected()) {
-                throw new TermsBadRequestException("필수 동의 약관을 모두 동의하지 않았습니다.");
-            }
+    private void validateDuplicate(int beforeSize, int afterSize) {
+        if (beforeSize != afterSize) {
+            throw new TermsBadRequestException("중복된 약관이 존재합니다.");
+        }
+    }
+
+    private void validateSelectedTerms(int size) {
+        if (!Terms.isSizeEqualToAllTerms(size)) {
+            throw new TermsBadRequestException("요청받은 필수 약관의 개수가 존재하는 필수 약관의 개수와 다릅니다.");
         }
     }
 
