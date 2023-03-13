@@ -84,10 +84,10 @@ public class OAuthService {
         }
 
         final List<TermsRequest> requestTerms = request.getTerms();
-        for(int i=0; i<Terms.values().length; i++) {
+        for (int i = 0; i < Terms.values().length; i++) {
             final TermsRequest termsRequest = requestTerms.get(i);
             final boolean isRequiredTerms = Terms.isRequiredTermsBy(i, termsRequest.getName());
-            if(isRequiredTerms && !termsRequest.isSelected()) {
+            if (isRequiredTerms && !termsRequest.isSelected()) {
                 throw new TermsBadRequestException("필수 동의 약관을 모두 동의하지 않았습니다.");
             }
         }
