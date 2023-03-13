@@ -79,11 +79,21 @@ public class OAuthService {
         final String memberId = oAuthClient.getMemberId(request.getSocialToken());
         validateMember(memberId);
 
-        if (!Terms.isSameSize(request.getTerms().size())) {
+        validateRequestTermsLength(request.getTerms().size());
+        validateRequestTerms(request.getTerms());
+
+        final String signToken = signTokenProvider.createToken(memberId);
+
+        return new SignTokenResponse(signToken);
+    }
+
+    private void validateRequestTermsLength(int size) {
+        if (!Terms.isSameSize(size)) {
             throw new TermsBadRequestException("요청받은 약관의 개수가 존재하는 약관의 개수와 다릅니다.");
         }
+    }
 
-        final List<TermsRequest> requestTerms = request.getTerms();
+    private void validateRequestTerms(List<TermsRequest> requestTerms) {
         for (int i = 0; i < Terms.values().length; i++) {
             final TermsRequest termsRequest = requestTerms.get(i);
             final boolean isRequiredTerms = Terms.isRequiredTermsBy(i, termsRequest.getName());
@@ -91,10 +101,6 @@ public class OAuthService {
                 throw new TermsBadRequestException("필수 동의 약관을 모두 동의하지 않았습니다.");
             }
         }
-
-        final String signToken = signTokenProvider.createToken(memberId);
-
-        return new SignTokenResponse(signToken);
     }
 
     public TokenRefreshResponse refresh(TokenRefreshRequest request) {
