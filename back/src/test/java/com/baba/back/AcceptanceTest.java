@@ -57,7 +57,7 @@ public class AcceptanceTest {
     }
 
     protected ExtractableResponse<Response> 약관_조회_요청() {
-        return post(AUTH_BASE_PATH + "/login/terms", 소셜_토큰_요청_데이터);
+        return get(AUTH_BASE_PATH + "/terms", 소셜_토큰_요청_데이터);
     }
 
     protected ExtractableResponse<Response> 약관_동의_요청() {
