@@ -1,5 +1,6 @@
 package com.baba.back.oauth.domain;
 
+import com.baba.back.oauth.exception.TermsBadRequestException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -14,4 +15,18 @@ public enum Terms {
     private final boolean required;
     private final String name;
     private final String url;
+
+    public static boolean isSameSize(int size) {
+        return Terms.values().length == size;
+    }
+
+    public static boolean isRequiredTermsBy(int idx, String name) {
+        final Terms terms = Terms.values()[idx];
+
+        if (!(terms.name).equals(name)) {
+            throw new TermsBadRequestException(idx + "번째 약관은 {" + terms.name + "}입니다.");
+        }
+
+        return terms.required;
+    }
 }
