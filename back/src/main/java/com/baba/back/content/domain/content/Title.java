@@ -1,6 +1,7 @@
 package com.baba.back.content.domain.content;
 
 import com.baba.back.content.exception.TitleLengthBadRequestException;
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.util.Objects;
 import lombok.Getter;
@@ -11,12 +12,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Title {
     public static final int MAX_TITLE_LENGTH = 10;
-    private String title;
 
-    public Title(String title) {
-        validateNull(title);
-        validateLength(title);
-        this.title = title;
+    @Column(name = "title")
+    private String value;
+
+    public Title(String value) {
+        validateNull(value);
+        validateLength(value);
+        this.value = value;
     }
 
     private void validateNull(String title) {
