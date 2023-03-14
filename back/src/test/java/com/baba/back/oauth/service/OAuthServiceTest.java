@@ -216,9 +216,9 @@ class OAuthServiceTest {
     @Test
     void 약관_동의_요청시_잘못된_약관이_존재하면_예외를_던진다() {
         // given
-        final String invalidToken = "invalidToken";
+        final String validToken = "validToken";
         final String invalidTermsName = "invalidTermsName";
-        final AgreeTermsRequest request = new AgreeTermsRequest(invalidToken,
+        final AgreeTermsRequest request = new AgreeTermsRequest(validToken,
                 List.of(new TermsRequest(Terms.TERMS_1.getName(), true),
                         new TermsRequest(Terms.TERMS_2.getName(), true),
                         new TermsRequest(invalidTermsName, true)));
@@ -233,8 +233,8 @@ class OAuthServiceTest {
     @Test
     void 약관_동의_요청시_모든_필수_동의_약관을_동의하지_않았으면_예외를_던진다() {
         // given
-        final String invalidToken = "invalidToken";
-        final AgreeTermsRequest request = new AgreeTermsRequest(invalidToken,
+        final String validToken = "validToken";
+        final AgreeTermsRequest request = new AgreeTermsRequest(validToken,
                 List.of(new TermsRequest(Terms.TERMS_1.getName(), true),
                         new TermsRequest(Terms.TERMS_2.getName(), false),
                         new TermsRequest(Terms.TERMS_3.getName(), false)));
@@ -249,8 +249,8 @@ class OAuthServiceTest {
     @Test
     void 약관_동의_요청시_중복된_약관이_존재하면_예외를_던진다() {
         // given
-        final String invalidToken = "invalidToken";
-        final AgreeTermsRequest request = new AgreeTermsRequest(invalidToken,
+        final String validToken = "validToken";
+        final AgreeTermsRequest request = new AgreeTermsRequest(validToken,
                 List.of(new TermsRequest(Terms.TERMS_1.getName(), true),
                         new TermsRequest(Terms.TERMS_1.getName(), true),
                         new TermsRequest(Terms.TERMS_2.getName(), true),
@@ -266,8 +266,8 @@ class OAuthServiceTest {
     @Test
     void 약관_동의_요청시_생략된_약관이_존재하면_예외를_던진다() {
         // given
-        final String invalidToken = "invalidToken";
-        final AgreeTermsRequest request = new AgreeTermsRequest(invalidToken,
+        final String validToken = "validToken";
+        final AgreeTermsRequest request = new AgreeTermsRequest(validToken,
                 List.of(new TermsRequest(Terms.TERMS_1.getName(), true),
                         new TermsRequest(Terms.TERMS_2.getName(), true)));
         given(oAuthClient.getMemberId(any())).willReturn(멤버1.getId());
