@@ -81,8 +81,9 @@ public class OAuthService {
         final String memberId = oAuthClient.getMemberId(request.getSocialToken());
         validateMember(memberId);
 
-        final Set<Terms> selectedTerms = findValidTerms(request.getTerms());
-        validateDuplicate(request.getTerms().size(), selectedTerms.size());
+        final List<TermsRequest> requestTerms = request.getTerms();
+        final Set<Terms> selectedTerms = findValidTerms(requestTerms);
+        validateDuplicate(requestTerms.size(), selectedTerms.size());
         validateSelectedTerms(selectedTerms.size());
 
         final String signToken = signTokenProvider.createToken(memberId);
