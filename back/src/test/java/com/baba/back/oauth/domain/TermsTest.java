@@ -8,13 +8,12 @@ import org.junit.jupiter.api.Test;
 
 class TermsTest {
 
-    public static final int REQUIRED_TERMS_LENGTH = 2;
     public static final int ALL_TERMS_LENGTH = Terms.values().length;
 
     @Test
     void 모든_약관의_개수가_다르면_false를_반환한다() {
         // given & when
-        final boolean sameSize = Terms.isSizeEqualToAllTerms(REQUIRED_TERMS_LENGTH);
+        final boolean sameSize = Terms.isSizeEqualToAllTerms(ALL_TERMS_LENGTH - 1);
 
         // then
         assertThat(sameSize).isFalse();
