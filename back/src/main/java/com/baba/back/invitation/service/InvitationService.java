@@ -41,7 +41,7 @@ public class InvitationService {
         final List<RelationGroup> groups = findRelationGroups(relations, request.getRelationGroup());
 
         final String inviteCode = InviteCodeGenerator.generate();
-        final InvitationCode invitationCode = getInvitationCode(request, inviteCode);
+        final InvitationCode invitationCode = saveInvitationCode(request, inviteCode);
         createInvitation(groups, invitationCode);
 
         return new CreateInviteCodeResponse(inviteCode);
@@ -60,7 +60,7 @@ public class InvitationService {
         return relations;
     }
 
-    private InvitationCode getInvitationCode(CreateInviteCodeRequest request, String inviteCode) {
+    private InvitationCode saveInvitationCode(CreateInviteCodeRequest request, String inviteCode) {
         return invitationCodeRepository.save(
                 InvitationCode.builder()
                         .inviteCode(inviteCode)
