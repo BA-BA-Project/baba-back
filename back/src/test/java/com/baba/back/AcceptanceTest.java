@@ -5,6 +5,7 @@ import static com.baba.back.SimpleRestAssured.post;
 import static com.baba.back.SimpleRestAssured.thenExtract;
 import static com.baba.back.fixture.RequestFixture.멤버_가입_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.소셜_토큰_요청_데이터;
+import static com.baba.back.fixture.RequestFixture.약관_동의_요청_데이터;
 
 import com.baba.back.oauth.dto.MemberSignUpRequest;
 import com.baba.back.oauth.dto.TokenRefreshRequest;
@@ -40,7 +41,7 @@ public class AcceptanceTest {
     protected ExtractableResponse<Response> 아기_등록_회원가입_요청() {
         return 아기_등록_회원가입_요청(멤버_가입_요청_데이터);
     }
-    
+
     protected ExtractableResponse<Response> 아기_등록_회원가입_요청(MemberSignUpRequest request) {
         final String signToken = signTokenProvider.createToken("member");
         return post(MEMBER_BASE_PATH + "/baby", Map.of("Authorization", "Bearer " + signToken), request);
@@ -56,6 +57,10 @@ public class AcceptanceTest {
 
     protected ExtractableResponse<Response> 약관_조회_요청() {
         return post(AUTH_BASE_PATH + "/terms", 소셜_토큰_요청_데이터);
+    }
+
+    protected ExtractableResponse<Response> 약관_동의_요청() {
+        return post(AUTH_BASE_PATH + "/login/terms", 약관_동의_요청_데이터);
     }
 
     protected ExtractableResponse<Response> 토큰_재발급_요청(TokenRefreshRequest request) {
