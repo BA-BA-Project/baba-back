@@ -1,23 +1,31 @@
 package com.baba.back.oauth.service;
 
 import com.baba.back.oauth.OAuthClient;
+import com.baba.back.oauth.domain.Terms;
 import com.baba.back.oauth.domain.member.Member;
 import com.baba.back.oauth.domain.token.Token;
-import com.baba.back.oauth.dto.LoginTokenResponse;
+import com.baba.back.oauth.dto.AgreeTermsRequest;
+import com.baba.back.oauth.dto.SearchTermsResponse;
 import com.baba.back.oauth.dto.SignTokenResponse;
 import com.baba.back.oauth.dto.SocialLoginResponse;
 import com.baba.back.oauth.dto.SocialTokenRequest;
+import com.baba.back.oauth.dto.TermsRequest;
+import com.baba.back.oauth.dto.TermsResponse;
 import com.baba.back.oauth.dto.TokenRefreshRequest;
 import com.baba.back.oauth.dto.TokenRefreshResponse;
+import com.baba.back.oauth.exception.MemberBadRequestException;
 import com.baba.back.oauth.exception.MemberNotFoundException;
+import com.baba.back.oauth.exception.TermsBadRequestException;
 import com.baba.back.oauth.exception.TokenBadRequestException;
 import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.oauth.repository.TokenRepository;
 import jakarta.transaction.Transactional;
-import java.util.Optional;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -25,6 +33,11 @@ import org.springframework.stereotype.Service;
 @Transactional
 @RequiredArgsConstructor
 public class OAuthService {
+
+    private static final SearchTermsResponse SEARCH_TERMS_RESPONSE = new SearchTermsResponse(
+            Arrays.stream(Terms.values())
+                    .map(terms -> new TermsResponse(terms.isRequired(), terms.getName(), terms.getUrl()))
+                    .toList());
 
     private final OAuthClient oAuthClient;
     private final AccessTokenProvider accessTokenProvider;
@@ -35,29 +48,77 @@ public class OAuthService {
 
     public SocialLoginResponse signInKakao(SocialTokenRequest request) {
         final String memberId = oAuthClient.getMemberId(request.getSocialToken());
-        final Optional<Member> member = memberRepository.findById(memberId);
+        final Member member = findMember(memberId);
 
-        if (member.isPresent()) {
-            final String accessToken = accessTokenProvider.createToken(memberId);
-            final String refreshToken = refreshTokenProvider.createToken(memberId);
-            saveRefreshToken(member.get(), refreshToken);
-            return new SocialLoginResponse(HttpStatus.OK, new LoginTokenResponse(accessToken, refreshToken));
-        }
+        final String accessToken = accessTokenProvider.createToken(memberId);
+        final String refreshToken = refreshTokenProvider.createToken(memberId);
+        saveRefreshToken(member, refreshToken);
 
-        final String signToken = signTokenProvider.createToken(memberId);
-        return new SocialLoginResponse(HttpStatus.NOT_FOUND, new SignTokenResponse(signToken));
+        return new SocialLoginResponse(accessToken, refreshToken);
     }
 
     private void saveRefreshToken(Member member, String refreshToken) {
         final Token token = tokenRepository.findByMember(member)
-                .orElseGet(
-                        () -> Token.builder()
-                                .member(member)
-                                .value(refreshToken)
-                                .build()
-                );
+                .orElseGet(() -> Token.builder().member(member).value(refreshToken).build());
         token.update(refreshToken);
         tokenRepository.save(token);
+    }
+
+    public SearchTermsResponse searchTerms(SocialTokenRequest request) {
+        final String memberId = oAuthClient.getMemberId(request.getSocialToken());
+        validateMember(memberId);
+
+        return SEARCH_TERMS_RESPONSE;
+    }
+
+    private void validateMember(String memberId) {
+        if (memberRepository.existsById(memberId)) {
+            throw new MemberBadRequestException("이미 회원가입된 유저는 약관을 조회하거나 약관을 동의할 수 없습니다.");
+        }
+    }
+
+    public SignTokenResponse agreeTerms(AgreeTermsRequest request) {
+        final String memberId = oAuthClient.getMemberId(request.getSocialToken());
+        validateMember(memberId);
+
+        final List<TermsRequest> requestTerms = request.getTerms();
+        final Set<Terms> selectedTerms = findValidTerms(requestTerms);
+        validateDuplicate(requestTerms.size(), selectedTerms.size());
+        validateSelectedTerms(selectedTerms.size());
+
+        final String signToken = signTokenProvider.createToken(memberId);
+
+        return new SignTokenResponse(signToken);
+    }
+
+    private Set<Terms> findValidTerms(List<TermsRequest> requestTerms) {
+        return requestTerms
+                .stream()
+                .map(termsRequest -> {
+                    final Terms terms = Terms.findByName(termsRequest.getName());
+                    validateRequiredTerms(terms.isRequired(), termsRequest.isSelected());
+
+                    return terms;
+                })
+                .collect(Collectors.toSet());
+    }
+
+    private void validateRequiredTerms(boolean isRequired, boolean isSelected) {
+        if (isRequired && !isSelected) {
+            throw new TermsBadRequestException("필수 동의 약관을 동의하지 않았습니다.");
+        }
+    }
+
+    private void validateDuplicate(int beforeSize, int afterSize) {
+        if (beforeSize != afterSize) {
+            throw new TermsBadRequestException("중복된 약관이 존재합니다.");
+        }
+    }
+
+    private void validateSelectedTerms(int size) {
+        if (!Terms.isSizeEqualToAllTerms(size)) {
+            throw new TermsBadRequestException("요청받은 필수 약관의 개수가 존재하는 필수 약관의 개수와 다릅니다.");
+        }
     }
 
     public TokenRefreshResponse refresh(TokenRefreshRequest request) {
@@ -81,9 +142,8 @@ public class OAuthService {
     }
 
     private Member findMember(String memberId) {
-        return memberRepository.findById(memberId).orElseThrow(
-                () -> new MemberNotFoundException(memberId + "에 해당하는 멤버가 존재하지 않습니다.")
-        );
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberNotFoundException(memberId + "에 해당하는 멤버가 존재하지 않습니다."));
     }
 
     private void validateToken(Member member, String refreshToken) {

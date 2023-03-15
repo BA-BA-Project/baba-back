@@ -1,10 +1,12 @@
 package com.baba.back.oauth.controller;
 
+import com.baba.back.oauth.dto.AgreeTermsRequest;
+import com.baba.back.oauth.dto.SearchTermsResponse;
+import com.baba.back.oauth.dto.SignTokenResponse;
 import com.baba.back.oauth.dto.SocialLoginResponse;
 import com.baba.back.oauth.dto.SocialTokenRequest;
 import com.baba.back.oauth.dto.TokenRefreshRequest;
 import com.baba.back.oauth.dto.TokenRefreshResponse;
-import com.baba.back.oauth.dto.TokenResponse;
 import com.baba.back.oauth.service.OAuthService;
 import com.baba.back.swagger.BadRequestResponse;
 import com.baba.back.swagger.CreatedResponse;
@@ -36,9 +38,26 @@ public class OAuthController {
     @NotFoundResponse
     @IntervalServerErrorResponse
     @PostMapping("/auth/login")
-    public ResponseEntity<TokenResponse> signInKakao(@RequestBody @Valid SocialTokenRequest tokenRequest) {
-        final SocialLoginResponse socialLoginResponse = oauthService.signInKakao(tokenRequest);
-        return ResponseEntity.status(socialLoginResponse.httpStatus()).body(socialLoginResponse.tokenResponse());
+    public ResponseEntity<SocialLoginResponse> signInKakao(@RequestBody @Valid SocialTokenRequest tokenRequest) {
+        return ResponseEntity.ok().body(oauthService.signInKakao(tokenRequest));
+    }
+
+    @Operation(summary = "약관 조회 요청")
+    @OkResponse
+    @BadRequestResponse
+    @IntervalServerErrorResponse
+    @PostMapping("/auth/terms")
+    public ResponseEntity<SearchTermsResponse> searchTerms(@RequestBody @Valid SocialTokenRequest tokenRequest) {
+        return ResponseEntity.ok().body(oauthService.searchTerms(tokenRequest));
+    }
+
+    @Operation(summary = "약관 동의 요청")
+    @CreatedResponse
+    @BadRequestResponse
+    @IntervalServerErrorResponse
+    @PostMapping("/auth/login/terms")
+    public ResponseEntity<SignTokenResponse> agreeTerms(@RequestBody @Valid AgreeTermsRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(oauthService.agreeTerms(request));
     }
 
     @Operation(summary = "토큰 재발급 요청")

@@ -2,6 +2,7 @@ package com.baba.back.oauth.service;
 
 import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.DomainFixture.토큰;
+import static com.baba.back.fixture.RequestFixture.약관_동의_요청_데이터;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -13,19 +14,26 @@ import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.times;
 
 import com.baba.back.oauth.OAuthClient;
+import com.baba.back.oauth.domain.Terms;
 import com.baba.back.oauth.domain.token.Token;
-import com.baba.back.oauth.dto.LoginTokenResponse;
+import com.baba.back.oauth.dto.AgreeTermsRequest;
+import com.baba.back.oauth.dto.SearchTermsResponse;
 import com.baba.back.oauth.dto.SignTokenResponse;
 import com.baba.back.oauth.dto.SocialLoginResponse;
 import com.baba.back.oauth.dto.SocialTokenRequest;
+import com.baba.back.oauth.dto.TermsRequest;
+import com.baba.back.oauth.dto.TermsResponse;
 import com.baba.back.oauth.dto.TokenRefreshRequest;
 import com.baba.back.oauth.dto.TokenRefreshResponse;
 import com.baba.back.oauth.exception.ExpiredTokenAuthenticationException;
 import com.baba.back.oauth.exception.InvalidTokenAuthenticationException;
+import com.baba.back.oauth.exception.MemberBadRequestException;
 import com.baba.back.oauth.exception.MemberNotFoundException;
+import com.baba.back.oauth.exception.TermsBadRequestException;
 import com.baba.back.oauth.exception.TokenBadRequestException;
 import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.oauth.repository.TokenRepository;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -33,7 +41,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 
 @ExtendWith(MockitoExtension.class)
@@ -61,7 +68,7 @@ class OAuthServiceTest {
     private TokenRepository tokenRepository;
 
     @Test
-    void 소셜_토큰이_유효하지_않다면_400을_반환한다() {
+    void 소셜_토큰이_유효하지_않다면_예외를_던진다() {
         // given
         final String invalidToken = "invalidToken";
         given(oAuthClient.getMemberId(invalidToken)).willThrow(HttpClientErrorException.class);
@@ -71,6 +78,21 @@ class OAuthServiceTest {
 
         assertThatThrownBy(() -> oAuthService.signInKakao(request))
                 .isInstanceOf(HttpClientErrorException.class);
+    }
+
+    @Test
+    void 가입이_되어있지_않으면_예외를_던진다() {
+        // given
+        final String validToken = "validToken";
+        final String memberId = "memberId";
+        final SocialTokenRequest request = new SocialTokenRequest(validToken);
+
+        given(oAuthClient.getMemberId(validToken)).willReturn(memberId);
+        given(memberRepository.findById(memberId)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> oAuthService.signInKakao(request))
+                .isInstanceOf(MemberNotFoundException.class);
     }
 
     @Test
@@ -91,8 +113,8 @@ class OAuthServiceTest {
 
         // then
         assertAll(
-                () -> assertThat(response.httpStatus()).isEqualTo(HttpStatus.OK),
-                () -> assertThat(response.tokenResponse()).isEqualTo(new LoginTokenResponse(accessToken, refreshToken))
+                () -> assertThat(response.accessToken()).isEqualTo(accessToken),
+                () -> assertThat(response.refreshToken()).isEqualTo(refreshToken)
         );
 
         then(tokenRepository).should(times(1)).save(any());
@@ -116,32 +138,159 @@ class OAuthServiceTest {
 
         // then
         assertAll(
-                () -> assertThat(response.httpStatus()).isEqualTo(HttpStatus.OK),
-                () -> assertThat(response.tokenResponse()).isEqualTo(new LoginTokenResponse(accessToken, refreshToken))
+                () -> assertThat(response.accessToken()).isEqualTo(accessToken),
+                () -> assertThat(response.refreshToken()).isEqualTo(refreshToken)
         );
 
         then(tokenRepository).should(times(1)).save(any());
     }
 
     @Test
-    void 가입이_되어있지_않으면_sign토큰을_발급한다() {
+    void 약관_조회_요청시_소셜_토큰이_유효하지_않다면_예외를_던진다() {
+        // given
+        final String invalidToken = "invalidToken";
+        final SocialTokenRequest request = new SocialTokenRequest(invalidToken);
+        given(oAuthClient.getMemberId(invalidToken)).willThrow(HttpClientErrorException.class);
+
+        // when & then
+        assertThatThrownBy(() -> oAuthService.searchTerms(request))
+                .isInstanceOf(HttpClientErrorException.class);
+    }
+
+    @Test
+    void 약관_조회_요청시_이미_가입_되어있으면_예외를_던진다() {
         // given
         final String validToken = "validToken";
-        final String memberId = "memberId";
-        final String signToken = "signToken";
+        final SocialTokenRequest request = new SocialTokenRequest(validToken);
+        given(oAuthClient.getMemberId(any())).willReturn(멤버1.getId());
+        given(memberRepository.existsById(멤버1.getId())).willReturn(true);
 
-        given(oAuthClient.getMemberId(validToken)).willReturn(memberId);
-        given(memberRepository.findById(memberId)).willReturn(Optional.empty());
-        given(signTokenProvider.createToken(memberId)).willReturn(signToken);
+        // when & then
+        assertThatThrownBy(() -> oAuthService.searchTerms(request))
+                .isInstanceOf(MemberBadRequestException.class);
+    }
+
+    @Test
+    void 약관_조회_요청시_약관을_응답한다() {
+        // given
+        final String validToken = "invalidToken";
+        final SocialTokenRequest request = new SocialTokenRequest(validToken);
+        given(oAuthClient.getMemberId(any())).willReturn(멤버1.getId());
+        given(memberRepository.existsById(멤버1.getId())).willReturn(false);
 
         // when
-        final SocialLoginResponse response = oAuthService.signInKakao(new SocialTokenRequest(validToken));
+        final SearchTermsResponse response = oAuthService.searchTerms(request);
 
         // then
-        assertAll(
-                () -> assertThat(response.httpStatus()).isEqualTo(HttpStatus.NOT_FOUND),
-                () -> assertThat(response.tokenResponse()).isEqualTo(new SignTokenResponse(signToken))
+        assertThat(response.terms()).containsExactly(
+                new TermsResponse(Terms.TERMS_1.isRequired(), Terms.TERMS_1.getName(), Terms.TERMS_1.getUrl()),
+                new TermsResponse(Terms.TERMS_2.isRequired(), Terms.TERMS_2.getName(), Terms.TERMS_2.getUrl()),
+                new TermsResponse(Terms.TERMS_3.isRequired(), Terms.TERMS_3.getName(), Terms.TERMS_3.getUrl())
         );
+    }
+
+    @Test
+    void 약관_동의_요청시_소셜_토큰이_유효하지_않다면_예외를_던진다() {
+        // given
+        final String invalidToken = "invalidToken";
+        final AgreeTermsRequest request = new AgreeTermsRequest(
+                invalidToken, List.of(new TermsRequest("이용약관 동의", true)));
+        given(oAuthClient.getMemberId(invalidToken)).willThrow(HttpClientErrorException.class);
+
+        // when & then
+        assertThatThrownBy(() -> oAuthService.agreeTerms(request))
+                .isInstanceOf(HttpClientErrorException.class);
+    }
+
+    @Test
+    void 약관_동의_요청시_이미_가입_되어있으면_예외를_던진다() {
+        // given
+        given(oAuthClient.getMemberId(any())).willReturn(멤버1.getId());
+        given(memberRepository.existsById(멤버1.getId())).willReturn(true);
+
+        // when & then
+        assertThatThrownBy(() -> oAuthService.agreeTerms(약관_동의_요청_데이터))
+                .isInstanceOf(MemberBadRequestException.class);
+    }
+
+    @Test
+    void 약관_동의_요청시_잘못된_약관이_존재하면_예외를_던진다() {
+        // given
+        final String validToken = "validToken";
+        final String invalidTermsName = "invalidTermsName";
+        final AgreeTermsRequest request = new AgreeTermsRequest(validToken,
+                List.of(new TermsRequest(Terms.TERMS_1.getName(), true),
+                        new TermsRequest(Terms.TERMS_2.getName(), true),
+                        new TermsRequest(invalidTermsName, true)));
+        given(oAuthClient.getMemberId(any())).willReturn(멤버1.getId());
+        given(memberRepository.existsById(멤버1.getId())).willReturn(false);
+
+        // when & then
+        assertThatThrownBy(() -> oAuthService.agreeTerms(request))
+                .isInstanceOf(TermsBadRequestException.class);
+    }
+
+    @Test
+    void 약관_동의_요청시_모든_필수_동의_약관을_동의하지_않았으면_예외를_던진다() {
+        // given
+        final String validToken = "validToken";
+        final AgreeTermsRequest request = new AgreeTermsRequest(validToken,
+                List.of(new TermsRequest(Terms.TERMS_1.getName(), true),
+                        new TermsRequest(Terms.TERMS_2.getName(), false),
+                        new TermsRequest(Terms.TERMS_3.getName(), false)));
+        given(oAuthClient.getMemberId(any())).willReturn(멤버1.getId());
+        given(memberRepository.existsById(멤버1.getId())).willReturn(false);
+
+        // when & then
+        assertThatThrownBy(() -> oAuthService.agreeTerms(request))
+                .isInstanceOf(TermsBadRequestException.class);
+    }
+
+    @Test
+    void 약관_동의_요청시_중복된_약관이_존재하면_예외를_던진다() {
+        // given
+        final String validToken = "validToken";
+        final AgreeTermsRequest request = new AgreeTermsRequest(validToken,
+                List.of(new TermsRequest(Terms.TERMS_1.getName(), true),
+                        new TermsRequest(Terms.TERMS_1.getName(), true),
+                        new TermsRequest(Terms.TERMS_2.getName(), true),
+                        new TermsRequest(Terms.TERMS_3.getName(), false)));
+        given(oAuthClient.getMemberId(any())).willReturn(멤버1.getId());
+        given(memberRepository.existsById(멤버1.getId())).willReturn(false);
+
+        // when & then
+        assertThatThrownBy(() -> oAuthService.agreeTerms(request))
+                .isInstanceOf(TermsBadRequestException.class);
+    }
+
+    @Test
+    void 약관_동의_요청시_생략된_약관이_존재하면_예외를_던진다() {
+        // given
+        final String validToken = "validToken";
+        final AgreeTermsRequest request = new AgreeTermsRequest(validToken,
+                List.of(new TermsRequest(Terms.TERMS_1.getName(), true),
+                        new TermsRequest(Terms.TERMS_2.getName(), true)));
+        given(oAuthClient.getMemberId(any())).willReturn(멤버1.getId());
+        given(memberRepository.existsById(멤버1.getId())).willReturn(false);
+
+        // when & then
+        assertThatThrownBy(() -> oAuthService.agreeTerms(request))
+                .isInstanceOf(TermsBadRequestException.class);
+    }
+
+    @Test
+    void 약관_동의_요청시_모든_필수_동의_약관을_동의하면_signToken을_발급한다() {
+        // given
+        final String signToken = "signToken";
+        given(oAuthClient.getMemberId(any())).willReturn(멤버1.getId());
+        given(memberRepository.existsById(멤버1.getId())).willReturn(false);
+        given(signTokenProvider.createToken(멤버1.getId())).willReturn(signToken);
+
+        // when
+        final SignTokenResponse response = oAuthService.agreeTerms(약관_동의_요청_데이터);
+
+        // then
+        assertThat(response.signToken()).isEqualTo(signToken);
     }
 
     @Test

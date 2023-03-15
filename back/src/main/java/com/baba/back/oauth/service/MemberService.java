@@ -11,6 +11,7 @@ import com.baba.back.oauth.domain.token.Token;
 import com.baba.back.oauth.dto.MemberResponse;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
+import com.baba.back.oauth.dto.SignUpWithBabyResponse;
 import com.baba.back.oauth.exception.MemberBadRequestException;
 import com.baba.back.oauth.exception.MemberNotFoundException;
 import com.baba.back.oauth.repository.MemberRepository;
@@ -41,7 +42,7 @@ public class MemberService {
     private final TokenRepository tokenRepository;
     private final Clock clock;
 
-    public MemberSignUpResponse signUp(MemberSignUpRequest request, String memberId) {
+    public SignUpWithBabyResponse signUpWithBaby(MemberSignUpRequest request, String memberId) {
         validateSignUp(memberId);
         final Member member = saveMember(memberId, request);
 
@@ -52,7 +53,7 @@ public class MemberService {
         final String refreshToken = refreshTokenProvider.createToken(memberId);
         saveRefreshToken(member, refreshToken);
 
-        return new MemberSignUpResponse(accessToken, refreshToken);
+        return new SignUpWithBabyResponse(new MemberSignUpResponse(accessToken, refreshToken), babies.getFirstBabyId());
     }
 
     private void validateSignUp(String memberId) {
@@ -81,7 +82,7 @@ public class MemberService {
     private void saveRelations(Babies babies, Member member, String relationName) {
         final Color groupColor = Color.from(picker);
 
-        babies.getBabies()
+        babies.getValues()
                 .stream()
                 .map(baby -> {
                     final RelationGroup relationGroup = saveRelationGroup(baby, groupColor);

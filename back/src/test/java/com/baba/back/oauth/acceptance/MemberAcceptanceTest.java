@@ -1,5 +1,6 @@
 package com.baba.back.oauth.acceptance;
 
+import static com.baba.back.SimpleRestAssured.post;
 import static com.baba.back.SimpleRestAssured.toObject;
 import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.RequestFixture.멤버_가입_요청_데이터;
@@ -19,6 +20,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -41,7 +43,8 @@ class MemberAcceptanceTest extends AcceptanceTest {
     @ValueSource(strings = "invalidToken")
     void 아기_등록_회원가입_요청에_유효하지_않은_sign_토큰으로_요청_시_401을_응답한다(String invalidSignToken) {
         // given
-        final ExtractableResponse<Response> response = 아기_등록_회원가입_요청(invalidSignToken, 멤버_가입_요청_데이터);
+        final ExtractableResponse<Response> response = post("/api/members/baby",
+                Map.of("Authorization", "Bearer " + invalidSignToken), 멤버_가입_요청_데이터);
 
         // when & then
         assertAll(
@@ -57,8 +60,7 @@ class MemberAcceptanceTest extends AcceptanceTest {
                 List.of(new BabyRequest("아기1", LocalDate.of(2022, 1, 1)),
                         new BabyRequest("아기2", LocalDate.of(2023, 1, 1)))
         );
-        final String signToken = signTokenProvider.createToken(MEMBER_ID);
-        final ExtractableResponse<Response> response = 아기_등록_회원가입_요청(signToken, invalidMemberSignUpRequest);
+        final ExtractableResponse<Response> response = 아기_등록_회원가입_요청(invalidMemberSignUpRequest);
 
         // when & then
         assertAll(
@@ -70,10 +72,10 @@ class MemberAcceptanceTest extends AcceptanceTest {
     @Test
     void 아기_등록_회원가입_요청_시_이미_가입한_유저가_회원가입을_요청하면_400을_던진다() {
         // given
-        아기_등록_회원가입_요청_멤버_1();
+        아기_등록_회원가입_요청();
 
         // when
-        final ExtractableResponse<Response> response = 아기_등록_회원가입_요청_멤버_1();
+        final ExtractableResponse<Response> response = 아기_등록_회원가입_요청();
 
         //  then
         assertAll(
@@ -85,11 +87,12 @@ class MemberAcceptanceTest extends AcceptanceTest {
     @Test
     void 아기_등록_회원가입을_진행한다() {
         // when
-        final ExtractableResponse<Response> response = 아기_등록_회원가입_요청_멤버_1();
+        final ExtractableResponse<Response> response = 아기_등록_회원가입_요청();
 
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                () -> assertThat(getBabyId(response)).isNotBlank(),
                 () -> assertThat(response.as(MemberSignUpResponse.class).accessToken()).isNotBlank(),
                 () -> assertThat(response.as(MemberSignUpResponse.class).refreshToken()).isNotBlank()
         );
@@ -98,8 +101,7 @@ class MemberAcceptanceTest extends AcceptanceTest {
     @Test
     void 사용자_정보를_조회한다() {
         // given
-        final String signToken = signTokenProvider.createToken(멤버1.getId());
-        final ExtractableResponse<Response> 아기_등록_회원가입_응답 = 아기_등록_회원가입_요청(signToken, 멤버_가입_요청_데이터);
+        final ExtractableResponse<Response> 아기_등록_회원가입_응답 = 아기_등록_회원가입_요청(멤버_가입_요청_데이터);
         final String accessToken = toObject(아기_등록_회원가입_응답, MemberSignUpResponse.class).accessToken();
 
         // when

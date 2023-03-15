@@ -7,9 +7,9 @@ import com.baba.back.content.domain.FileHandler;
 import com.baba.back.content.domain.ImageFile;
 import com.baba.back.content.domain.Like;
 import com.baba.back.content.domain.content.Content;
-import com.baba.back.content.domain.content.ContentDate;
+import com.baba.back.content.dto.ContentResponse;
+import com.baba.back.content.dto.ContentsResponse;
 import com.baba.back.content.dto.CreateContentRequest;
-import com.baba.back.content.dto.CreateContentResponse;
 import com.baba.back.content.dto.LikeContentResponse;
 import com.baba.back.content.exception.ContentAuthorizationException;
 import com.baba.back.content.exception.ContentBadRequestException;
@@ -24,6 +24,7 @@ import com.baba.back.relation.exception.RelationNotFoundException;
 import com.baba.back.relation.repository.RelationRepository;
 import java.time.Clock;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -42,7 +43,7 @@ public class ContentService {
     private final FileHandler fileHandler;
     private final Clock clock;
 
-    public CreateContentResponse createContent(CreateContentRequest request, String memberId, String babyId) {
+    public Long createContent(CreateContentRequest request, String memberId, String babyId) {
         final Member member = findMember(memberId);
         final Baby baby = findBaby(babyId);
         final Relation relation = findRelation(member, baby);
@@ -55,16 +56,17 @@ public class ContentService {
                 .cardStyle(request.getCardStyle())
                 .baby(baby)
                 .owner(member)
+                .relation(relation.getRelationName())
                 .build();
 
-        checkDuplication(content.getContentDate(), baby);
+        checkDuplication(baby, content.getContentDate());
 
         final ImageFile imageFile = new ImageFile(request.getPhoto());
         final String imageSource = fileHandler.upload(imageFile);
         content.updateURL(imageSource);
-        contentRepository.save(content);
+        final Content savedContent = contentRepository.save(content);
 
-        return new CreateContentResponse(true);
+        return savedContent.getId();
     }
 
     private Member findMember(String memberId) {
@@ -89,8 +91,8 @@ public class ContentService {
         }
     }
 
-    private void checkDuplication(ContentDate contentDate, Baby baby) {
-        if (contentRepository.existsByContentDateAndBaby(contentDate, baby)) {
+    private void checkDuplication(Baby baby, LocalDate contentDate) {
+        if (contentRepository.existsByBabyAndContentDateValue(baby, contentDate)) {
             throw new ContentBadRequestException("컨텐츠가 이미 존재합니다.");
         }
     }
@@ -113,7 +115,7 @@ public class ContentService {
     }
 
     private Like findAndUpdateLike(Member member, Content content) {
-        final Optional<Like> like = likeRepository.findByMemberAndContent(member, content);
+        final Optional<Like> like = likeRepository.findByContentAndMember(content, member);
         like.ifPresent(Like::updateDeleted);
 
         return like.orElseGet(
@@ -121,5 +123,30 @@ public class ContentService {
                         .member(member)
                         .content(content)
                         .build());
+    }
+
+    public ContentsResponse getContents(String memberId, String babyId, int year, int month) {
+        final Member member = findMember(memberId);
+        final Baby baby = findBaby(babyId);
+        findRelation(member, baby);
+
+        List<Content> contents = contentRepository.findByBabyYearAndMonth(baby, year, month);
+
+        return new ContentsResponse(
+                contents.stream()
+                        .map(
+                                content -> new ContentResponse(
+                                content.getId(),
+                                content.getOwnerName(),
+                                content.getRelationName(),
+                                content.getContentDate(),
+                                content.getTitle(),
+                                likeRepository.existsByContentAndMember(content, member),
+                                content.getImageSource(),
+                                content.getCardStyle()
+                        ))
+                        .sorted()
+                        .toList()
+        );
     }
 }

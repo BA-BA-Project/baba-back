@@ -2,7 +2,7 @@ package com.baba.back.relation.domain;
 
 import com.baba.back.baby.domain.Baby;
 import com.baba.back.oauth.domain.member.Color;
-import com.baba.back.oauth.domain.member.Name;
+import com.baba.back.common.domain.Name;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -44,5 +44,17 @@ public class RelationGroup {
         this.relationGroupName = new Name(relationGroupName);
         this.groupColor = groupColor;
         this.family = family;
+    }
+
+    public String getBabyId() {
+        return this.baby.getId();
+    }
+
+    public String getBabyName() {
+        return this.baby.getName();
+    }
+
+    public String getGroupColor() {
+        return this.groupColor.getValue();
     }
 }

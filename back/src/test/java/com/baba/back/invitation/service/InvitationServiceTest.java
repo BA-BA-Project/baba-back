@@ -4,6 +4,8 @@ import static com.baba.back.fixture.DomainFixture.관계1;
 import static com.baba.back.fixture.DomainFixture.관계2;
 import static com.baba.back.fixture.DomainFixture.관계그룹3;
 import static com.baba.back.fixture.DomainFixture.관계그룹4;
+import static com.baba.back.fixture.DomainFixture.관계그룹5;
+import static com.baba.back.fixture.DomainFixture.관계그룹6;
 import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.DomainFixture.아기1;
 import static com.baba.back.fixture.DomainFixture.아기2;
@@ -105,9 +107,9 @@ class InvitationServiceTest {
         given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
         given(relationRepository.findAllByMemberAndRelationGroupFamily(멤버1, true)).willReturn(List.of(관계1, 관계2));
         given(relationGroupRepository.findByBabyAndRelationGroupNameValue(아기1, 초대코드_생성_요청_데이터.getRelationGroup()))
-                .willReturn(Optional.of(관계그룹3));
+                .willReturn(Optional.of(관계그룹5));
         given(relationGroupRepository.findByBabyAndRelationGroupNameValue(아기2, 초대코드_생성_요청_데이터.getRelationGroup()))
-                .willReturn(Optional.of(관계그룹4));
+                .willReturn(Optional.of(관계그룹6));
         given(clock.instant()).willReturn(now.instant());
         given(clock.getZone()).willReturn(now.getZone());
         given(invitationCodeRepository.save(any(InvitationCode.class))).willReturn(초대코드정보);

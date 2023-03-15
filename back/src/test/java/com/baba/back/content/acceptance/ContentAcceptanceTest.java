@@ -1,12 +1,9 @@
 package com.baba.back.content.acceptance;
 
-import static com.baba.back.SimpleRestAssured.post;
 import static com.baba.back.SimpleRestAssured.thenExtract;
 import static com.baba.back.SimpleRestAssured.toObject;
-import static com.baba.back.fixture.DomainFixture.관계그룹1;
-import static com.baba.back.fixture.DomainFixture.멤버1;
+import static com.baba.back.fixture.DomainFixture.nowDate;
 import static com.baba.back.fixture.DomainFixture.아기1;
-import static com.baba.back.fixture.DomainFixture.컨텐츠;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
@@ -15,54 +12,26 @@ import static org.mockito.BDDMockito.given;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.baba.back.AcceptanceTest;
-import com.baba.back.baby.domain.Baby;
-import com.baba.back.baby.repository.BabyRepository;
-import com.baba.back.content.domain.content.Content;
-import com.baba.back.content.dto.CreateContentResponse;
+import com.baba.back.content.dto.ContentResponse;
+import com.baba.back.content.dto.ContentsResponse;
 import com.baba.back.content.dto.LikeContentResponse;
-import com.baba.back.content.repository.ContentRepository;
-import com.baba.back.oauth.repository.MemberRepository;
-import com.baba.back.oauth.service.AccessTokenProvider;
-import com.baba.back.relation.domain.Relation;
-import com.baba.back.relation.domain.RelationGroup;
-import com.baba.back.relation.repository.RelationGroupRepository;
-import com.baba.back.relation.repository.RelationRepository;
+import com.baba.back.oauth.dto.MemberSignUpResponse;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 public class ContentAcceptanceTest extends AcceptanceTest {
 
-    public static final String BASE_PATH = "/api/album";
     public static final String VALID_URL = "http://test";
-
-    @Autowired
-    private AccessTokenProvider tokenProvider;
-
-    @Autowired
-    private MemberRepository memberRepository;
-
-    @Autowired
-    private BabyRepository babyRepository;
-
-    @Autowired
-    private RelationGroupRepository relationGroupRepository;
-
-    @Autowired
-    private RelationRepository relationRepository;
-
-    @Autowired
-    private ContentRepository contentRepository;
 
     @MockBean
     private AmazonS3 amazonS3;
@@ -70,17 +39,17 @@ public class ContentAcceptanceTest extends AcceptanceTest {
     @Test
     void 요청_body에_null값이_있으면_400을_던진다() {
         // given
-        final String token = tokenProvider.createToken(멤버1.getId());
+        final String accessToken = toObject(아기_등록_회원가입_요청(), MemberSignUpResponse.class).accessToken();
 
         // when
         final ExtractableResponse<Response> response = thenExtract(
                 RestAssured.given()
-                        .headers(Map.of("Authorization", "Bearer " + token))
+                        .headers(Map.of("Authorization", "Bearer " + accessToken))
                         .multiPart("photo", "test_file.jpg", "Something".getBytes(), MediaType.IMAGE_PNG_VALUE)
-                        .multiPart("date", LocalDate.of(2023, 1, 25).toString())
+                        .multiPart("date", LocalDate.now())
                         .multiPart("cardStyle", "card_basic_1")
                         .when()
-                        .post(Paths.get(BASE_PATH, 아기1.getId()).toString())
+                        .post("/api/album/" + 아기1.getId())
         );
 
         // then
@@ -90,30 +59,13 @@ public class ContentAcceptanceTest extends AcceptanceTest {
     @Test
     void AWS_자체_오류로_S3에_파일_업로드_실패시_500을_던진다() {
         // given
-        final String token = tokenProvider.createToken(멤버1.getId());
-
-        memberRepository.save(멤버1);
-        babyRepository.save(아기1);
-        final RelationGroup relationGroup = relationGroupRepository.save(관계그룹1);
-        relationRepository.save(Relation.builder()
-                .member(멤버1)
-                .relationName("아빠")
-                .relationGroup(relationGroup)
-                .build());
-
+        final ExtractableResponse<Response> signUpResponse = 아기_등록_회원가입_요청();
+        final String accessToken = toObject(signUpResponse, MemberSignUpResponse.class).accessToken();
+        final String babyId = getBabyId(signUpResponse);
         given(amazonS3.putObject(any())).willThrow(AmazonServiceException.class);
 
         // when
-        final ExtractableResponse<Response> response = thenExtract(
-                RestAssured.given()
-                        .headers(Map.of("Authorization", "Bearer " + token))
-                        .multiPart("photo", "test_file.jpg", "Something".getBytes(), MediaType.IMAGE_PNG_VALUE)
-                        .multiPart("date", LocalDate.of(2023, 1, 25).toString())
-                        .multiPart("title", "제목")
-                        .multiPart("cardStyle", "CARD_BASIC_1")
-                        .when()
-                        .post(Paths.get(BASE_PATH, 아기1.getId()).toString())
-        );
+        final ExtractableResponse<Response> response = 성장앨범_생성_요청(accessToken, babyId, nowDate);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -122,58 +74,34 @@ public class ContentAcceptanceTest extends AcceptanceTest {
     @Test
     void 컨텐츠를_생성한다() throws MalformedURLException {
         // given
-        final String token = tokenProvider.createToken(멤버1.getId());
-
-        memberRepository.save(멤버1);
-        babyRepository.save(아기1);
-        final RelationGroup relationGroup = relationGroupRepository.save(관계그룹1);
-        relationRepository.save(Relation.builder()
-                .member(멤버1)
-                .relationName("아빠")
-                .relationGroup(relationGroup)
-                .build());
-
+        final ExtractableResponse<Response> signUpResponse = 아기_등록_회원가입_요청();
+        final String accessToken = toObject(signUpResponse, MemberSignUpResponse.class).accessToken();
+        final String babyId = getBabyId(signUpResponse);
         given(amazonS3.getUrl(any(String.class), any(String.class))).willReturn(new URL(VALID_URL));
 
         // when
-        final ExtractableResponse<Response> response = thenExtract(
-                RestAssured.given()
-                        .headers(Map.of("Authorization", "Bearer " + token))
-                        .multiPart("photo", "test_file.jpg", "Something".getBytes(), MediaType.IMAGE_PNG_VALUE)
-                        .multiPart("date", LocalDate.of(2023, 1, 25).toString())
-                        .multiPart("title", "제목")
-                        .multiPart("cardStyle", "CARD_BASIC_1")
-                        .when()
-                        .post(Paths.get(BASE_PATH, 아기1.getId()).toString())
-        );
+        final ExtractableResponse<Response> response = 성장앨범_생성_요청(accessToken, babyId, nowDate);
 
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
-                () -> assertThat(toObject(response, CreateContentResponse.class).isSuccess()).isTrue()
+                () -> assertThat(getContentId(response)).isPositive()
         );
+
     }
 
     @Test
-    void 좋아요를_처음_누르면_좋아요가_추가된다() {
+    void 좋아요를_처음_누르면_좋아요가_추가된다() throws MalformedURLException {
         // given
-        final String token = tokenProvider.createToken(멤버1.getId());
+        final ExtractableResponse<Response> signUpResponse = 아기_등록_회원가입_요청();
+        final String accessToken = toObject(signUpResponse, MemberSignUpResponse.class).accessToken();
+        final String babyId = getBabyId(signUpResponse);
 
-        memberRepository.save(멤버1);
-        final Baby baby = babyRepository.save(아기1);
-        final RelationGroup relationGroup = relationGroupRepository.save(관계그룹1);
-        relationRepository.save(Relation.builder()
-                .member(멤버1)
-                .relationName("아빠")
-                .relationGroup(relationGroup)
-                .build());
-        final Content content = contentRepository.save(컨텐츠);
+        given(amazonS3.getUrl(any(String.class), any(String.class))).willReturn(new URL(VALID_URL));
+        final Long contentId = getContentId(성장앨범_생성_요청(accessToken, babyId, nowDate));
 
         // when
-        final ExtractableResponse<Response> response = post(
-                Paths.get(BASE_PATH, baby.getId(), content.getId().toString(), "like").toString(),
-                Map.of("Authorization", "Bearer " + token)
-        );
+        final ExtractableResponse<Response> response = 좋아요_요청(accessToken, babyId, contentId);
 
         // then
         assertAll(
@@ -183,31 +111,17 @@ public class ContentAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    void 좋아요를_처음_누르고_한번_더_누르면_기존의_좋아요가_취소된다() {
+    void 좋아요를_처음_누르고_한번_더_누르면_기존의_좋아요가_취소된다() throws MalformedURLException {
         // given
-        final String token = tokenProvider.createToken(멤버1.getId());
-
-        memberRepository.save(멤버1);
-        final Baby baby = babyRepository.save(아기1);
-
-        final RelationGroup relationGroup = relationGroupRepository.save(관계그룹1);
-        relationRepository.save(Relation.builder()
-                .member(멤버1)
-                .relationName("아빠")
-                .relationGroup(relationGroup)
-                .build());
-        final Content content = contentRepository.save(컨텐츠);
+        final ExtractableResponse<Response> signUpResponse = 아기_등록_회원가입_요청();
+        final String accessToken = toObject(signUpResponse, MemberSignUpResponse.class).accessToken();
+        final String babyId = getBabyId(signUpResponse);
+        given(amazonS3.getUrl(any(String.class), any(String.class))).willReturn(new URL(VALID_URL));
+        final Long contentId = getContentId(성장앨범_생성_요청(accessToken, babyId, nowDate));
+        좋아요_요청(accessToken, babyId, contentId);
 
         // when
-        post(
-                Paths.get(BASE_PATH, baby.getId(), content.getId().toString(), "like").toString(),
-                Map.of("Authorization", "Bearer " + token)
-        );
-
-        final ExtractableResponse<Response> response = post(
-                Paths.get(BASE_PATH, baby.getId(), content.getId().toString(), "like").toString(),
-                Map.of("Authorization", "Bearer " + token)
-        );
+        final ExtractableResponse<Response> response = 좋아요_요청(accessToken, babyId, contentId);
 
         // then
         assertAll(
@@ -217,42 +131,60 @@ public class ContentAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    void 좋아요를_취소하고_한번_더_누르면_다시_좋아요가_된다() {
+    void 좋아요를_취소하고_한번_더_누르면_다시_좋아요가_된다() throws MalformedURLException {
         // given
-        final String token = tokenProvider.createToken(멤버1.getId());
-
-        memberRepository.save(멤버1);
-        final Baby baby = babyRepository.save(아기1);
-
-        final RelationGroup relationGroup = relationGroupRepository.save(관계그룹1);
-        relationRepository.save(Relation.builder()
-                .member(멤버1)
-                .relationName("아빠")
-                .relationGroup(relationGroup)
-                .build());
-        final Content content = contentRepository.save(컨텐츠);
+        final ExtractableResponse<Response> signUpResponse = 아기_등록_회원가입_요청();
+        final String accessToken = toObject(signUpResponse, MemberSignUpResponse.class).accessToken();
+        final String babyId = getBabyId(signUpResponse);
+        given(amazonS3.getUrl(any(String.class), any(String.class))).willReturn(new URL(VALID_URL));
+        final Long contentId = getContentId(성장앨범_생성_요청(accessToken, babyId, nowDate));
+        좋아요_요청(accessToken, babyId, contentId);
+        좋아요_요청(accessToken, babyId, contentId);
 
         // when
-        post(
-                Paths.get(BASE_PATH, baby.getId(), content.getId().toString(), "like").toString(),
-                Map.of("Authorization", "Bearer " + token)
-        );
-
-        // when
-        post(
-                Paths.get(BASE_PATH, baby.getId(), content.getId().toString(), "like").toString(),
-                Map.of("Authorization", "Bearer " + token)
-        );
-
-        final ExtractableResponse<Response> response = post(
-                Paths.get(BASE_PATH, baby.getId(), content.getId().toString(), "like").toString(),
-                Map.of("Authorization", "Bearer " + token)
-        );
+        final ExtractableResponse<Response> response = 좋아요_요청(accessToken, babyId, contentId);
 
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(toObject(response, LikeContentResponse.class).isLiked()).isTrue()
         );
+    }
+
+    @Test
+    void 원하는_년_월의_성장_앨범을_조회한다() throws MalformedURLException {
+        // given
+        final ExtractableResponse<Response> signUpResponse = 아기_등록_회원가입_요청();
+        final String accessToken = toObject(signUpResponse, MemberSignUpResponse.class).accessToken();
+        final String babyId = getBabyId(signUpResponse);
+        given(amazonS3.getUrl(any(String.class), any(String.class))).willReturn(new URL(VALID_URL));
+        성장앨범_생성_요청(accessToken, babyId, nowDate);
+        성장앨범_생성_요청(accessToken, babyId, nowDate.minusDays(1));
+        성장앨범_생성_요청(accessToken, babyId, nowDate.minusDays(2));
+        성장앨범_생성_요청(accessToken, babyId, nowDate.minusDays(3));
+
+        // when
+        final ExtractableResponse<Response> response = 성장_앨범_메인_요청(
+                accessToken, babyId, nowDate.getYear(), nowDate.getMonthValue()
+        );
+
+        // then
+        final List<ContentResponse> album = toObject(response, ContentsResponse.class).album();
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(album).hasSize(4),
+                () -> assertThat(album.stream().map(ContentResponse::date).toList())
+                        .containsExactly(
+                                nowDate.minusDays(3),
+                                nowDate.minusDays(2),
+                                nowDate.minusDays(1),
+                                nowDate
+                        )
+        );
+    }
+
+    // TODO: 2023/03/12 초대 로직 생성 후 테스트 작성
+    @Test
+    void 원하는_년_월의_내가_올린_성장_앨범과_다른_사람이_올린_성장_앨범을_조회한다() {
     }
 }

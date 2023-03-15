@@ -1,9 +1,9 @@
 package com.baba.back.oauth.service;
 
 import static com.baba.back.fixture.DomainFixture.관계1;
-import static com.baba.back.fixture.DomainFixture.관계2;
+import static com.baba.back.fixture.DomainFixture.관계3;
 import static com.baba.back.fixture.DomainFixture.관계그룹1;
-import static com.baba.back.fixture.DomainFixture.관계그룹2;
+import static com.baba.back.fixture.DomainFixture.관계그룹3;
 import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.DomainFixture.아기1;
 import static com.baba.back.fixture.DomainFixture.아기2;
@@ -27,6 +27,7 @@ import com.baba.back.oauth.domain.token.Token;
 import com.baba.back.oauth.dto.MemberResponse;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
+import com.baba.back.oauth.dto.SignUpWithBabyResponse;
 import com.baba.back.oauth.exception.MemberBadRequestException;
 import com.baba.back.oauth.exception.MemberNotFoundException;
 import com.baba.back.oauth.repository.MemberRepository;
@@ -88,7 +89,7 @@ class MemberServiceTest {
         given(memberRepository.existsById(memberId)).willReturn(true);
 
         // when & then
-        assertThatThrownBy(() -> memberService.signUp(new MemberSignUpRequest(), memberId))
+        assertThatThrownBy(() -> memberService.signUpWithBaby(new MemberSignUpRequest(), memberId))
                 .isInstanceOf(MemberBadRequestException.class);
     }
 
@@ -107,14 +108,14 @@ class MemberServiceTest {
         given(clock.instant()).willReturn(now.instant());
         given(clock.getZone()).willReturn(now.getZone());
         given(babyRepository.save(any(Baby.class))).willReturn(아기1, 아기2);
-        given(relationGroupRepository.save(any(RelationGroup.class))).willReturn(관계그룹1, 관계그룹2);
-        given(relationRepository.save(any(Relation.class))).willReturn(관계1, 관계2);
+        given(relationGroupRepository.save(any(RelationGroup.class))).willReturn(관계그룹1, 관계그룹3);
+        given(relationRepository.save(any(Relation.class))).willReturn(관계1, 관계3);
         given(accessTokenProvider.createToken(memberId)).willReturn(accessToken);
         given(refreshTokenProvider.createToken(memberId)).willReturn(refreshToken);
         given(tokenRepository.save(any(Token.class))).willReturn(any());
 
         // when
-        final MemberSignUpResponse response = memberService.signUp(멤버_가입_요청_데이터, memberId);
+        final SignUpWithBabyResponse response = memberService.signUpWithBaby(멤버_가입_요청_데이터, memberId);
 
         //then
         then(memberRepository).should(times(1)).save(any());
@@ -123,9 +124,10 @@ class MemberServiceTest {
         then(relationGroupRepository).should(times(2)).save(any(RelationGroup.class));
         then(relationRepository).should(times(2)).save(any());
 
+        final MemberSignUpResponse memberSignUpResponse = response.memberSignUpResponse();
         assertAll(
-                () -> assertThat(response.accessToken()).isEqualTo(accessToken),
-                () -> assertThat(response.refreshToken()).isEqualTo(refreshToken)
+                () -> assertThat(memberSignUpResponse.accessToken()).isEqualTo(accessToken),
+                () -> assertThat(memberSignUpResponse.refreshToken()).isEqualTo(refreshToken)
         );
     }
 

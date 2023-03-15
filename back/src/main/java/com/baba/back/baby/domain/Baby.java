@@ -1,6 +1,6 @@
 package com.baba.back.baby.domain;
 
-import com.baba.back.oauth.domain.member.Name;
+import com.baba.back.common.domain.Name;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -32,5 +32,9 @@ public class Baby {
 
     public LocalDate getBirthday() {
         return birthday.getBirthday();
+    }
+
+    public String getName() {
+        return this.name.getValue();
     }
 }
