@@ -1,6 +1,7 @@
 package com.baba.back.invitation.domain;
 
 import com.baba.back.invitation.exception.ExpirationBadReqeustException;
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -13,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class Expiration {
     public static final int EXPIRATION_DAYS = 10;
 
+    @Column(name = "expiration")
     private LocalDateTime value;
 
     private Expiration(LocalDateTime value) {
