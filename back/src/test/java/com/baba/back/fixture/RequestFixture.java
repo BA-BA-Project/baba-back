@@ -35,6 +35,9 @@ public class RequestFixture {
             new MockMultipartFile("photo", "file.png", "image/png",
                     "Mock File".getBytes()), CARD_BASIC_1.toString());
 
-    public static final CreateInviteCodeRequest 초대코드_생성_요청_데이터 = new CreateInviteCodeRequest(
+    public static final CreateInviteCodeRequest 초대코드_생성_요청_데이터1 = new CreateInviteCodeRequest(
             "외가", "이모");
+
+    public static final CreateInviteCodeRequest 초대코드_생성_요청_데이터2 = new CreateInviteCodeRequest(
+            "가족", "아빠");
 }

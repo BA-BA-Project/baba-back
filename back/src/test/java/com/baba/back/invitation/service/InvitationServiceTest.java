@@ -2,8 +2,6 @@ package com.baba.back.invitation.service;
 
 import static com.baba.back.fixture.DomainFixture.관계1;
 import static com.baba.back.fixture.DomainFixture.관계2;
-import static com.baba.back.fixture.DomainFixture.관계그룹3;
-import static com.baba.back.fixture.DomainFixture.관계그룹4;
 import static com.baba.back.fixture.DomainFixture.관계그룹5;
 import static com.baba.back.fixture.DomainFixture.관계그룹6;
 import static com.baba.back.fixture.DomainFixture.멤버1;
@@ -12,7 +10,7 @@ import static com.baba.back.fixture.DomainFixture.아기2;
 import static com.baba.back.fixture.DomainFixture.초대코드정보;
 import static com.baba.back.fixture.DomainFixture.초대1;
 import static com.baba.back.fixture.DomainFixture.초대2;
-import static com.baba.back.fixture.RequestFixture.초대코드_생성_요청_데이터;
+import static com.baba.back.fixture.RequestFixture.초대코드_생성_요청_데이터1;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -70,7 +68,7 @@ class InvitationServiceTest {
         given(memberRepository.findById(멤버1.getId())).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> invitationService.createInviteCode(초대코드_생성_요청_데이터, 멤버1.getId()))
+        assertThatThrownBy(() -> invitationService.createInviteCode(초대코드_생성_요청_데이터1, 멤버1.getId()))
                 .isInstanceOf(MemberNotFoundException.class);
     }
 
@@ -81,7 +79,7 @@ class InvitationServiceTest {
         given(relationRepository.findAllByMemberAndRelationGroupFamily(멤버1, true)).willReturn(List.of());
 
         // when & then
-        assertThatThrownBy(() -> invitationService.createInviteCode(초대코드_생성_요청_데이터, 멤버1.getId()))
+        assertThatThrownBy(() -> invitationService.createInviteCode(초대코드_생성_요청_데이터1, 멤버1.getId()))
                 .isInstanceOf(RelationNotFoundException.class);
     }
 
@@ -91,11 +89,11 @@ class InvitationServiceTest {
         given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
         given(relationRepository.findAllByMemberAndRelationGroupFamily(멤버1, true)).willReturn(List.of(관계1, 관계2));
         given(relationGroupRepository.findByBabyAndRelationGroupNameValue(
-                any(Baby.class), eq(초대코드_생성_요청_데이터.getRelationGroup())))
+                any(Baby.class), eq(초대코드_생성_요청_데이터1.getRelationGroup())))
                 .willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> invitationService.createInviteCode(초대코드_생성_요청_데이터, 멤버1.getId()))
+        assertThatThrownBy(() -> invitationService.createInviteCode(초대코드_생성_요청_데이터1, 멤버1.getId()))
                 .isInstanceOf(RelationGroupNotFoundException.class);
     }
 
@@ -106,9 +104,9 @@ class InvitationServiceTest {
 
         given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
         given(relationRepository.findAllByMemberAndRelationGroupFamily(멤버1, true)).willReturn(List.of(관계1, 관계2));
-        given(relationGroupRepository.findByBabyAndRelationGroupNameValue(아기1, 초대코드_생성_요청_데이터.getRelationGroup()))
+        given(relationGroupRepository.findByBabyAndRelationGroupNameValue(아기1, 초대코드_생성_요청_데이터1.getRelationGroup()))
                 .willReturn(Optional.of(관계그룹5));
-        given(relationGroupRepository.findByBabyAndRelationGroupNameValue(아기2, 초대코드_생성_요청_데이터.getRelationGroup()))
+        given(relationGroupRepository.findByBabyAndRelationGroupNameValue(아기2, 초대코드_생성_요청_데이터1.getRelationGroup()))
                 .willReturn(Optional.of(관계그룹6));
         given(clock.instant()).willReturn(now.instant());
         given(clock.getZone()).willReturn(now.getZone());
@@ -116,7 +114,7 @@ class InvitationServiceTest {
         given(invitationRepository.save(any(Invitation.class))).willReturn(초대1, 초대2);
 
         // when
-        final CreateInviteCodeResponse response = invitationService.createInviteCode(초대코드_생성_요청_데이터, 멤버1.getId());
+        final CreateInviteCodeResponse response = invitationService.createInviteCode(초대코드_생성_요청_데이터1, 멤버1.getId());
 
         // then
         assertThat(response.inviteCode()).isNotBlank();

@@ -6,6 +6,7 @@ import static com.baba.back.SimpleRestAssured.thenExtract;
 import static com.baba.back.fixture.RequestFixture.멤버_가입_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.소셜_토큰_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.약관_동의_요청_데이터;
+import static com.baba.back.fixture.RequestFixture.초대코드_생성_요청_데이터2;
 
 import com.baba.back.oauth.dto.MemberSignUpRequest;
 import com.baba.back.oauth.dto.TokenRefreshRequest;
@@ -96,6 +97,12 @@ public class AcceptanceTest {
                 CONTENT_BASE_PATH + "/" + babyId + "?year=" + year + "&month=" + month,
                 Map.of("Authorization", "Bearer " + accessToken)
         );
+    }
+
+    protected ExtractableResponse<Response> 초대_코드_생성_요청(String accessToken) {
+        return post(BABY_BASE_PATH + "/invite-code",
+                Map.of("Authorization", "Bearer " + accessToken),
+                초대코드_생성_요청_데이터2);
     }
 
     protected Long getContentId(ExtractableResponse<Response> response) {
