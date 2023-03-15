@@ -4,6 +4,8 @@ import com.baba.back.baby.domain.Baby;
 import com.baba.back.content.domain.Like;
 import com.baba.back.content.domain.content.CardStyle;
 import com.baba.back.content.domain.content.Content;
+import com.baba.back.invitation.domain.InvitationCode;
+import com.baba.back.invitation.domain.Invitation;
 import com.baba.back.oauth.domain.member.Color;
 import com.baba.back.oauth.domain.member.IconName;
 import com.baba.back.oauth.domain.member.Member;
@@ -11,6 +13,7 @@ import com.baba.back.oauth.domain.token.Token;
 import com.baba.back.relation.domain.Relation;
 import com.baba.back.relation.domain.RelationGroup;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class DomainFixture {
 
@@ -43,8 +46,20 @@ public class DomainFixture {
             .build();
 
     public static final RelationGroup 관계그룹2 = RelationGroup.builder()
+            .baby(아기2)
+            .relationGroupName("가족")
+            .family(true)
+            .build();
+
+    public static final RelationGroup 관계그룹3 = RelationGroup.builder()
             .baby(아기1)
-            .relationGroupName("친구")
+            .relationGroupName("외가")
+            .family(false)
+            .build();
+
+    public static final RelationGroup 관계그룹4 = RelationGroup.builder()
+            .baby(아기2)
+            .relationGroupName("외가")
             .family(false)
             .build();
 
@@ -77,5 +92,21 @@ public class DomainFixture {
     public static final Token 토큰 = Token.builder()
             .member(멤버1)
             .value("토큰")
+            .build();
+
+    public static final InvitationCode 초대코드정보 = InvitationCode.builder()
+            .inviteCode("AAAAAA")
+            .relationName("이모")
+            .now(LocalDateTime.now())
+            .build();
+
+    public static final Invitation 초대1 = Invitation.builder()
+            .invitationCode(초대코드정보)
+            .relationGroup(관계그룹3)
+            .build();
+
+    public static final Invitation 초대2 = Invitation.builder()
+            .invitationCode(초대코드정보)
+            .relationGroup(관계그룹4)
             .build();
 }
