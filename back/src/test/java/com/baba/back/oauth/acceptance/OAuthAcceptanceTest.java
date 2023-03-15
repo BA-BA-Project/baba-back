@@ -2,6 +2,7 @@ package com.baba.back.oauth.acceptance;
 
 import static com.baba.back.SimpleRestAssured.toObject;
 import static com.baba.back.fixture.DomainFixture.멤버1;
+import static com.baba.back.fixture.RequestFixture.멤버_가입_요청_데이터;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,8 +38,8 @@ class OAuthAcceptanceTest extends AcceptanceTest {
     @Test
     void 소셜_로그인_요청_시_이미_가입되어_있으면_access_token과_refresh_token_과_200을_응답한다() {
         // given
-        아기_등록_회원가입_요청_멤버_1();
-        given(oAuthClient.getMemberId(any())).willReturn(멤버1.getId());
+        아기_등록_회원가입_요청();
+        given(oAuthClient.getMemberId(any())).willReturn("member");
 
         // when
         final ExtractableResponse<Response> response = 소셜_로그인_요청();
@@ -67,8 +68,8 @@ class OAuthAcceptanceTest extends AcceptanceTest {
     @Test
     void 약관_조회_요청_시_이미_가입되어_있으면_400을_응답한다() {
         // given
-        아기_등록_회원가입_요청_멤버_1();
-        given(oAuthClient.getMemberId(any())).willReturn(멤버1.getId());
+        아기_등록_회원가입_요청();
+        given(oAuthClient.getMemberId(any())).willReturn("member");
 
         // when
         final ExtractableResponse<Response> response = 약관_조회_요청();
@@ -95,8 +96,8 @@ class OAuthAcceptanceTest extends AcceptanceTest {
     @Test
     void 약관_동의_요청_시_이미_가입되어_있으면_400을_응답한다() {
         // given
-        아기_등록_회원가입_요청_멤버_1();
-        given(oAuthClient.getMemberId(any())).willReturn(멤버1.getId());
+        아기_등록_회원가입_요청(멤버_가입_요청_데이터);
+        given(oAuthClient.getMemberId(any())).willReturn("member");
 
         // when
         final ExtractableResponse<Response> response = 약관_동의_요청();
@@ -123,7 +124,7 @@ class OAuthAcceptanceTest extends AcceptanceTest {
     @Test
     void 토큰_재발급_요청_시_refresh토큰의_만료기간이_하루보다_많이_남았으면_access토큰을_재발급하고_201을_응답한다() {
         // given
-        final ExtractableResponse<Response> 회원가입_응답 = 아기_등록_회원가입_요청_멤버_1();
+        final ExtractableResponse<Response> 회원가입_응답 = 아기_등록_회원가입_요청();
         final String refreshToken = toObject(회원가입_응답, MemberSignUpResponse.class).refreshToken();
         given(refreshTokenProvider.isExpiringSoon(refreshToken)).willReturn(false);
 
@@ -143,7 +144,7 @@ class OAuthAcceptanceTest extends AcceptanceTest {
     @Test
     void 토큰_재발급_요청_시_refresh토큰의_만료기간이_하루_이하로_남았으면_access토큰과_refresh토큰을_재발급하고_201을_응답한다() {
         // given
-        final ExtractableResponse<Response> 회원가입_응답 = 아기_등록_회원가입_요청_멤버_1();
+        final ExtractableResponse<Response> 회원가입_응답 = 아기_등록_회원가입_요청();
         final String refreshToken = toObject(회원가입_응답, MemberSignUpResponse.class).refreshToken();
         given(refreshTokenProvider.isExpiringSoon(refreshToken)).willReturn(true);
 

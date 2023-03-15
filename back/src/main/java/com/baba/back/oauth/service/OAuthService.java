@@ -73,7 +73,7 @@ public class OAuthService {
 
     private void validateMember(String memberId) {
         if (memberRepository.existsById(memberId)) {
-            throw new MemberBadRequestException("이미 회원가입된 유저는 약관을 조회할 수 없습니다.");
+            throw new MemberBadRequestException("이미 회원가입된 유저는 약관을 조회하거나 약관을 동의할 수 없습니다.");
         }
     }
 

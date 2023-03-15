@@ -26,7 +26,7 @@ class BabyAcceptanceTest extends AcceptanceTest {
     @Test
     void 아기_리스트_요청_시_등록된_아기가_조회된다() {
         // given
-        final String accessToken = toObject(아기_등록_회원가입_요청_멤버_1(), MemberSignUpResponse.class).accessToken();
+        final String accessToken = toObject(아기_등록_회원가입_요청(), MemberSignUpResponse.class).accessToken();
 
         // when
         final ExtractableResponse<Response> response = 아기_리스트_조회_요청(accessToken);

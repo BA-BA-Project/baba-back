@@ -1,6 +1,7 @@
 package com.baba.back.content.domain.content;
 
 import com.baba.back.content.exception.ImageSourceBadRequestException;
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.util.Objects;
 import lombok.Getter;
@@ -10,11 +11,13 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class ImageSource {
-    private String imageSource;
 
-    public ImageSource(String imageSource) {
-        validateNull(imageSource);
-        this.imageSource = imageSource;
+    @Column(name = "image_source")
+    private String value;
+
+    public ImageSource(String value) {
+        validateNull(value);
+        this.value = value;
     }
 
     private void validateNull(String imageSource) {

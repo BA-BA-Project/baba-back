@@ -1,7 +1,7 @@
 package com.baba.back.relation.domain;
 
 import com.baba.back.oauth.domain.member.Member;
-import com.baba.back.oauth.domain.member.Name;
+import com.baba.back.common.domain.Name;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
