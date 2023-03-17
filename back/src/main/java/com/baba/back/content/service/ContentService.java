@@ -4,22 +4,29 @@ import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.exception.BabyNotFoundException;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.common.FileHandler;
-import com.baba.back.content.domain.content.ImageFile;
 import com.baba.back.content.domain.Like;
+import com.baba.back.content.domain.comment.Comment;
+import com.baba.back.content.domain.comment.Tag;
 import com.baba.back.content.domain.content.Content;
+import com.baba.back.content.domain.content.ImageFile;
 import com.baba.back.content.dto.ContentResponse;
 import com.baba.back.content.dto.ContentsResponse;
+import com.baba.back.content.dto.CreateCommentRequest;
 import com.baba.back.content.dto.CreateContentRequest;
 import com.baba.back.content.dto.LikeContentResponse;
 import com.baba.back.content.exception.ContentAuthorizationException;
 import com.baba.back.content.exception.ContentBadRequestException;
 import com.baba.back.content.exception.ContentNotFountException;
+import com.baba.back.content.exception.TagBadRequestException;
+import com.baba.back.content.repository.CommentRepository;
 import com.baba.back.content.repository.ContentRepository;
 import com.baba.back.content.repository.LikeRepository;
+import com.baba.back.content.repository.TagRepository;
 import com.baba.back.oauth.domain.member.Member;
 import com.baba.back.oauth.exception.MemberNotFoundException;
 import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.relation.domain.Relation;
+import com.baba.back.relation.domain.RelationGroup;
 import com.baba.back.relation.exception.RelationNotFoundException;
 import com.baba.back.relation.repository.RelationRepository;
 import java.time.Clock;
@@ -40,6 +47,8 @@ public class ContentService {
     private final BabyRepository babyRepository;
     private final RelationRepository relationRepository;
     private final LikeRepository likeRepository;
+    private final CommentRepository commentRepository;
+    private final TagRepository tagRepository;
     private final FileHandler fileHandler;
     private final Clock clock;
 
@@ -136,17 +145,63 @@ public class ContentService {
                 contents.stream()
                         .map(
                                 content -> new ContentResponse(
-                                content.getId(),
-                                content.getOwnerName(),
-                                content.getRelationName(),
-                                content.getContentDate(),
-                                content.getTitle(),
-                                likeRepository.existsByContentAndMember(content, member),
-                                content.getImageSource(),
-                                content.getCardStyle()
-                        ))
+                                        content.getId(),
+                                        content.getOwnerName(),
+                                        content.getRelationName(),
+                                        content.getContentDate(),
+                                        content.getTitle(),
+                                        likeRepository.existsByContentAndMember(content, member),
+                                        content.getImageSource(),
+                                        content.getCardStyle()
+                                ))
                         .sorted()
                         .toList()
         );
+    }
+
+    public Long createComment(String memberId, String babyId, Long contentId, CreateCommentRequest request) {
+        final Member owner = findMember(memberId);
+        final Baby baby = findBaby(babyId);
+        final Relation ownerRelation = findRelation(owner, baby);
+
+        final Content content = findContent(contentId);
+        final Comment comment = Comment.builder()
+                .content(content)
+                .owner(owner)
+                .text(request.getComment())
+                .build();
+        commentRepository.save(comment);
+
+        final String tagMemberId = request.getTag();
+        if (tagMemberId.isBlank()) {
+            return comment.getId();
+        }
+
+        final RelationGroup ownerRelationGroup = ownerRelation.getRelationGroup();
+
+        final Member tagMember = findMember(tagMemberId);
+        final Relation tagMemberRelation = findRelation(tagMember, baby);
+        final RelationGroup tagMemberRelationGroup = tagMemberRelation.getRelationGroup();
+        validateRelationGroup(ownerRelationGroup, tagMemberRelationGroup);
+
+        final Tag tag = Tag.builder()
+                .comment(comment)
+                .tagMember(tagMember)
+                .build();
+        tagRepository.save(tag);
+
+        return comment.getId();
+    }
+
+    private void validateRelationGroup(RelationGroup ownerRelationGroup, RelationGroup tagMemberRelationGroup) {
+        if (!ownerRelationGroup.include(tagMemberRelationGroup)) {
+
+            throw new TagBadRequestException(
+                    String.format("%s에 속한 멤버는 %s에 속한 멤버를 태그할 수 없습니다.",
+                            ownerRelationGroup.getRelationGroupName(),
+                            tagMemberRelationGroup.getRelationGroupName()
+                    )
+            );
+        }
     }
 }

@@ -31,7 +31,7 @@ public class Relation {
     @AttributeOverride(name = "value", column = @Column(name = "relation_name"))
     private Name relationName;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     private RelationGroup relationGroup;
 
     @Builder

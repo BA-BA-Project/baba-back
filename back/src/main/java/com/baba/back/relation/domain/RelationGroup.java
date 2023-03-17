@@ -57,4 +57,12 @@ public class RelationGroup {
     public String getGroupColor() {
         return this.groupColor.getValue();
     }
+
+    public String getRelationGroupName() {
+        return relationGroupName.getValue();
+    }
+
+    public boolean include(RelationGroup other) {
+        return this.family || this.equals(other);
+    }
 }

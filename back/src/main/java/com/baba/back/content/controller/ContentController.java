@@ -1,6 +1,7 @@
 package com.baba.back.content.controller;
 
 import com.baba.back.content.dto.ContentsResponse;
+import com.baba.back.content.dto.CreateCommentRequest;
 import com.baba.back.content.dto.CreateContentRequest;
 import com.baba.back.content.dto.LikeContentResponse;
 import com.baba.back.content.service.ContentService;
@@ -74,5 +75,22 @@ public class ContentController {
                                                         @RequestParam("year") int year,
                                                         @RequestParam("month") int month) {
         return ResponseEntity.ok(contentService.getContents(memberId, babyId, year, month));
+    }
+
+    @Operation(summary = "성장 앨범 댓글 추가 요청")
+    @CreatedResponse
+    @UnAuthorizedResponse
+    @NotFoundResponse
+    @IntervalServerErrorResponse
+    @PostMapping("/album/{babyId}/{contentId}/comment")
+    public ResponseEntity<Void> createComment(@Login String memberId,
+                                              @PathVariable("babyId") String babyId,
+                                              @PathVariable("contentId") Long contentId,
+                                              @RequestBody CreateCommentRequest request) {
+
+        Long commentId = contentService.createComment(memberId, babyId, contentId, request);
+        return ResponseEntity
+                .created(URI.create("/album/" + babyId + "/" + commentId + "/comment/" + commentId))
+                .build();
     }
 }
