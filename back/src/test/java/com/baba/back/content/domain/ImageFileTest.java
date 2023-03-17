@@ -3,6 +3,7 @@ package com.baba.back.content.domain;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.baba.back.content.domain.content.ImageFile;
 import com.baba.back.content.exception.ImageFileBadRequestException;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;

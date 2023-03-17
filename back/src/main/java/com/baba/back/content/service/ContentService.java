@@ -4,7 +4,7 @@ import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.exception.BabyNotFoundException;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.common.FileHandler;
-import com.baba.back.content.domain.ImageFile;
+import com.baba.back.content.domain.content.ImageFile;
 import com.baba.back.content.domain.Like;
 import com.baba.back.content.domain.content.Content;
 import com.baba.back.content.dto.ContentResponse;

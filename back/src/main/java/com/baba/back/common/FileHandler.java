@@ -1,6 +1,6 @@
 package com.baba.back.common;
 
-import com.baba.back.content.domain.ImageFile;
+import com.baba.back.content.domain.content.ImageFile;
 
 public interface FileHandler {
     /**

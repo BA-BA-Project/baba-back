@@ -1,4 +1,4 @@
-package com.baba.back.content.domain;
+package com.baba.back.content.domain.content;
 
 import com.baba.back.content.exception.ImageFileBadRequestException;
 import java.util.Objects;
@@ -7,8 +7,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 public class ImageFile {
-    public static final String VALID_START_TYPE = "image";
-    public static final String INVALID_END_TYPE = "gif";
+    private static final String VALID_START_TYPE = "image";
+    private static final String INVALID_END_TYPE = "gif";
 
     private final MultipartFile file;
 

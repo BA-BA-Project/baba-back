@@ -19,7 +19,7 @@ import static org.mockito.Mockito.times;
 import com.baba.back.baby.exception.BabyNotFoundException;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.common.FileHandler;
-import com.baba.back.content.domain.ImageFile;
+import com.baba.back.content.domain.content.ImageFile;
 import com.baba.back.content.domain.content.Content;
 import com.baba.back.content.dto.ContentResponse;
 import com.baba.back.content.dto.ContentsResponse;
