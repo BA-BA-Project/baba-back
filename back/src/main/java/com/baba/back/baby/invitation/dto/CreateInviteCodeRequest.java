@@ -1,4 +1,4 @@
-package com.baba.back.invitation.dto;
+package com.baba.back.baby.invitation.dto;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

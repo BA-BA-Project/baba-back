@@ -1,8 +1,8 @@
-package com.baba.back.invitation.controller;
+package com.baba.back.baby.invitation.controller;
 
-import com.baba.back.invitation.dto.CreateInviteCodeRequest;
-import com.baba.back.invitation.dto.CreateInviteCodeResponse;
-import com.baba.back.invitation.service.InvitationService;
+import com.baba.back.baby.invitation.service.InvitationService;
+import com.baba.back.baby.invitation.dto.CreateInviteCodeRequest;
+import com.baba.back.baby.invitation.dto.CreateInviteCodeResponse;
 import com.baba.back.oauth.support.Login;
 import com.baba.back.swagger.BadRequestResponse;
 import com.baba.back.swagger.CreatedResponse;

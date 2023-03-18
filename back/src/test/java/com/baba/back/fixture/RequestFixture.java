@@ -4,7 +4,7 @@ import static com.baba.back.content.domain.content.CardStyle.CARD_BASIC_1;
 
 import com.baba.back.baby.dto.BabyRequest;
 import com.baba.back.content.dto.CreateContentRequest;
-import com.baba.back.invitation.dto.CreateInviteCodeRequest;
+import com.baba.back.baby.invitation.dto.CreateInviteCodeRequest;
 import com.baba.back.oauth.domain.Terms;
 import com.baba.back.oauth.dto.AgreeTermsRequest;
 import com.baba.back.oauth.dto.MemberSignUpRequest;

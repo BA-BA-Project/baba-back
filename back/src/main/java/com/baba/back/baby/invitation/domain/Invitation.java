@@ -1,4 +1,4 @@
-package com.baba.back.invitation.domain;
+package com.baba.back.baby.invitation.domain;
 
 import com.baba.back.relation.domain.RelationGroup;
 import jakarta.persistence.Entity;

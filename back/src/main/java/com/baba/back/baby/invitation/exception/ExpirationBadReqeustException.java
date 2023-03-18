@@ -1,4 +1,4 @@
-package com.baba.back.invitation.exception;
+package com.baba.back.baby.invitation.exception;
 
 import com.baba.back.exception.BadRequestException;
 

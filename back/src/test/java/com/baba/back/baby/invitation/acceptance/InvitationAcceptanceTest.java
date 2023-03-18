@@ -1,11 +1,11 @@
-package com.baba.back.invitation.acceptance;
+package com.baba.back.baby.invitation.acceptance;
 
 import static com.baba.back.SimpleRestAssured.toObject;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.baba.back.AcceptanceTest;
-import com.baba.back.invitation.dto.CreateInviteCodeResponse;
+import com.baba.back.baby.invitation.dto.CreateInviteCodeResponse;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
