@@ -1,13 +1,14 @@
-package com.baba.back.invitation.service;
+package com.baba.back.baby.invitation.service;
 
 import com.baba.back.baby.domain.Baby;
-import com.baba.back.invitation.domain.Invitation;
-import com.baba.back.invitation.domain.InvitationCode;
-import com.baba.back.invitation.dto.CreateInviteCodeRequest;
-import com.baba.back.invitation.dto.CreateInviteCodeResponse;
-import com.baba.back.invitation.exception.RelationGroupNotFoundException;
-import com.baba.back.invitation.repository.InvitationRepository;
-import com.baba.back.invitation.repository.InvitationCodeRepository;
+import com.baba.back.baby.invitation.domain.Invitation;
+import com.baba.back.baby.invitation.domain.InvitationCode;
+import com.baba.back.baby.invitation.domain.InviteCode;
+import com.baba.back.baby.invitation.dto.CreateInviteCodeRequest;
+import com.baba.back.baby.invitation.dto.CreateInviteCodeResponse;
+import com.baba.back.baby.invitation.exception.RelationGroupNotFoundException;
+import com.baba.back.baby.invitation.repository.InvitationRepository;
+import com.baba.back.baby.invitation.repository.InvitationCodeRepository;
 import com.baba.back.oauth.domain.member.Member;
 import com.baba.back.oauth.exception.MemberNotFoundException;
 import com.baba.back.oauth.repository.MemberRepository;
@@ -33,6 +34,7 @@ public class InvitationService {
     private final RelationGroupRepository relationGroupRepository;
     private final InvitationCodeRepository invitationCodeRepository;
     private final InvitationRepository invitationRepository;
+    private final CodeGenerator randomCodeGenerator;
     private final Clock clock;
 
     public CreateInviteCodeResponse createInviteCode(CreateInviteCodeRequest request, String memberId) {
@@ -40,11 +42,11 @@ public class InvitationService {
         final List<Relation> relations = findFamilyRelations(member);
         final List<RelationGroup> groups = findRelationGroups(relations, request.getRelationGroup());
 
-        final String inviteCode = InviteCodeGenerator.generate();
-        final InvitationCode invitationCode = saveInvitationCode(request, inviteCode);
+        final InviteCode inviteCode = InviteCode.from(randomCodeGenerator);
+        final InvitationCode invitationCode = saveInvitationCode(request.getRelationName(), inviteCode);
         createInvitation(groups, invitationCode);
 
-        return new CreateInviteCodeResponse(inviteCode);
+        return new CreateInviteCodeResponse(inviteCode.getValue());
     }
 
     private Member findMember(String memberId) {
@@ -60,11 +62,11 @@ public class InvitationService {
         return relations;
     }
 
-    private InvitationCode saveInvitationCode(CreateInviteCodeRequest request, String inviteCode) {
+    private InvitationCode saveInvitationCode(String relationName, InviteCode inviteCode) {
         return invitationCodeRepository.save(
                 InvitationCode.builder()
                         .inviteCode(inviteCode)
-                        .relationName(request.getRelationName())
+                        .relationName(relationName)
                         .now(LocalDateTime.now(clock))
                         .build()
         );

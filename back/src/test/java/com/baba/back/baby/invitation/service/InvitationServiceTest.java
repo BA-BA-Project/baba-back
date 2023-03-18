@@ -1,4 +1,4 @@
-package com.baba.back.invitation.service;
+package com.baba.back.baby.invitation.service;
 
 import static com.baba.back.fixture.DomainFixture.관계1;
 import static com.baba.back.fixture.DomainFixture.관계2;
@@ -7,23 +7,25 @@ import static com.baba.back.fixture.DomainFixture.관계그룹6;
 import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.DomainFixture.아기1;
 import static com.baba.back.fixture.DomainFixture.아기2;
-import static com.baba.back.fixture.DomainFixture.초대코드정보;
 import static com.baba.back.fixture.DomainFixture.초대1;
 import static com.baba.back.fixture.DomainFixture.초대2;
+import static com.baba.back.fixture.DomainFixture.초대코드정보;
 import static com.baba.back.fixture.RequestFixture.초대코드_생성_요청_데이터1;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 
 import com.baba.back.baby.domain.Baby;
-import com.baba.back.invitation.domain.InvitationCode;
-import com.baba.back.invitation.domain.Invitation;
-import com.baba.back.invitation.dto.CreateInviteCodeResponse;
-import com.baba.back.invitation.exception.RelationGroupNotFoundException;
-import com.baba.back.invitation.repository.InvitationRepository;
-import com.baba.back.invitation.repository.InvitationCodeRepository;
+import com.baba.back.baby.invitation.domain.Invitation;
+import com.baba.back.baby.invitation.domain.InvitationCode;
+import com.baba.back.baby.invitation.dto.CreateInviteCodeResponse;
+import com.baba.back.baby.invitation.exception.RelationGroupNotFoundException;
+import com.baba.back.baby.invitation.repository.InvitationCodeRepository;
+import com.baba.back.baby.invitation.repository.InvitationRepository;
 import com.baba.back.oauth.exception.MemberNotFoundException;
 import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.relation.exception.RelationNotFoundException;
@@ -58,6 +60,9 @@ class InvitationServiceTest {
 
     @Mock
     private InvitationRepository invitationRepository;
+
+    @Mock
+    private CodeGenerator codeGenerator;
 
     @Mock
     private Clock clock;
@@ -100,6 +105,7 @@ class InvitationServiceTest {
     @Test
     void 초대코드_생성_요청시_초대_코드를_생성한다() {
         // given
+        final String inviteCode = "AAAAAA";
         final Clock now = Clock.systemDefaultZone();
 
         given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
@@ -108,6 +114,7 @@ class InvitationServiceTest {
                 .willReturn(Optional.of(관계그룹5));
         given(relationGroupRepository.findByBabyAndRelationGroupNameValue(아기2, 초대코드_생성_요청_데이터1.getRelationGroup()))
                 .willReturn(Optional.of(관계그룹6));
+        given(codeGenerator.generate(anyInt(), anyString())).willReturn(inviteCode);
         given(clock.instant()).willReturn(now.instant());
         given(clock.getZone()).willReturn(now.getZone());
         given(invitationCodeRepository.save(any(InvitationCode.class))).willReturn(초대코드정보);
@@ -117,6 +124,6 @@ class InvitationServiceTest {
         final CreateInviteCodeResponse response = invitationService.createInviteCode(초대코드_생성_요청_데이터1, 멤버1.getId());
 
         // then
-        assertThat(response.inviteCode()).isNotBlank();
+        assertThat(response.inviteCode()).isEqualTo(inviteCode);
     }
 }

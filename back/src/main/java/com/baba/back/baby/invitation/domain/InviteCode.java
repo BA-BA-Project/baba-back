@@ -1,6 +1,7 @@
-package com.baba.back.invitation.domain;
+package com.baba.back.baby.invitation.domain;
 
-import com.baba.back.invitation.exception.InviteCodeBadRequestException;
+import com.baba.back.baby.invitation.exception.InviteCodeBadRequestException;
+import com.baba.back.baby.invitation.service.CodeGenerator;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.util.Objects;
@@ -11,8 +12,13 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class InviteCode {
-    public static final int INVITE_CODE_LENGTH = 6;
-    public static final String ALLOWED_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    private static final int INVITE_CODE_LENGTH = 6;
+    private static final String ALLOWED_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+    public static InviteCode from(CodeGenerator generator) {
+        final String generatedCode = generator.generate(INVITE_CODE_LENGTH, ALLOWED_CHARS);
+        return new InviteCode(generatedCode);
+    }
 
     @Column(name = "invite_code")
     private String value;

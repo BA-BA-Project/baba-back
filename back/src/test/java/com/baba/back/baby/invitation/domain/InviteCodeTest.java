@@ -1,14 +1,31 @@
-package com.baba.back.invitation.domain;
+package com.baba.back.baby.invitation.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.baba.back.invitation.exception.InviteCodeBadRequestException;
+import com.baba.back.baby.invitation.exception.InviteCodeBadRequestException;
+import com.baba.back.baby.invitation.service.CodeGenerator;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 class InviteCodeTest {
+
+    @Test
+    void generator를_통해_초대코드를_생성한다() {
+        // given
+        final String expectedCode = "ABCDEF";
+        final CodeGenerator generator = (length, chars) -> expectedCode;
+
+        // when
+        final InviteCode inviteCode = InviteCode.from(generator);
+
+        // then
+        assertThat(inviteCode.getValue()).isEqualTo(expectedCode);
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {"abcddef", "가나다라마바사"})
     @NullAndEmptySource

@@ -1,4 +1,4 @@
-package com.baba.back.invitation.domain;
+package com.baba.back.baby.invitation.domain;
 
 import com.baba.back.common.domain.Name;
 import jakarta.persistence.AttributeOverride;
@@ -32,8 +32,8 @@ public class InvitationCode {
     private Expiration expiration;
 
     @Builder
-    public InvitationCode(String inviteCode, String relationName, LocalDateTime now) {
-        this.inviteCode = new InviteCode(inviteCode);
+    public InvitationCode(InviteCode inviteCode, String relationName, LocalDateTime now) {
+        this.inviteCode = inviteCode;
         this.relationName = new Name(relationName);
         this.expiration = Expiration.from(now);
     }

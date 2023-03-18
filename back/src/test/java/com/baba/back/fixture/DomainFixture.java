@@ -1,11 +1,12 @@
 package com.baba.back.fixture;
 
 import com.baba.back.baby.domain.Baby;
+import com.baba.back.baby.invitation.domain.InviteCode;
 import com.baba.back.content.domain.Like;
 import com.baba.back.content.domain.content.CardStyle;
 import com.baba.back.content.domain.content.Content;
-import com.baba.back.invitation.domain.Invitation;
-import com.baba.back.invitation.domain.InvitationCode;
+import com.baba.back.baby.invitation.domain.Invitation;
+import com.baba.back.baby.invitation.domain.InvitationCode;
 import com.baba.back.oauth.domain.member.Color;
 import com.baba.back.oauth.domain.member.IconName;
 import com.baba.back.oauth.domain.member.Member;
@@ -173,7 +174,7 @@ public class DomainFixture {
             .build();
 
     public static final InvitationCode 초대코드정보 = InvitationCode.builder()
-            .inviteCode("AAAAAA")
+            .inviteCode(new InviteCode("AAAAAA"))
             .relationName("이모")
             .now(nowDateTime)
             .build();
