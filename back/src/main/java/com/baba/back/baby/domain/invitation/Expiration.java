@@ -1,6 +1,6 @@
-package com.baba.back.baby.invitation.domain;
+package com.baba.back.baby.domain.invitation;
 
-import com.baba.back.baby.invitation.exception.ExpirationBadReqeustException;
+import com.baba.back.baby.exception.ExpirationBadReqeustException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.time.LocalDateTime;

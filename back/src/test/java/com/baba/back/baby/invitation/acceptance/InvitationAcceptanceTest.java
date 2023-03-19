@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.baba.back.AcceptanceTest;
-import com.baba.back.baby.invitation.dto.CreateInviteCodeResponse;
+import com.baba.back.baby.dto.CreateInviteCodeResponse;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;

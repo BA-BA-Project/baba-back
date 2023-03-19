@@ -1,9 +1,9 @@
-package com.baba.back.baby.invitation.domain;
+package com.baba.back.baby.domain.invitation;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.baba.back.baby.invitation.exception.ExpirationBadReqeustException;
+import com.baba.back.baby.exception.ExpirationBadReqeustException;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 

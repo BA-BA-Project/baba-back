@@ -1,4 +1,4 @@
-package com.baba.back.baby.invitation.service;
+package com.baba.back.baby.service;
 
 @FunctionalInterface
 public interface CodeGenerator {

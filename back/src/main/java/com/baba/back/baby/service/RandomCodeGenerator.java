@@ -1,4 +1,4 @@
-package com.baba.back.baby.invitation.service;
+package com.baba.back.baby.service;
 
 import java.util.Random;
 import org.springframework.stereotype.Component;

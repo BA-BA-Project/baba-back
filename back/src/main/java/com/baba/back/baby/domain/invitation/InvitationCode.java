@@ -1,4 +1,4 @@
-package com.baba.back.baby.invitation.domain;
+package com.baba.back.baby.domain.invitation;
 
 import com.baba.back.common.domain.Name;
 import jakarta.persistence.AttributeOverride;
@@ -22,7 +22,7 @@ public class InvitationCode {
     private Long id;
 
     @Embedded
-    private InviteCode inviteCode;
+    private Code code;
 
     @Embedded
     @AttributeOverride(name = "name", column = @Column(name = "relation_name"))
@@ -32,8 +32,8 @@ public class InvitationCode {
     private Expiration expiration;
 
     @Builder
-    public InvitationCode(InviteCode inviteCode, String relationName, LocalDateTime now) {
-        this.inviteCode = inviteCode;
+    public InvitationCode(Code code, String relationName, LocalDateTime now) {
+        this.code = code;
         this.relationName = new Name(relationName);
         this.expiration = Expiration.from(now);
     }

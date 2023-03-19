@@ -1,6 +1,6 @@
-package com.baba.back.baby.invitation.repository;
+package com.baba.back.baby.repository;
 
-import com.baba.back.baby.invitation.domain.Invitation;
+import com.baba.back.baby.domain.invitation.Invitation;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface InvitationRepository extends JpaRepository<Invitation, Long> {
