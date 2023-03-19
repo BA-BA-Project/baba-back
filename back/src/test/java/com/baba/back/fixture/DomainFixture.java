@@ -174,7 +174,7 @@ public class DomainFixture {
             .build();
 
     public static final InvitationCode 초대코드정보 = InvitationCode.builder()
-            .inviteCode(new InviteCode("AAAAAA"))
+            .inviteCode(InviteCode.from("AAAAAA"))
             .relationName("이모")
             .now(nowDateTime)
             .build();

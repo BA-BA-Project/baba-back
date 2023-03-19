@@ -20,10 +20,14 @@ public class InviteCode {
         return new InviteCode(generatedCode);
     }
 
+    public static InviteCode from(String inviteCode) {
+        return new InviteCode(inviteCode);
+    }
+
     @Column(name = "invite_code")
     private String value;
 
-    public InviteCode(String value) {
+    private InviteCode(String value) {
         validateNull(value);
         validateLength(value);
         validateCode(value);
