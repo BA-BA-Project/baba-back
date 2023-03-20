@@ -125,12 +125,8 @@ public class BabyService {
         );
     }
 
-    public SearchInviteCodeResponse searchInviteCode(String code, String memberId) {
-        // TODO: DomainFixture의 초대코드 정보 -> 초대코드
-
-        // TODO: new Code() 제거
-
-        validateMember(memberId);
+    public SearchInviteCodeResponse searchInviteCode(String code, String memberId, boolean isMember) {
+        validateMember(memberId, isMember);
 
         final InvitationCode invitationCode = getInvitationCode(code);
         validateInvitationCode(invitationCode);
@@ -149,9 +145,10 @@ public class BabyService {
                 invitationCode.getRelationName());
     }
 
-    private void validateMember(String memberId) {
-        if (memberRepository.existsById(memberId)) {
-            throw new MemberBadRequestException(memberId + "는 이미 가입한 멤버입니다.");
+    private void validateMember(String memberId, boolean isMember) {
+        if(isMember != memberRepository.existsById(memberId)) {
+            String errorMessage = isMember ? "는 이미 가입한 멤버입니다." : "에 해당하는 멤버가 존재하지 않습니다.";
+            throw new MemberBadRequestException(memberId + errorMessage);
         }
     }
 

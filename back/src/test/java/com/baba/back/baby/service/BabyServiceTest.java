@@ -181,12 +181,22 @@ class BabyServiceTest {
     }
 
     @Test
-    void 초대코드_조회_요청시_멤버가_있으면_예외를_던진다() {
+    void 가입자가_초대코드_조회_요청시_멤버가_있으면_예외를_던진다() {
         // given
         given(memberRepository.existsById(멤버1.getId())).willReturn(true);
 
         // when & then
-        assertThatThrownBy(() -> babyService.searchInviteCode(초대코드.getCode().getValue(), 멤버1.getId()))
+        assertThatThrownBy(() -> babyService.searchInviteCode(초대코드.getCode().getValue(), 멤버1.getId(), false))
+                .isInstanceOf(MemberBadRequestException.class);
+    }
+
+    @Test
+    void 멤버가_초대코드_조회_요청시_멤버가_없으면_예외를_던진다() {
+        // given
+        given(memberRepository.existsById(멤버1.getId())).willReturn(false);
+
+        // when & then
+        assertThatThrownBy(() -> babyService.searchInviteCode(초대코드.getCode().getValue(), 멤버1.getId(), true))
                 .isInstanceOf(MemberBadRequestException.class);
     }
 
@@ -198,7 +208,7 @@ class BabyServiceTest {
                 .willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> babyService.searchInviteCode(초대코드.getCode().getValue(), 멤버1.getId()))
+        assertThatThrownBy(() -> babyService.searchInviteCode(초대코드.getCode().getValue(), 멤버1.getId(), false))
                 .isInstanceOf(InvitationCodeNotFoundException.class);
     }
 
@@ -229,7 +239,7 @@ class BabyServiceTest {
 
         // when & then
         assertThatThrownBy(
-                () -> babyService.searchInviteCode(validInviteCode, 멤버1.getId()))
+                () -> babyService.searchInviteCode(validInviteCode, 멤버1.getId(), false))
                 .isInstanceOf(InvitationCodeBadRequestException.class);
     }
 
@@ -253,7 +263,7 @@ class BabyServiceTest {
         given(invitationRepository.findAllByInvitationCode(invitationCode)).willReturn(List.of(초대1, 초대2));
 
         // when
-        final SearchInviteCodeResponse response = babyService.searchInviteCode(validInviteCode, 멤버1.getId());
+        final SearchInviteCodeResponse response = babyService.searchInviteCode(validInviteCode, 멤버1.getId(), false);
 
         // then
         Assertions.assertAll(

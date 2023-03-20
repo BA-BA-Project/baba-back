@@ -24,7 +24,8 @@ public class LoginConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(loginInterceptor)
                 .addPathPatterns("/**")
-                .excludePathPatterns("/auth/**", swaggerPath, "/swagger-ui/**", "/v3/api-docs/**", "/members/baby");
+                .excludePathPatterns("/auth/**", swaggerPath, "/swagger-ui/**", "/v3/api-docs/**", "/members/baby",
+                        "/baby/invite-code/visitor");
     }
 
     @Override

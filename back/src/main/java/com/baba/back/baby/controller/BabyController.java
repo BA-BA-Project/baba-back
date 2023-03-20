@@ -3,8 +3,10 @@ package com.baba.back.baby.controller;
 import com.baba.back.baby.dto.BabiesResponse;
 import com.baba.back.baby.dto.CreateInviteCodeRequest;
 import com.baba.back.baby.dto.CreateInviteCodeResponse;
+import com.baba.back.baby.dto.SearchInviteCodeResponse;
 import com.baba.back.baby.service.BabyService;
 import com.baba.back.oauth.support.Login;
+import com.baba.back.oauth.support.SignUp;
 import com.baba.back.swagger.BadRequestResponse;
 import com.baba.back.swagger.CreatedResponse;
 import com.baba.back.swagger.IntervalServerErrorResponse;
@@ -20,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "아기 관련 API")
@@ -46,8 +49,33 @@ public class BabyController {
     @NotFoundResponse
     @IntervalServerErrorResponse
     @PostMapping("/baby/invite-code")
-    public ResponseEntity<CreateInviteCodeResponse> createInviteCode(@RequestBody @NotNull CreateInviteCodeRequest request,
-                                                                     @Login String memberId) {
+    public ResponseEntity<CreateInviteCodeResponse> createInviteCode(
+            @RequestBody @NotNull CreateInviteCodeRequest request,
+            @Login String memberId) {
         return ResponseEntity.status(HttpStatus.CREATED).body(babyService.createInviteCode(request, memberId));
+    }
+
+    @Operation(summary = "초대 코드 조회 요청(가입자용)")
+    @OkResponse
+    @BadRequestResponse
+    @UnAuthorizedResponse
+    @NotFoundResponse
+    @IntervalServerErrorResponse
+    @GetMapping ("/baby/invite-code/visitor")
+    public ResponseEntity<SearchInviteCodeResponse> searchInviteCodeByVisitor(@RequestParam String code,
+                                                                              @SignUp String memberId) {
+        return ResponseEntity.ok().body(babyService.searchInviteCode(code, memberId, false));
+    }
+
+    @Operation(summary = "초대 코드 조회 요청(멤버용)")
+    @OkResponse
+    @BadRequestResponse
+    @UnAuthorizedResponse
+    @NotFoundResponse
+    @IntervalServerErrorResponse
+    @GetMapping ("/baby/invite-code/member")
+    public ResponseEntity<SearchInviteCodeResponse> searchInviteCodeByMember(@RequestParam String code,
+                                                                              @Login String memberId) {
+        return ResponseEntity.ok().body(babyService.searchInviteCode(code, memberId, true));
     }
 }

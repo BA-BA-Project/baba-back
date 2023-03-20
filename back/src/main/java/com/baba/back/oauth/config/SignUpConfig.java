@@ -19,7 +19,7 @@ public class SignUpConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(signUpInterceptor)
-                .addPathPatterns("/members/baby");
+                .addPathPatterns("/members/baby", "/baby/invite-code/visitor");
     }
 
     @Override
