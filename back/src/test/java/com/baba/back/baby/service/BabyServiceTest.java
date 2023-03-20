@@ -17,7 +17,7 @@ import static com.baba.back.fixture.DomainFixture.아기3;
 import static com.baba.back.fixture.DomainFixture.아기4;
 import static com.baba.back.fixture.DomainFixture.초대1;
 import static com.baba.back.fixture.DomainFixture.초대2;
-import static com.baba.back.fixture.DomainFixture.초대코드정보;
+import static com.baba.back.fixture.DomainFixture.초대코드;
 import static com.baba.back.fixture.RequestFixture.초대코드_생성_요청_데이터1;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -170,7 +170,7 @@ class BabyServiceTest {
         given(codeGenerator.generate(anyInt(), anyString())).willReturn(inviteCode);
         given(clock.instant()).willReturn(now.instant());
         given(clock.getZone()).willReturn(now.getZone());
-        given(invitationCodeRepository.save(any(InvitationCode.class))).willReturn(초대코드정보);
+        given(invitationCodeRepository.save(any(InvitationCode.class))).willReturn(초대코드);
         given(invitationRepository.save(any(Invitation.class))).willReturn(초대1, 초대2);
 
         // when
@@ -186,7 +186,7 @@ class BabyServiceTest {
         given(memberRepository.existsById(멤버1.getId())).willReturn(true);
 
         // when & then
-        assertThatThrownBy(() -> babyService.searchInviteCode(초대코드정보.getCode().getValue(), 멤버1.getId()))
+        assertThatThrownBy(() -> babyService.searchInviteCode(초대코드.getCode().getValue(), 멤버1.getId()))
                 .isInstanceOf(MemberBadRequestException.class);
     }
 
@@ -194,11 +194,11 @@ class BabyServiceTest {
     void 초대코드_조회_요청시_해당_초대코드가_존재하지_않으면_예외를_던진다() {
         // given
         given(memberRepository.existsById(멤버1.getId())).willReturn(false);
-        given(invitationCodeRepository.findByCodeValue(초대코드정보.getCode().getValue()))
+        given(invitationCodeRepository.findByCodeValue(초대코드.getCode().getValue()))
                 .willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> babyService.searchInviteCode(초대코드정보.getCode().getValue(), 멤버1.getId()))
+        assertThatThrownBy(() -> babyService.searchInviteCode(초대코드.getCode().getValue(), 멤버1.getId()))
                 .isInstanceOf(InvitationCodeNotFoundException.class);
     }
 
