@@ -4,6 +4,7 @@ import static com.baba.back.content.domain.content.CardStyle.CARD_BASIC_1;
 
 import com.baba.back.baby.dto.BabyRequest;
 import com.baba.back.content.dto.CreateContentRequest;
+import com.baba.back.baby.dto.CreateInviteCodeRequest;
 import com.baba.back.oauth.domain.Terms;
 import com.baba.back.oauth.dto.AgreeTermsRequest;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
@@ -33,4 +34,10 @@ public class RequestFixture {
     public static final CreateContentRequest 컨텐츠_생성_요청_데이터 = new CreateContentRequest(LocalDate.now(), "제목",
             new MockMultipartFile("photo", "file.png", "image/png",
                     "Mock File".getBytes()), CARD_BASIC_1.toString());
+
+    public static final CreateInviteCodeRequest 초대코드_생성_요청_데이터1 = new CreateInviteCodeRequest(
+            "외가", "이모");
+
+    public static final CreateInviteCodeRequest 초대코드_생성_요청_데이터2 = new CreateInviteCodeRequest(
+            "가족", "아빠");
 }
