@@ -31,4 +31,8 @@ public class Expiration {
             throw new ExpirationBadReqeustException("현재시각은 null일 수 없습니다.");
         }
     }
+
+    public boolean isExpired(LocalDateTime now) {
+        return now.isAfter(value);
+    }
 }
