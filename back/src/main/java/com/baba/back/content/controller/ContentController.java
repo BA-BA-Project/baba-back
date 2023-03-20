@@ -79,6 +79,7 @@ public class ContentController {
 
     @Operation(summary = "성장 앨범 댓글 추가 요청")
     @CreatedResponse
+    @BadRequestResponse
     @UnAuthorizedResponse
     @NotFoundResponse
     @IntervalServerErrorResponse
@@ -86,7 +87,7 @@ public class ContentController {
     public ResponseEntity<Void> createComment(@Login String memberId,
                                               @PathVariable("babyId") String babyId,
                                               @PathVariable("contentId") Long contentId,
-                                              @RequestBody CreateCommentRequest request) {
+                                              @RequestBody @Valid CreateCommentRequest request) {
 
         Long commentId = contentService.createComment(memberId, babyId, contentId, request);
         return ResponseEntity

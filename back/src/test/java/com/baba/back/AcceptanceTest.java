@@ -8,6 +8,7 @@ import static com.baba.back.fixture.RequestFixture.소셜_토큰_요청_데이�
 import static com.baba.back.fixture.RequestFixture.약관_동의_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.초대코드_생성_요청_데이터2;
 
+import com.baba.back.content.dto.CreateCommentRequest;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
 import com.baba.back.oauth.dto.TokenRefreshRequest;
 import com.baba.back.oauth.service.SignTokenProvider;
@@ -17,6 +18,7 @@ import io.restassured.response.Response;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,11 +42,19 @@ public class AcceptanceTest {
     int port;
 
     protected ExtractableResponse<Response> 아기_등록_회원가입_요청() {
-        return 아기_등록_회원가입_요청(멤버_가입_요청_데이터);
+        return 아기_등록_회원가입_요청(UUID.randomUUID().toString(), 멤버_가입_요청_데이터);
+    }
+
+    protected ExtractableResponse<Response> 아기_등록_회원가입_요청(String memberId) {
+        return 아기_등록_회원가입_요청(memberId, 멤버_가입_요청_데이터);
     }
 
     protected ExtractableResponse<Response> 아기_등록_회원가입_요청(MemberSignUpRequest request) {
-        final String signToken = signTokenProvider.createToken("member");
+        return 아기_등록_회원가입_요청(UUID.randomUUID().toString(), request);
+    }
+
+    protected ExtractableResponse<Response> 아기_등록_회원가입_요청(String memberId, MemberSignUpRequest request) {
+        final String signToken = signTokenProvider.createToken(memberId);
         return post(MEMBER_BASE_PATH + "/baby", Map.of("Authorization", "Bearer " + signToken), request);
     }
 
@@ -92,6 +102,15 @@ public class AcceptanceTest {
         );
     }
 
+    protected ExtractableResponse<Response> 댓글_생성_요청(String accessToken, String babyId, Long contentId,
+                                                     CreateCommentRequest request) {
+        return post(
+                Paths.get(CONTENT_BASE_PATH, babyId, contentId.toString(), "comment").toString(),
+                Map.of("Authorization", "Bearer " + accessToken),
+                request
+        );
+    }
+
     protected ExtractableResponse<Response> 성장_앨범_메인_요청(String accessToken, String babyId, int year, int month) {
         return get(
                 CONTENT_BASE_PATH + "/" + babyId + "?year=" + year + "&month=" + month,
@@ -114,6 +133,12 @@ public class AcceptanceTest {
     protected String getBabyId(ExtractableResponse<Response> response) {
         final String location = getLocation(response);
         return location.split("/")[2];
+    }
+
+    protected Long getCommentId(ExtractableResponse<Response> response) {
+        final String location = getLocation(response);
+        final String id = location.split("/")[5];
+        return Long.parseLong(id);
     }
 
     protected String getLocation(ExtractableResponse<Response> response) {

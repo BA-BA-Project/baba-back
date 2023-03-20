@@ -71,10 +71,11 @@ class MemberAcceptanceTest extends AcceptanceTest {
     @Test
     void 아기_등록_회원가입_요청_시_이미_가입한_유저가_회원가입을_요청하면_400을_던진다() {
         // given
-        아기_등록_회원가입_요청();
+        final String memberId = "memberId";
+        아기_등록_회원가입_요청(memberId);
 
         // when
-        final ExtractableResponse<Response> response = 아기_등록_회원가입_요청();
+        final ExtractableResponse<Response> response = 아기_등록_회원가입_요청(memberId);
 
         //  then
         assertAll(
