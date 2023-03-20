@@ -39,6 +39,7 @@ import com.baba.back.baby.dto.InviteCodeBabyResponse;
 import com.baba.back.baby.dto.SearchInviteCodeResponse;
 import com.baba.back.baby.exception.InvitationCodeBadRequestException;
 import com.baba.back.baby.exception.InvitationCodeNotFoundException;
+import com.baba.back.baby.exception.InvitationNotFoundException;
 import com.baba.back.baby.exception.RelationGroupNotFoundException;
 import com.baba.back.baby.repository.InvitationCodeRepository;
 import com.baba.back.baby.repository.InvitationRepository;
@@ -53,7 +54,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -244,6 +244,30 @@ class BabyServiceTest {
     }
 
     @Test
+    void 초대코드_조회_요청시_등록된_초대가_없으면_예외를_던진다() {
+        // given
+        final String validInviteCode = "AAAAAA";
+
+        final Clock now = Clock.systemDefaultZone();
+        given(clock.instant()).willReturn(now.instant());
+        given(clock.getZone()).willReturn(now.getZone());
+
+        final InvitationCode invitationCode = InvitationCode.builder()
+                .code(Code.from((length, chars) -> validInviteCode))
+                .relationName("이모")
+                .now(LocalDateTime.now(clock))
+                .build();
+
+        given(memberRepository.existsById(멤버1.getId())).willReturn(false);
+        given(invitationCodeRepository.findByCodeValue(validInviteCode)).willReturn(Optional.of(invitationCode));
+        given(invitationRepository.findAllByInvitationCode(invitationCode)).willReturn(List.of());
+
+        // when & then
+        assertThatThrownBy(() -> babyService.searchInviteCode(validInviteCode, 멤버1.getId(), false))
+                .isInstanceOf(InvitationNotFoundException.class);
+    }
+
+    @Test
     void 초대코드_조회_요청시_관련_정보를_확인할_수_있다() {
         // given
         final String validInviteCode = "AAAAAA";
@@ -266,12 +290,11 @@ class BabyServiceTest {
         final SearchInviteCodeResponse response = babyService.searchInviteCode(validInviteCode, 멤버1.getId(), false);
 
         // then
-        Assertions.assertAll(
+        assertAll(
                 () -> assertThat(response.relationName()).isEqualTo(invitationCode.getRelationName()),
                 () -> assertThat(response.babies()).containsExactly(
                         new InviteCodeBabyResponse(아기1.getName()),
                         new InviteCodeBabyResponse(아기2.getName()))
         );
-
     }
 }
