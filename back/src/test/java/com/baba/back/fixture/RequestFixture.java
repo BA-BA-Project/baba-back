@@ -1,10 +1,12 @@
 package com.baba.back.fixture;
 
 import static com.baba.back.content.domain.content.CardStyle.CARD_BASIC_1;
+import static com.baba.back.fixture.DomainFixture.멤버2;
 
 import com.baba.back.baby.dto.BabyRequest;
-import com.baba.back.content.dto.CreateContentRequest;
 import com.baba.back.baby.dto.CreateInviteCodeRequest;
+import com.baba.back.content.dto.CreateCommentRequest;
+import com.baba.back.content.dto.CreateContentRequest;
 import com.baba.back.oauth.domain.Terms;
 import com.baba.back.oauth.dto.AgreeTermsRequest;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
@@ -34,6 +36,9 @@ public class RequestFixture {
     public static final CreateContentRequest 컨텐츠_생성_요청_데이터 = new CreateContentRequest(LocalDate.now(), "제목",
             new MockMultipartFile("photo", "file.png", "image/png",
                     "Mock File".getBytes()), CARD_BASIC_1.toString());
+
+    public static final CreateCommentRequest 태그_댓글_생성_요청_데이터 = new CreateCommentRequest(멤버2.getId(), "댓글!");
+    public static final CreateCommentRequest 댓글_생성_요청_데이터 = new CreateCommentRequest("", "댓글!");
 
     public static final CreateInviteCodeRequest 초대코드_생성_요청_데이터1 = new CreateInviteCodeRequest(
             "외가", "이모");
