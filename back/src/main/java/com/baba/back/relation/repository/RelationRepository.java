@@ -15,4 +15,5 @@ public interface RelationRepository extends JpaRepository<Relation, Long> {
                                            @Param("baby") Baby baby);
 
     List<Relation> findAllByMember(Member member);
+    List<Relation> findAllByMemberAndRelationGroupFamily(Member member, boolean isFamily);
 }

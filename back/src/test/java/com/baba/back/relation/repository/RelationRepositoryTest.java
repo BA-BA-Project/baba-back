@@ -3,7 +3,7 @@ package com.baba.back.relation.repository;
 import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.DomainFixture.아기1;
 import static com.baba.back.fixture.DomainFixture.아기2;
-
+import static org.assertj.core.api.Assertions.assertThat;
 import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.oauth.domain.member.Member;
@@ -52,7 +52,7 @@ class RelationRepositoryTest {
         final Relation relation = relationRepository.findByMemberAndBaby(savedMember, savedBaby).orElseThrow();
 
         // then
-        Assertions.assertThat(relation).isEqualTo(savedRelation);
+        assertThat(relation).isEqualTo(savedRelation);
     }
 
     @Test
@@ -89,5 +89,42 @@ class RelationRepositoryTest {
 
         // then
         Assertions.assertThat(relation).containsExactly(savedRelation1, savedRelation2);
+    }
+
+    @Test
+    void findAllByMemberAndFamily_메소드_호출시_멤버의_가족관계를_조회한다() {
+        // given
+        final Member savedMember = memberRepository.save(멤버1);
+        final Baby savedBaby1 = babyRepository.save(아기1);
+        final Baby savedBaby2 = babyRepository.save(아기2);
+        final RelationGroup savedRelationGroup1 = relationGroupRepository.save(RelationGroup.builder()
+                .baby(savedBaby1)
+                .relationGroupName("가족")
+                .family(true)
+                .build());
+
+        final Relation savedRelation1 = relationRepository.save(Relation.builder()
+                .member(savedMember)
+                .relationName("아빠")
+                .relationGroup(savedRelationGroup1)
+                .build());
+
+        final RelationGroup savedRelationGroup2 = relationGroupRepository.save(RelationGroup.builder()
+                .baby(savedBaby2)
+                .relationGroupName("가족")
+                .family(true)
+                .build());
+
+        final Relation savedRelation2 = relationRepository.save(Relation.builder()
+                .member(savedMember)
+                .relationName("아빠")
+                .relationGroup(savedRelationGroup2)
+                .build());
+
+        // when
+        final List<Relation> relations = relationRepository.findAllByMemberAndRelationGroupFamily(savedMember, true);
+
+        // then
+        assertThat(relations).containsExactly(savedRelation1, savedRelation2);
     }
 }

@@ -2,7 +2,7 @@ package com.baba.back.content.acceptance;
 
 import static com.baba.back.SimpleRestAssured.thenExtract;
 import static com.baba.back.SimpleRestAssured.toObject;
-import static com.baba.back.fixture.DomainFixture.now;
+import static com.baba.back.fixture.DomainFixture.nowDate;
 import static com.baba.back.fixture.DomainFixture.아기1;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -65,7 +65,7 @@ public class ContentAcceptanceTest extends AcceptanceTest {
         given(amazonS3.putObject(any())).willThrow(AmazonServiceException.class);
 
         // when
-        final ExtractableResponse<Response> response = 성장앨범_생성_요청(accessToken, babyId, now);
+        final ExtractableResponse<Response> response = 성장앨범_생성_요청(accessToken, babyId, nowDate);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -80,7 +80,7 @@ public class ContentAcceptanceTest extends AcceptanceTest {
         given(amazonS3.getUrl(any(String.class), any(String.class))).willReturn(new URL(VALID_URL));
 
         // when
-        final ExtractableResponse<Response> response = 성장앨범_생성_요청(accessToken, babyId, now);
+        final ExtractableResponse<Response> response = 성장앨범_생성_요청(accessToken, babyId, nowDate);
 
         // then
         assertAll(
@@ -98,7 +98,7 @@ public class ContentAcceptanceTest extends AcceptanceTest {
         final String babyId = getBabyId(signUpResponse);
 
         given(amazonS3.getUrl(any(String.class), any(String.class))).willReturn(new URL(VALID_URL));
-        final Long contentId = getContentId(성장앨범_생성_요청(accessToken, babyId, now));
+        final Long contentId = getContentId(성장앨범_생성_요청(accessToken, babyId, nowDate));
 
         // when
         final ExtractableResponse<Response> response = 좋아요_요청(accessToken, babyId, contentId);
@@ -117,7 +117,7 @@ public class ContentAcceptanceTest extends AcceptanceTest {
         final String accessToken = toObject(signUpResponse, MemberSignUpResponse.class).accessToken();
         final String babyId = getBabyId(signUpResponse);
         given(amazonS3.getUrl(any(String.class), any(String.class))).willReturn(new URL(VALID_URL));
-        final Long contentId = getContentId(성장앨범_생성_요청(accessToken, babyId, now));
+        final Long contentId = getContentId(성장앨범_생성_요청(accessToken, babyId, nowDate));
         좋아요_요청(accessToken, babyId, contentId);
 
         // when
@@ -137,7 +137,7 @@ public class ContentAcceptanceTest extends AcceptanceTest {
         final String accessToken = toObject(signUpResponse, MemberSignUpResponse.class).accessToken();
         final String babyId = getBabyId(signUpResponse);
         given(amazonS3.getUrl(any(String.class), any(String.class))).willReturn(new URL(VALID_URL));
-        final Long contentId = getContentId(성장앨범_생성_요청(accessToken, babyId, now));
+        final Long contentId = getContentId(성장앨범_생성_요청(accessToken, babyId, nowDate));
         좋아요_요청(accessToken, babyId, contentId);
         좋아요_요청(accessToken, babyId, contentId);
 
@@ -158,14 +158,14 @@ public class ContentAcceptanceTest extends AcceptanceTest {
         final String accessToken = toObject(signUpResponse, MemberSignUpResponse.class).accessToken();
         final String babyId = getBabyId(signUpResponse);
         given(amazonS3.getUrl(any(String.class), any(String.class))).willReturn(new URL(VALID_URL));
-        성장앨범_생성_요청(accessToken, babyId, now);
-        성장앨범_생성_요청(accessToken, babyId, now.minusDays(1));
-        성장앨범_생성_요청(accessToken, babyId, now.minusDays(2));
-        성장앨범_생성_요청(accessToken, babyId, now.minusDays(3));
+        성장앨범_생성_요청(accessToken, babyId, nowDate);
+        성장앨범_생성_요청(accessToken, babyId, nowDate.minusDays(1));
+        성장앨범_생성_요청(accessToken, babyId, nowDate.minusDays(2));
+        성장앨범_생성_요청(accessToken, babyId, nowDate.minusDays(3));
 
         // when
         final ExtractableResponse<Response> response = 성장_앨범_메인_요청(
-                accessToken, babyId, now.getYear(), now.getMonthValue()
+                accessToken, babyId, nowDate.getYear(), nowDate.getMonthValue()
         );
 
         // then
@@ -175,10 +175,10 @@ public class ContentAcceptanceTest extends AcceptanceTest {
                 () -> assertThat(album).hasSize(4),
                 () -> assertThat(album.stream().map(ContentResponse::date).toList())
                         .containsExactly(
-                                now.minusDays(3),
-                                now.minusDays(2),
-                                now.minusDays(1),
-                                now
+                                nowDate.minusDays(3),
+                                nowDate.minusDays(2),
+                                nowDate.minusDays(1),
+                                nowDate
                         )
         );
     }

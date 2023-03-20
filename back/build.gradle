@@ -99,7 +99,8 @@ jacocoTestCoverageVerification {
                     '**.*Exception*',
                     '**.*Extractor*',
                     '**.*Picker*',
-                    '**.*ControllerAdvice*'
+                    '**.*ControllerAdvice*',
+                    '**.*Generator*'
             ]
         }
 
