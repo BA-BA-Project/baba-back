@@ -14,7 +14,7 @@ class InvitationCodeTest {
         // given
         final LocalDateTime now = LocalDateTime.now();
         final InvitationCode invitationCode = InvitationCode.builder()
-                .code(new Code("AAAAAA"))
+                .code(Code.from((length, chars) -> "AAAAAA"))
                 .relationName("외가")
                 .now(now)
                 .build();
@@ -28,7 +28,7 @@ class InvitationCodeTest {
         // given
         final LocalDateTime now = LocalDateTime.now();
         final InvitationCode invitationCode = InvitationCode.builder()
-                .code(new Code("AAAAAA"))
+                .code(Code.from((length, chars) -> "AAAAAA"))
                 .relationName("외가")
                 .now(now)
                 .build();
