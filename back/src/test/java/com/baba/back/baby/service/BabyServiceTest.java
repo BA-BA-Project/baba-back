@@ -29,22 +29,31 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 
 import com.baba.back.baby.domain.Baby;
+import com.baba.back.baby.domain.invitation.Code;
 import com.baba.back.baby.domain.invitation.Invitation;
 import com.baba.back.baby.domain.invitation.InvitationCode;
 import com.baba.back.baby.dto.BabiesResponse;
 import com.baba.back.baby.dto.BabyResponse;
 import com.baba.back.baby.dto.CreateInviteCodeResponse;
+import com.baba.back.baby.dto.InviteCodeBabyResponse;
+import com.baba.back.baby.dto.SearchInviteCodeResponse;
+import com.baba.back.baby.exception.InvitationCodeBadRequestException;
+import com.baba.back.baby.exception.InvitationCodeNotFoundException;
 import com.baba.back.baby.exception.RelationGroupNotFoundException;
 import com.baba.back.baby.repository.InvitationCodeRepository;
 import com.baba.back.baby.repository.InvitationRepository;
+import com.baba.back.oauth.exception.MemberBadRequestException;
 import com.baba.back.oauth.exception.MemberNotFoundException;
 import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.relation.exception.RelationNotFoundException;
 import com.baba.back.relation.repository.RelationGroupRepository;
 import com.baba.back.relation.repository.RelationRepository;
 import java.time.Clock;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -169,5 +178,90 @@ class BabyServiceTest {
 
         // then
         assertThat(response.inviteCode()).isEqualTo(inviteCode);
+    }
+
+    @Test
+    void 초대코드_조회_요청시_멤버가_있으면_예외를_던진다() {
+        // given
+        given(memberRepository.existsById(멤버1.getId())).willReturn(true);
+
+        // when & then
+        assertThatThrownBy(() -> babyService.searchInviteCode(초대코드정보.getCode().getValue(), 멤버1.getId()))
+                .isInstanceOf(MemberBadRequestException.class);
+    }
+
+    @Test
+    void 초대코드_조회_요청시_해당_초대코드가_존재하지_않으면_예외를_던진다() {
+        // given
+        given(memberRepository.existsById(멤버1.getId())).willReturn(false);
+        given(invitationCodeRepository.findByCodeValue(초대코드정보.getCode().getValue()))
+                .willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> babyService.searchInviteCode(초대코드정보.getCode().getValue(), 멤버1.getId()))
+                .isInstanceOf(InvitationCodeNotFoundException.class);
+    }
+
+    @Test
+    void 초대코드_조회_요청시_초대코드가_만료되었으면_예외를_던진다() {
+        // given
+        final String validInviteCode = "AAAAAA";
+        final LocalDateTime now = LocalDateTime.now();
+
+        final Clock nowClock = Clock.fixed(now.atZone(ZoneId.systemDefault()).toInstant(), ZoneId.systemDefault());
+        given(clock.instant()).willReturn(nowClock.instant());
+        given(clock.getZone()).willReturn(nowClock.getZone());
+
+        final InvitationCode invitationCode = InvitationCode.builder()
+                .code(new Code(validInviteCode))
+                .relationName("이모")
+                .now(LocalDateTime.now(clock))
+                .build();
+
+        given(memberRepository.existsById(멤버1.getId())).willReturn(false);
+        given(invitationCodeRepository.findByCodeValue(validInviteCode)).willReturn(Optional.of(invitationCode));
+
+        final Clock timeTravelClock = Clock.fixed(now.plusDays(10).plusSeconds(1)
+                .atZone(ZoneId.systemDefault()).toInstant(), ZoneId.systemDefault());
+
+        given(clock.instant()).willReturn(timeTravelClock.instant());
+        given(clock.getZone()).willReturn(timeTravelClock.getZone());
+
+        // when & then
+        assertThatThrownBy(
+                () -> babyService.searchInviteCode(validInviteCode, 멤버1.getId()))
+                .isInstanceOf(InvitationCodeBadRequestException.class);
+    }
+
+    @Test
+    void 초대코드_조회_요청시_관련_정보를_확인할_수_있다() {
+        // given
+        final String validInviteCode = "AAAAAA";
+
+        final Clock now = Clock.systemDefaultZone();
+        given(clock.instant()).willReturn(now.instant());
+        given(clock.getZone()).willReturn(now.getZone());
+
+        final InvitationCode invitationCode = InvitationCode.builder()
+                .code(new Code(validInviteCode))
+                .relationName("이모")
+                .now(LocalDateTime.now(clock))
+                .build();
+
+        given(memberRepository.existsById(멤버1.getId())).willReturn(false);
+        given(invitationCodeRepository.findByCodeValue(validInviteCode)).willReturn(Optional.of(invitationCode));
+        given(invitationRepository.findAllByInvitationCode(invitationCode)).willReturn(List.of(초대1, 초대2));
+
+        // when
+        final SearchInviteCodeResponse response = babyService.searchInviteCode(validInviteCode, 멤버1.getId());
+
+        // then
+        Assertions.assertAll(
+                () -> assertThat(response.relationName()).isEqualTo(invitationCode.getRelationName()),
+                () -> assertThat(response.babies()).containsExactly(
+                        new InviteCodeBabyResponse(아기1.getName()),
+                        new InviteCodeBabyResponse(아기2.getName()))
+        );
+
     }
 }

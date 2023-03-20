@@ -8,10 +8,16 @@ import com.baba.back.baby.dto.BabiesResponse;
 import com.baba.back.baby.dto.BabyResponse;
 import com.baba.back.baby.dto.CreateInviteCodeRequest;
 import com.baba.back.baby.dto.CreateInviteCodeResponse;
+import com.baba.back.baby.dto.InviteCodeBabyResponse;
+import com.baba.back.baby.dto.SearchInviteCodeResponse;
+import com.baba.back.baby.exception.InvitationCodeBadRequestException;
+import com.baba.back.baby.exception.InvitationCodeNotFoundException;
+import com.baba.back.baby.exception.InvitationNotFoundException;
 import com.baba.back.baby.exception.RelationGroupNotFoundException;
 import com.baba.back.baby.repository.InvitationCodeRepository;
 import com.baba.back.baby.repository.InvitationRepository;
 import com.baba.back.oauth.domain.member.Member;
+import com.baba.back.oauth.exception.MemberBadRequestException;
 import com.baba.back.oauth.exception.MemberNotFoundException;
 import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.relation.domain.Relation;
@@ -117,5 +123,55 @@ public class BabyService {
                         .relationGroup(relationGroup)
                         .build())
         );
+    }
+
+    public SearchInviteCodeResponse searchInviteCode(String code, String memberId) {
+        // TODO: DomainFixture의 초대코드 정보 -> 초대코드
+
+        // TODO: new Code() 제거
+
+        validateMember(memberId);
+
+        final InvitationCode invitationCode = getInvitationCode(code);
+        validateInvitationCode(invitationCode);
+
+        final List<Invitation> invitations = getInvitations(invitationCode);
+
+        return new SearchInviteCodeResponse(
+                invitations.stream()
+                        .map(invitation -> {
+                            final RelationGroup relationGroup = invitation.getRelationGroup();
+                            final Baby baby = relationGroup.getBaby();
+
+                            return new InviteCodeBabyResponse(baby.getName());
+                        })
+                        .toList(),
+                invitationCode.getRelationName());
+    }
+
+    private void validateMember(String memberId) {
+        if (memberRepository.existsById(memberId)) {
+            throw new MemberBadRequestException(memberId + "는 이미 가입한 멤버입니다.");
+        }
+    }
+
+    private InvitationCode getInvitationCode(String code) {
+        return invitationCodeRepository.findByCodeValue(code)
+                .orElseThrow(() -> new InvitationCodeNotFoundException(code + "는 존재하지 않는 초대 코드입니다."));
+    }
+
+    private void validateInvitationCode(InvitationCode invitationCode) {
+        if (invitationCode.isExpired(LocalDateTime.now(clock))) {
+            throw new InvitationCodeBadRequestException("초대 코드가 만료되었습니다.");
+        }
+    }
+
+    private List<Invitation> getInvitations(InvitationCode invitationCode) {
+        final List<Invitation> invitations = invitationRepository.findAllByInvitationCode(invitationCode);
+        if (invitations.isEmpty()) {
+            throw new InvitationNotFoundException("초대 정보가 존재하지 않습니다.");
+        }
+
+        return invitations;
     }
 }
