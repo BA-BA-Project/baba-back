@@ -194,8 +194,7 @@ public class ContentService {
     }
 
     private void validateRelationGroup(RelationGroup ownerRelationGroup, RelationGroup tagMemberRelationGroup) {
-        if (!ownerRelationGroup.include(tagMemberRelationGroup)) {
-
+        if (!ownerRelationGroup.canShare(tagMemberRelationGroup)) {
             throw new TagBadRequestException(
                     String.format("%s에 속한 멤버는 %s에 속한 멤버를 태그할 수 없습니다.",
                             ownerRelationGroup.getRelationGroupName(),
