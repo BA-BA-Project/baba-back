@@ -50,7 +50,8 @@ public class Content {
     private Name relation;
 
     @Builder
-    public Content(String title, LocalDate contentDate, LocalDate now, String cardStyle, Baby baby, Member owner, Name relation) {
+    public Content(String title, LocalDate contentDate, LocalDate now, String cardStyle, Baby baby, Member owner,
+                   Name relation) {
         this.title = new Title(title);
         this.contentDate = ContentDate.of(contentDate, now, baby.getBirthday());
         this.cardStyle = CardStyle.from(cardStyle);

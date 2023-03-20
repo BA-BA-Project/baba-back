@@ -46,8 +46,8 @@ public class BabyController {
     @NotFoundResponse
     @IntervalServerErrorResponse
     @PostMapping("/baby/invite-code")
-    public ResponseEntity<CreateInviteCodeResponse> createInviteCode(@RequestBody @NotNull CreateInviteCodeRequest request,
-                                                                     @Login String memberId) {
+    public ResponseEntity<CreateInviteCodeResponse> createInviteCode(
+            @RequestBody @NotNull CreateInviteCodeRequest request, @Login String memberId) {
         return ResponseEntity.status(HttpStatus.CREATED).body(babyService.createInviteCode(request, memberId));
     }
 }

@@ -4,7 +4,7 @@ import java.util.Random;
 import org.springframework.stereotype.Component;
 
 @Component
-public class RandomCodeGenerator implements CodeGenerator{
+public class RandomCodeGenerator implements CodeGenerator {
     private static final Random RANDOM = new Random();
 
     @Override

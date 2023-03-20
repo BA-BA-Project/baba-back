@@ -2,7 +2,6 @@ package com.baba.back.oauth.acceptance;
 
 import static com.baba.back.SimpleRestAssured.post;
 import static com.baba.back.SimpleRestAssured.toObject;
-import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.RequestFixture.멤버_가입_요청_데이터;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
