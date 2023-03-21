@@ -26,6 +26,7 @@ public class DomainFixture {
             .relationName("이모")
             .now(nowDateTime)
             .build();
+
     public static final Member 멤버1 = Member.builder()
             .id("member1")
             .name("멤버1")
@@ -44,6 +45,7 @@ public class DomainFixture {
             .member(멤버1)
             .value("토큰")
             .build();
+
     public static final Baby 아기1 = Baby.builder()
             .id("baby1")
             .name("아기1")
@@ -140,7 +142,7 @@ public class DomainFixture {
             .build();
     public static final Relation 관계5 = Relation.builder()
             .member(멤버2)
-            .relationName("친구동생")
+            .relationName("형")
             .relationGroup(관계그룹2)
             .build();
     public static final RelationGroup 관계그룹6 = RelationGroup.builder()
