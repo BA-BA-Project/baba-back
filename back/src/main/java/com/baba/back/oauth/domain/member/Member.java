@@ -1,5 +1,6 @@
 package com.baba.back.oauth.domain.member;
 
+import com.baba.back.common.domain.BaseEntity;
 import com.baba.back.common.domain.Name;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -11,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Member {
+public class Member extends BaseEntity {
 
     @Id
     private String id;

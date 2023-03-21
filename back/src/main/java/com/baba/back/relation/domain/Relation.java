@@ -1,5 +1,6 @@
 package com.baba.back.relation.domain;
 
+import com.baba.back.common.domain.BaseEntity;
 import com.baba.back.common.domain.Name;
 import com.baba.back.oauth.domain.member.Member;
 import jakarta.persistence.AttributeOverride;
@@ -18,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Relation {
+public class Relation extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,5 +1,6 @@
 package com.baba.back.content.domain.comment;
 
+import com.baba.back.common.domain.BaseEntity;
 import com.baba.back.content.domain.content.Content;
 import com.baba.back.oauth.domain.member.Member;
 import jakarta.persistence.Embedded;
@@ -16,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Comment {
+public class Comment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

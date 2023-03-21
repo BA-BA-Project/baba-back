@@ -1,5 +1,6 @@
 package com.baba.back.baby.domain.invitation;
 
+import com.baba.back.common.domain.BaseEntity;
 import com.baba.back.relation.domain.RelationGroup;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -14,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Invitation {
+public class Invitation extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
