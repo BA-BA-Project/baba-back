@@ -4,6 +4,7 @@ import static com.baba.back.fixture.DomainFixture.관계1;
 import static com.baba.back.fixture.DomainFixture.관계3;
 import static com.baba.back.fixture.DomainFixture.관계5;
 import static com.baba.back.fixture.DomainFixture.관계6;
+import static com.baba.back.fixture.DomainFixture.관계7;
 import static com.baba.back.fixture.DomainFixture.댓글1;
 import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.DomainFixture.멤버2;
@@ -453,7 +454,7 @@ class ContentServiceTest {
         // given
         given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
         given(babyRepository.findById(아기1.getId())).willReturn(Optional.of(아기1));
-        given(relationRepository.findByMemberAndBaby(멤버1, 아기1)).willReturn(Optional.of(관계1));
+        given(relationRepository.findByMemberAndBaby(멤버1, 아기1)).willReturn(Optional.of(관계7));
         given(contentRepository.findById(컨텐츠1.getId())).willReturn(Optional.of(컨텐츠1));
         given(commentRepository.save(any(Comment.class))).willReturn(댓글1);
         given(memberRepository.findById(멤버2.getId())).willReturn(Optional.of(멤버2));

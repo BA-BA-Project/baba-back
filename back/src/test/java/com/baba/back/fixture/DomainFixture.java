@@ -140,17 +140,31 @@ public class DomainFixture {
             .relationName("아빠")
             .relationGroup(관계그룹2)
             .build();
-    public static final Relation 관계5 = Relation.builder()
-            .member(멤버2)
-            .relationName("형")
-            .relationGroup(관계그룹2)
-            .build();
     public static final RelationGroup 관계그룹6 = RelationGroup.builder()
             .baby(아기2)
             .relationGroupName("외가")
             .family(false)
             .groupColor(Color.COLOR_1)
             .build();
+    public static final Relation 관계5 = Relation.builder()
+            .member(멤버2)
+            .relationName("사촌 형")
+            .relationGroup(관계그룹6)
+            .build();
+
+    public static final RelationGroup 관계그룹7 = RelationGroup.builder()
+            .baby(아기2)
+            .relationGroupName("친가")
+            .family(false)
+            .groupColor(Color.COLOR_1)
+            .build();
+
+    public static final Relation 관계7 = Relation.builder()
+            .member(멤버1)
+            .relationName("친척 형")
+            .relationGroup(관계그룹7)
+            .build();
+
     public static final Invitation 초대2 = Invitation.builder()
             .invitationCode(초대코드정보)
             .relationGroup(관계그룹6)
