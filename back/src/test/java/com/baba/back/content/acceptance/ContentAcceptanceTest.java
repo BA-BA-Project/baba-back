@@ -214,6 +214,11 @@ public class ContentAcceptanceTest extends AcceptanceTest {
         );
     }
 
+    // TODO: 2023/03/21 멤버 초대 API 구현 후 작성
+    @Test
+    void 태그를_하고_댓글을_추가할_수_있다() throws MalformedURLException {
+    }
+
     @Test
     void 아기와_관계없는_멤버를_태그한_댓글을_추가할_수_없다() throws MalformedURLException {
         // given
