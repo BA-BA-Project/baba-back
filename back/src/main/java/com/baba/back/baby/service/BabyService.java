@@ -17,7 +17,6 @@ import com.baba.back.baby.exception.RelationGroupNotFoundException;
 import com.baba.back.baby.repository.InvitationCodeRepository;
 import com.baba.back.baby.repository.InvitationRepository;
 import com.baba.back.oauth.domain.member.Member;
-import com.baba.back.oauth.exception.MemberBadRequestException;
 import com.baba.back.oauth.exception.MemberNotFoundException;
 import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.relation.domain.Relation;
@@ -125,9 +124,7 @@ public class BabyService {
         );
     }
 
-    public SearchInviteCodeResponse searchInviteCode(String code, String memberId, boolean isMember) {
-        validateMember(memberId, isMember);
-
+    public SearchInviteCodeResponse searchInviteCode(String code) {
         final InvitationCode invitationCode = getInvitationCode(code);
         validateInvitationCode(invitationCode);
 
@@ -143,13 +140,6 @@ public class BabyService {
                         })
                         .toList(),
                 invitationCode.getRelationName());
-    }
-
-    private void validateMember(String memberId, boolean isMember) {
-        if(isMember != memberRepository.existsById(memberId)) {
-            String errorMessage = isMember ? "는 이미 가입한 멤버입니다." : "에 해당하는 멤버가 존재하지 않습니다.";
-            throw new MemberBadRequestException(memberId + errorMessage);
-        }
     }
 
     private InvitationCode getInvitationCode(String code) {

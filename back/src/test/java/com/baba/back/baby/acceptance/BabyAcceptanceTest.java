@@ -75,32 +75,13 @@ class BabyAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    void 가입자가_초대_코드_조회_요청_시_저장된_초대_코드_정보를_응답한다() {
+    void 초대_코드_조회_요청_시_저장된_초대_코드_정보를_응답한다() {
         // given
         final String accessToken = toObject(아기_등록_회원가입_요청(), MemberSignUpResponse.class).accessToken();
         final String code = toObject(가족_초대_코드_생성_요청(accessToken), CreateInviteCodeResponse.class).inviteCode();
 
         // when
-        final ExtractableResponse<Response> response = 초대_코드_조회_요청_가입자용(code);
-
-        // then
-        final SearchInviteCodeResponse codeResponse = toObject(response, SearchInviteCodeResponse.class);
-        assertAll(
-                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(codeResponse.relationName()).isEqualTo(초대코드_생성_요청_데이터2.getRelationName()),
-                () -> assertThat(codeResponse.babies().stream().map(InviteCodeBabyResponse::babyName).toList())
-                        .containsExactly(아기1.getName(), 아기2.getName())
-        );
-    }
-
-    @Test
-    void 멤버가_초대_코드_조회_요청_시_저장된_초대_코드_정보를_응답한다() {
-        // given
-        final String accessToken = toObject(아기_등록_회원가입_요청(), MemberSignUpResponse.class).accessToken();
-        final String code = toObject(가족_초대_코드_생성_요청(accessToken), CreateInviteCodeResponse.class).inviteCode();
-
-        // when
-        final ExtractableResponse<Response> response = 초대_코드_조회_요청_멤버용(accessToken, code);
+        final ExtractableResponse<Response> response = 초대장_조회_요청(code);
 
         // then
         final SearchInviteCodeResponse codeResponse = toObject(response, SearchInviteCodeResponse.class);
@@ -114,12 +95,7 @@ class BabyAcceptanceTest extends AcceptanceTest {
 
     // TODO: 2023/03/20 관계그룹 생성 로직 추가 이후 다른 그룹의 초대 코드 조회 테스트를 추가한다.
     @Test
-    void 가입자가_초대_코드_조회_요청_시_가족_그룹_이외의_초대_코드도_조회할_수_있다() {
-
-    }
-
-    @Test
-    void 멤버가_초대_코드_조회_요청_시_가족_그룹_이외의_초대_코드도_조회할_수_있다() {
+    void 초대_코드_조회_요청_시_가족_그룹_이외의_초대_코드도_조회할_수_있다() {
 
     }
 

@@ -49,15 +49,8 @@ public class AcceptanceTest {
         return post(MEMBER_BASE_PATH + "/baby", Map.of("Authorization", "Bearer " + signToken), request);
     }
 
-    protected ExtractableResponse<Response> 초대_코드_조회_요청_가입자용(String code) {
-        final String signToken = signTokenProvider.createToken("member2");
-        return get(BABY_BASE_PATH + "/invite-code/visitor" + "?code=" + code,
-                Map.of("Authorization", "Bearer " + signToken));
-    }
-
-    protected ExtractableResponse<Response> 초대_코드_조회_요청_멤버용(String accessToken, String code) {
-        return get(BABY_BASE_PATH + "/invite-code/member" + "?code=" + code,
-                Map.of("Authorization", "Bearer " + accessToken));
+    protected ExtractableResponse<Response> 초대장_조회_요청(String code) {
+        return get(BABY_BASE_PATH + "/invitation" + "?code=" + code);
     }
 
     protected ExtractableResponse<Response> 사용자_정보_요청(String accessToken) {

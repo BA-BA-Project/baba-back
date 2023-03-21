@@ -6,7 +6,6 @@ import com.baba.back.baby.dto.CreateInviteCodeResponse;
 import com.baba.back.baby.dto.SearchInviteCodeResponse;
 import com.baba.back.baby.service.BabyService;
 import com.baba.back.oauth.support.Login;
-import com.baba.back.oauth.support.SignUp;
 import com.baba.back.swagger.BadRequestResponse;
 import com.baba.back.swagger.CreatedResponse;
 import com.baba.back.swagger.IntervalServerErrorResponse;
@@ -55,27 +54,14 @@ public class BabyController {
         return ResponseEntity.status(HttpStatus.CREATED).body(babyService.createInviteCode(request, memberId));
     }
 
-    @Operation(summary = "초대 코드 조회 요청(가입자용)")
+    @Operation(summary = "초대장 조회 요청")
     @OkResponse
     @BadRequestResponse
     @UnAuthorizedResponse
     @NotFoundResponse
     @IntervalServerErrorResponse
-    @GetMapping ("/baby/invite-code/visitor")
-    public ResponseEntity<SearchInviteCodeResponse> searchInviteCodeByVisitor(@RequestParam String code,
-                                                                              @SignUp String memberId) {
-        return ResponseEntity.ok().body(babyService.searchInviteCode(code, memberId, false));
-    }
-
-    @Operation(summary = "초대 코드 조회 요청(멤버용)")
-    @OkResponse
-    @BadRequestResponse
-    @UnAuthorizedResponse
-    @NotFoundResponse
-    @IntervalServerErrorResponse
-    @GetMapping ("/baby/invite-code/member")
-    public ResponseEntity<SearchInviteCodeResponse> searchInviteCodeByMember(@RequestParam String code,
-                                                                              @Login String memberId) {
-        return ResponseEntity.ok().body(babyService.searchInviteCode(code, memberId, true));
+    @GetMapping("/baby/invitation")
+    public ResponseEntity<SearchInviteCodeResponse> searchInviteCodeByVisitor(@RequestParam String code) {
+        return ResponseEntity.ok().body(babyService.searchInviteCode(code));
     }
 }

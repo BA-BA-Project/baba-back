@@ -181,34 +181,13 @@ class BabyServiceTest {
     }
 
     @Test
-    void 가입자가_초대코드_조회_요청시_멤버가_있으면_예외를_던진다() {
-        // given
-        given(memberRepository.existsById(멤버1.getId())).willReturn(true);
-
-        // when & then
-        assertThatThrownBy(() -> babyService.searchInviteCode(초대코드.getCode().getValue(), 멤버1.getId(), false))
-                .isInstanceOf(MemberBadRequestException.class);
-    }
-
-    @Test
-    void 멤버가_초대코드_조회_요청시_멤버가_없으면_예외를_던진다() {
-        // given
-        given(memberRepository.existsById(멤버1.getId())).willReturn(false);
-
-        // when & then
-        assertThatThrownBy(() -> babyService.searchInviteCode(초대코드.getCode().getValue(), 멤버1.getId(), true))
-                .isInstanceOf(MemberBadRequestException.class);
-    }
-
-    @Test
     void 초대코드_조회_요청시_해당_초대코드가_존재하지_않으면_예외를_던진다() {
         // given
-        given(memberRepository.existsById(멤버1.getId())).willReturn(false);
         given(invitationCodeRepository.findByCodeValue(초대코드.getCode().getValue()))
                 .willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> babyService.searchInviteCode(초대코드.getCode().getValue(), 멤버1.getId(), false))
+        assertThatThrownBy(() -> babyService.searchInviteCode(초대코드.getCode().getValue()))
                 .isInstanceOf(InvitationCodeNotFoundException.class);
     }
 
@@ -228,7 +207,6 @@ class BabyServiceTest {
                 .now(LocalDateTime.now(clock))
                 .build();
 
-        given(memberRepository.existsById(멤버1.getId())).willReturn(false);
         given(invitationCodeRepository.findByCodeValue(validInviteCode)).willReturn(Optional.of(invitationCode));
 
         final Clock timeTravelClock = Clock.fixed(now.plusDays(10).plusSeconds(1)
@@ -239,7 +217,7 @@ class BabyServiceTest {
 
         // when & then
         assertThatThrownBy(
-                () -> babyService.searchInviteCode(validInviteCode, 멤버1.getId(), false))
+                () -> babyService.searchInviteCode(validInviteCode))
                 .isInstanceOf(InvitationCodeBadRequestException.class);
     }
 
@@ -258,12 +236,11 @@ class BabyServiceTest {
                 .now(LocalDateTime.now(clock))
                 .build();
 
-        given(memberRepository.existsById(멤버1.getId())).willReturn(false);
         given(invitationCodeRepository.findByCodeValue(validInviteCode)).willReturn(Optional.of(invitationCode));
         given(invitationRepository.findAllByInvitationCode(invitationCode)).willReturn(List.of());
 
         // when & then
-        assertThatThrownBy(() -> babyService.searchInviteCode(validInviteCode, 멤버1.getId(), false))
+        assertThatThrownBy(() -> babyService.searchInviteCode(validInviteCode))
                 .isInstanceOf(InvitationNotFoundException.class);
     }
 
@@ -282,12 +259,11 @@ class BabyServiceTest {
                 .now(LocalDateTime.now(clock))
                 .build();
 
-        given(memberRepository.existsById(멤버1.getId())).willReturn(false);
         given(invitationCodeRepository.findByCodeValue(validInviteCode)).willReturn(Optional.of(invitationCode));
         given(invitationRepository.findAllByInvitationCode(invitationCode)).willReturn(List.of(초대1, 초대2));
 
         // when
-        final SearchInviteCodeResponse response = babyService.searchInviteCode(validInviteCode, 멤버1.getId(), false);
+        final SearchInviteCodeResponse response = babyService.searchInviteCode(validInviteCode);
 
         // then
         assertAll(
