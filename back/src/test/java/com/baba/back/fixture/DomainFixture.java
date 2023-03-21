@@ -173,19 +173,19 @@ public class DomainFixture {
             .groupColor(Color.COLOR_1)
             .build();
 
-    public static final InvitationCode 초대코드정보 = InvitationCode.builder()
-            .code(new Code("AAAAAA"))
+    public static final InvitationCode 초대코드 = InvitationCode.builder()
+            .code(Code.from(((length, chars) -> "AAAAAA")))
             .relationName("이모")
             .now(nowDateTime)
             .build();
 
     public static final Invitation 초대1 = Invitation.builder()
-            .invitationCode(초대코드정보)
+            .invitationCode(초대코드)
             .relationGroup(관계그룹5)
             .build();
 
     public static final Invitation 초대2 = Invitation.builder()
-            .invitationCode(초대코드정보)
+            .invitationCode(초대코드)
             .relationGroup(관계그룹6)
             .build();
 }

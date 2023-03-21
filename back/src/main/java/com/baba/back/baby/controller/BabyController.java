@@ -3,6 +3,7 @@ package com.baba.back.baby.controller;
 import com.baba.back.baby.dto.BabiesResponse;
 import com.baba.back.baby.dto.CreateInviteCodeRequest;
 import com.baba.back.baby.dto.CreateInviteCodeResponse;
+import com.baba.back.baby.dto.SearchInviteCodeResponse;
 import com.baba.back.baby.service.BabyService;
 import com.baba.back.oauth.support.Login;
 import com.baba.back.swagger.BadRequestResponse;
@@ -20,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "아기 관련 API")
@@ -46,8 +48,20 @@ public class BabyController {
     @NotFoundResponse
     @IntervalServerErrorResponse
     @PostMapping("/baby/invite-code")
-    public ResponseEntity<CreateInviteCodeResponse> createInviteCode(@RequestBody @NotNull CreateInviteCodeRequest request,
-                                                                     @Login String memberId) {
+    public ResponseEntity<CreateInviteCodeResponse> createInviteCode(
+            @RequestBody @NotNull CreateInviteCodeRequest request,
+            @Login String memberId) {
         return ResponseEntity.status(HttpStatus.CREATED).body(babyService.createInviteCode(request, memberId));
+    }
+
+    @Operation(summary = "초대장 조회 요청")
+    @OkResponse
+    @BadRequestResponse
+    @UnAuthorizedResponse
+    @NotFoundResponse
+    @IntervalServerErrorResponse
+    @GetMapping("/baby/invitation")
+    public ResponseEntity<SearchInviteCodeResponse> searchInviteCodeByVisitor(@RequestParam String code) {
+        return ResponseEntity.ok().body(babyService.searchInviteCode(code));
     }
 }

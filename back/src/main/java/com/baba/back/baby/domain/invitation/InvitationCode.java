@@ -37,4 +37,12 @@ public class InvitationCode {
         this.relationName = new Name(relationName);
         this.expiration = Expiration.from(now);
     }
+
+    public String getRelationName() {
+        return this.relationName.getValue();
+    }
+
+    public boolean isExpired(LocalDateTime now) {
+        return this.expiration.isExpired(now);
+    }
 }

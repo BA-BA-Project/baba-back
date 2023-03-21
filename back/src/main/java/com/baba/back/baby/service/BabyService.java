@@ -8,6 +8,11 @@ import com.baba.back.baby.dto.BabiesResponse;
 import com.baba.back.baby.dto.BabyResponse;
 import com.baba.back.baby.dto.CreateInviteCodeRequest;
 import com.baba.back.baby.dto.CreateInviteCodeResponse;
+import com.baba.back.baby.dto.InviteCodeBabyResponse;
+import com.baba.back.baby.dto.SearchInviteCodeResponse;
+import com.baba.back.baby.exception.InvitationCodeBadRequestException;
+import com.baba.back.baby.exception.InvitationCodeNotFoundException;
+import com.baba.back.baby.exception.InvitationNotFoundException;
 import com.baba.back.baby.exception.RelationGroupNotFoundException;
 import com.baba.back.baby.repository.InvitationCodeRepository;
 import com.baba.back.baby.repository.InvitationRepository;
@@ -117,5 +122,43 @@ public class BabyService {
                         .relationGroup(relationGroup)
                         .build())
         );
+    }
+
+    public SearchInviteCodeResponse searchInviteCode(String code) {
+        final InvitationCode invitationCode = getInvitationCode(code);
+        validateInvitationCode(invitationCode);
+
+        final List<Invitation> invitations = getInvitations(invitationCode);
+
+        return new SearchInviteCodeResponse(
+                invitations.stream()
+                        .map(invitation -> {
+                            final RelationGroup relationGroup = invitation.getRelationGroup();
+                            final Baby baby = relationGroup.getBaby();
+
+                            return new InviteCodeBabyResponse(baby.getName());
+                        })
+                        .toList(),
+                invitationCode.getRelationName());
+    }
+
+    private InvitationCode getInvitationCode(String code) {
+        return invitationCodeRepository.findByCodeValue(code)
+                .orElseThrow(() -> new InvitationCodeNotFoundException(code + "는 존재하지 않는 초대 코드입니다."));
+    }
+
+    private void validateInvitationCode(InvitationCode invitationCode) {
+        if (invitationCode.isExpired(LocalDateTime.now(clock))) {
+            throw new InvitationCodeBadRequestException("초대 코드가 만료되었습니다.");
+        }
+    }
+
+    private List<Invitation> getInvitations(InvitationCode invitationCode) {
+        final List<Invitation> invitations = invitationRepository.findAllByInvitationCode(invitationCode);
+        if (invitations.isEmpty()) {
+            throw new InvitationNotFoundException("초대 정보가 존재하지 않습니다.");
+        }
+
+        return invitations;
     }
 }
