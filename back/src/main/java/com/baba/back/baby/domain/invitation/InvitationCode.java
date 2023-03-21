@@ -43,6 +43,6 @@ public class InvitationCode {
     }
 
     public boolean isExpired(LocalDateTime now) {
-        return expiration.isExpired(now);
+        return this.expiration.isExpired(now);
     }
 }

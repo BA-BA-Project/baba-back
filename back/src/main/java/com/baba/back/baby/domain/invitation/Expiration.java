@@ -33,6 +33,6 @@ public class Expiration {
     }
 
     public boolean isExpired(LocalDateTime now) {
-        return now.isAfter(value);
+        return now.isAfter(this.value);
     }
 }
