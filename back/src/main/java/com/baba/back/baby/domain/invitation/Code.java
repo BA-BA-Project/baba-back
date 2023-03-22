@@ -23,7 +23,7 @@ public class Code {
     @Column(name = "invite_code")
     private String value;
 
-    public Code(String value) {
+    private Code(String value) {
         validateNull(value);
         validateLength(value);
         validateCode(value);

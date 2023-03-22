@@ -1,6 +1,6 @@
 package com.baba.back.relation.domain;
 
-import static com.baba.back.fixture.DomainFixture.관계그룹1;
+import static com.baba.back.fixture.DomainFixture.관계그룹10;
 import static com.baba.back.fixture.DomainFixture.아기1;
 import static com.baba.back.fixture.DomainFixture.아기2;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -14,7 +14,7 @@ class RelationGroupTest {
     @Test
     void 관계_그룹의_정보를_조회할_수_있다() {
         // given
-        final RelationGroup relationGroup = 관계그룹1;
+        final RelationGroup relationGroup = 관계그룹10;
 
         // when & then
         assertAll(

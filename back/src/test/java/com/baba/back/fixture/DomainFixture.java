@@ -22,7 +22,7 @@ public class DomainFixture {
     public static final LocalDate nowDate = LocalDate.of(2023, 3, 12);
     public static final LocalDateTime nowDateTime = LocalDateTime.of(nowDate, LocalTime.NOON);
     public static final InvitationCode 초대코드정보 = InvitationCode.builder()
-            .code(new Code("AAAAAA"))
+            .code(Code.from(((length, chars) -> "AAAAAA")))
             .relationName("이모")
             .now(nowDateTime)
             .build();
@@ -41,9 +41,9 @@ public class DomainFixture {
             .iconName(IconName.PROFILE_G_1.toString())
             .iconColor(Color.COLOR_1)
             .build();
-    public static final Token 토큰 = Token.builder()
+    public static final Token 토큰1 = Token.builder()
             .member(멤버1)
-            .value("토큰")
+            .value("토큰1")
             .build();
 
     public static final Baby 아기1 = Baby.builder()
@@ -52,122 +52,120 @@ public class DomainFixture {
             .birthday(nowDate)
             .now(nowDate)
             .build();
-    public static final RelationGroup 관계그룹1 = RelationGroup.builder()
+    public static final RelationGroup 관계그룹10 = RelationGroup.builder()
             .baby(아기1)
             .relationGroupName("가족")
             .family(true)
             .groupColor(Color.COLOR_1)
             .build();
-    public static final Relation 관계1 = Relation.builder()
+    public static final Relation 관계10 = Relation.builder()
             .member(멤버1)
             .relationName("아빠")
-            .relationGroup(관계그룹1)
+            .relationGroup(관계그룹10)
             .build();
-    public static final Content 컨텐츠1 = Content.builder()
+    public static final Content 컨텐츠10 = Content.builder()
             .title("제목1")
             .contentDate(nowDate)
             .now(nowDate)
             .cardStyle(CardStyle.CARD_BASIC_1.toString())
             .baby(아기1)
             .owner(멤버1)
-            .relation(관계1.getRelationName())
+            .relation(관계10.getRelationName())
             .build();
-    public static final Like 좋아요 = Like.builder()
+    public static final Like 좋아요10 = Like.builder()
             .member(멤버1)
-            .content(컨텐츠1)
+            .content(컨텐츠10)
             .build();
-    public static final Comment 댓글1 = Comment.builder()
+    public static final Comment 댓글10 = Comment.builder()
             .owner(멤버1)
-            .content(컨텐츠1)
+            .content(컨텐츠10)
             .text("댓글!")
             .build();
-    public static final Content 컨텐츠2 = Content.builder()
+    public static final Content 컨텐츠11 = Content.builder()
             .title("제목2")
             .contentDate(nowDate.minusDays(1))
             .now(nowDate)
             .cardStyle(CardStyle.CARD_CANDY_1.toString())
             .baby(아기1)
             .owner(멤버1)
-            .relation(관계1.getRelationName())
+            .relation(관계10.getRelationName())
             .build();
-    public static final Content 컨텐츠3 = Content.builder()
+    public static final Content 컨텐츠12 = Content.builder()
             .title("제목3")
             .contentDate(nowDate.minusDays(2))
             .now(nowDate)
             .cardStyle(CardStyle.CARD_CLOUD_2.toString())
             .baby(아기1)
             .owner(멤버1)
-            .relation(관계1.getRelationName())
+            .relation(관계10.getRelationName())
             .build();
-    public static final Content 컨텐츠4 = Content.builder()
+    public static final Content 컨텐츠13 = Content.builder()
             .title("제목4")
             .contentDate(nowDate.minusMonths(1))
             .now(nowDate)
             .cardStyle(CardStyle.CARD_CHECK_1.toString())
             .baby(아기1)
             .owner(멤버1)
-            .relation(관계1.getRelationName())
+            .relation(관계10.getRelationName())
             .build();
-    public static final Relation 관계6 = Relation.builder()
+    public static final Relation 관계11 = Relation.builder()
             .member(멤버2)
             .relationName("엄마")
-            .relationGroup(관계그룹1)
+            .relationGroup(관계그룹10)
             .build();
-    public static final RelationGroup 관계그룹5 = RelationGroup.builder()
+    public static final RelationGroup 관계그룹11 = RelationGroup.builder()
             .baby(아기1)
             .relationGroupName("외가")
             .family(false)
             .groupColor(Color.COLOR_1)
             .build();
-    public static final Invitation 초대1 = Invitation.builder()
+    public static final Invitation 초대10 = Invitation.builder()
             .invitationCode(초대코드정보)
-            .relationGroup(관계그룹5)
+            .relationGroup(관계그룹11)
             .build();
+
     public static final Baby 아기2 = Baby.builder()
             .id("baby2")
             .name("아기2")
             .birthday(nowDate)
             .now(nowDate)
             .build();
-    public static final RelationGroup 관계그룹2 = RelationGroup.builder()
+    public static final RelationGroup 관계그룹20 = RelationGroup.builder()
             .baby(아기2)
             .relationGroupName("가족")
             .family(true)
             .groupColor(Color.COLOR_1)
             .build();
-    public static final Relation 관계2 = Relation.builder()
+    public static final Relation 관계20 = Relation.builder()
             .member(멤버1)
             .relationName("아빠")
-            .relationGroup(관계그룹2)
+            .relationGroup(관계그룹20)
             .build();
-    public static final RelationGroup 관계그룹6 = RelationGroup.builder()
+    public static final RelationGroup 관계그룹21 = RelationGroup.builder()
             .baby(아기2)
             .relationGroupName("외가")
             .family(false)
             .groupColor(Color.COLOR_1)
             .build();
-    public static final Relation 관계5 = Relation.builder()
+    public static final Relation 관계21 = Relation.builder()
             .member(멤버2)
             .relationName("사촌 형")
-            .relationGroup(관계그룹6)
+            .relationGroup(관계그룹21)
             .build();
-
-    public static final RelationGroup 관계그룹7 = RelationGroup.builder()
+    public static final Invitation 초대20 = Invitation.builder()
+            .invitationCode(초대코드정보)
+            .relationGroup(관계그룹21)
+            .build();
+    public static final RelationGroup 관계그룹22 = RelationGroup.builder()
             .baby(아기2)
             .relationGroupName("친가")
             .family(false)
             .groupColor(Color.COLOR_1)
             .build();
-
-    public static final Relation 관계7 = Relation.builder()
+    public static final Relation 관계22 = Relation.builder()
             .member(멤버1)
             .relationName("친척 형")
-            .relationGroup(관계그룹7)
-            .build();
-
-    public static final Invitation 초대2 = Invitation.builder()
-            .invitationCode(초대코드정보)
-            .relationGroup(관계그룹6)
+            .relationGroup(관계그룹22)
             .build();
     public static final Baby 아기3 = Baby.builder()
             .id("baby3")
@@ -175,16 +173,16 @@ public class DomainFixture {
             .birthday(nowDate)
             .now(nowDate)
             .build();
-    public static final RelationGroup 관계그룹3 = RelationGroup.builder()
+    public static final RelationGroup 관계그룹30 = RelationGroup.builder()
             .baby(아기3)
             .relationGroupName("친구")
             .family(false)
             .groupColor(Color.COLOR_1)
             .build();
-    public static final Relation 관계3 = Relation.builder()
+    public static final Relation 관계30 = Relation.builder()
             .member(멤버1)
             .relationName("아빠친구")
-            .relationGroup(관계그룹3)
+            .relationGroup(관계그룹30)
             .build();
     public static final Baby 아기4 = Baby.builder()
             .id("baby4")
@@ -192,15 +190,15 @@ public class DomainFixture {
             .birthday(nowDate)
             .now(nowDate)
             .build();
-    public static final RelationGroup 관계그룹4 = RelationGroup.builder()
+    public static final RelationGroup 관계그룹40 = RelationGroup.builder()
             .baby(아기4)
             .relationGroupName("외가")
             .family(false)
             .groupColor(Color.COLOR_1)
             .build();
-    public static final Relation 관계4 = Relation.builder()
+    public static final Relation 관계40 = Relation.builder()
             .member(멤버1)
             .relationName("외삼촌")
-            .relationGroup(관계그룹4)
+            .relationGroup(관계그룹40)
             .build();
 }

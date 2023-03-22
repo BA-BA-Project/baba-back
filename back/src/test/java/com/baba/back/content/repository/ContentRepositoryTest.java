@@ -2,10 +2,10 @@ package com.baba.back.content.repository;
 
 import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.DomainFixture.아기1;
-import static com.baba.back.fixture.DomainFixture.컨텐츠1;
-import static com.baba.back.fixture.DomainFixture.컨텐츠2;
-import static com.baba.back.fixture.DomainFixture.컨텐츠3;
-import static com.baba.back.fixture.DomainFixture.컨텐츠4;
+import static com.baba.back.fixture.DomainFixture.컨텐츠10;
+import static com.baba.back.fixture.DomainFixture.컨텐츠11;
+import static com.baba.back.fixture.DomainFixture.컨텐츠12;
+import static com.baba.back.fixture.DomainFixture.컨텐츠13;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.baba.back.baby.domain.Baby;
@@ -35,10 +35,10 @@ class ContentRepositoryTest {
         // given
         memberRepository.save(멤버1);
         final Baby baby = babyRepository.save(아기1);
-        contentRepository.save(컨텐츠1);
+        contentRepository.save(컨텐츠10);
 
         // when
-        final boolean exists = contentRepository.existsByBabyAndContentDateValue(baby, 컨텐츠1.getContentDate());
+        final boolean exists = contentRepository.existsByBabyAndContentDateValue(baby, 컨텐츠10.getContentDate());
 
         // then
         assertThat(exists).isTrue();
@@ -51,7 +51,7 @@ class ContentRepositoryTest {
         final Baby baby = babyRepository.save(아기1);
 
         // when
-        final boolean exists = contentRepository.existsByBabyAndContentDateValue(baby, 컨텐츠1.getContentDate());
+        final boolean exists = contentRepository.existsByBabyAndContentDateValue(baby, 컨텐츠10.getContentDate());
 
         // then
         assertThat(exists).isFalse();
@@ -62,12 +62,12 @@ class ContentRepositoryTest {
         // given
         final Baby baby = babyRepository.save(아기1);
         memberRepository.save(멤버1);
-        contentRepository.save(컨텐츠1);
-        contentRepository.save(컨텐츠2);
-        contentRepository.save(컨텐츠3);
-        contentRepository.save(컨텐츠4);
+        contentRepository.save(컨텐츠10);
+        contentRepository.save(컨텐츠11);
+        contentRepository.save(컨텐츠12);
+        contentRepository.save(컨텐츠13);
 
-        final LocalDate now = 컨텐츠1.getContentDate();
+        final LocalDate now = 컨텐츠10.getContentDate();
 
         // when
         final List<Content> contents = contentRepository.findByBabyYearAndMonth(
@@ -84,10 +84,10 @@ class ContentRepositoryTest {
         // given
         final Baby baby = babyRepository.save(아기1);
         memberRepository.save(멤버1);
-        contentRepository.save(컨텐츠1);
-        contentRepository.save(컨텐츠2);
-        contentRepository.save(컨텐츠3);
-        contentRepository.save(컨텐츠4);
+        contentRepository.save(컨텐츠10);
+        contentRepository.save(컨텐츠11);
+        contentRepository.save(컨텐츠12);
+        contentRepository.save(컨텐츠13);
 
         final LocalDate now = LocalDate.now().minusMonths(100);
 
