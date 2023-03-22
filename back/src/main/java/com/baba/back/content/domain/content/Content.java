@@ -1,6 +1,7 @@
 package com.baba.back.content.domain.content;
 
 import com.baba.back.baby.domain.Baby;
+import com.baba.back.common.domain.BaseEntity;
 import com.baba.back.common.domain.Name;
 import com.baba.back.oauth.domain.member.Member;
 import jakarta.persistence.AttributeOverride;
@@ -22,7 +23,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Content {
+public class Content extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -50,7 +51,8 @@ public class Content {
     private Name relation;
 
     @Builder
-    public Content(String title, LocalDate contentDate, LocalDate now, String cardStyle, Baby baby, Member owner, Name relation) {
+    public Content(String title, LocalDate contentDate, LocalDate now, String cardStyle, Baby baby, Member owner,
+                   Name relation) {
         this.title = new Title(title);
         this.contentDate = ContentDate.of(contentDate, now, baby.getBirthday());
         this.cardStyle = CardStyle.from(cardStyle);

@@ -14,8 +14,10 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.baba.back.AcceptanceTest;
 import com.baba.back.content.dto.ContentResponse;
 import com.baba.back.content.dto.ContentsResponse;
+import com.baba.back.content.dto.CreateCommentRequest;
 import com.baba.back.content.dto.LikeContentResponse;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
+import com.baba.back.oauth.service.AccessTokenProvider;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -25,6 +27,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -32,6 +35,9 @@ import org.springframework.http.MediaType;
 public class ContentAcceptanceTest extends AcceptanceTest {
 
     public static final String VALID_URL = "http://test";
+
+    @Autowired
+    private AccessTokenProvider accessTokenProvider;
 
     @MockBean
     private AmazonS3 amazonS3;
@@ -186,5 +192,52 @@ public class ContentAcceptanceTest extends AcceptanceTest {
     // TODO: 2023/03/12 초대 로직 생성 후 테스트 작성
     @Test
     void 원하는_년_월의_내가_올린_성장_앨범과_다른_사람이_올린_성장_앨범을_조회한다() {
+    }
+
+    @Test
+    void 태그를_하지않고_댓글을_추가할_수_있다() throws MalformedURLException {
+        // given
+        final ExtractableResponse<Response> signUpResponse = 아기_등록_회원가입_요청();
+        final String accessToken = toObject(signUpResponse, MemberSignUpResponse.class).accessToken();
+        final String babyId = getBabyId(signUpResponse);
+        given(amazonS3.getUrl(any(String.class), any(String.class))).willReturn(new URL(VALID_URL));
+        final Long contentId = getContentId(성장앨범_생성_요청(accessToken, babyId, nowDate));
+
+        // when
+        final ExtractableResponse<Response> response =
+                댓글_생성_요청(accessToken, babyId, contentId, new CreateCommentRequest("", "안녕"));
+
+        // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                () -> assertThat(getCommentId(response)).isPositive()
+        );
+    }
+
+    // TODO: 2023/03/21 멤버 초대 API 구현 후 작성
+    @Test
+    void 태그를_하고_댓글을_추가할_수_있다() throws MalformedURLException {
+    }
+
+    @Test
+    void 아기와_관계없는_멤버를_태그한_댓글을_추가할_수_없다() throws MalformedURLException {
+        // given
+        final ExtractableResponse<Response> signUpResponse1 = 아기_등록_회원가입_요청();
+        final String accessToken1 = toObject(signUpResponse1, MemberSignUpResponse.class).accessToken();
+        final String babyId = getBabyId(signUpResponse1);
+        given(amazonS3.getUrl(any(String.class), any(String.class))).willReturn(new URL(VALID_URL));
+        final Long contentId = getContentId(성장앨범_생성_요청(accessToken1, babyId, nowDate));
+
+        // given
+        final ExtractableResponse<Response> signUpResponse2 = 아기_등록_회원가입_요청();
+        final String accessToken2 = toObject(signUpResponse2, MemberSignUpResponse.class).accessToken();
+        final String member2Id = accessTokenProvider.parseToken(accessToken2);
+
+        // when
+        final ExtractableResponse<Response> response =
+                댓글_생성_요청(accessToken1, babyId, contentId, new CreateCommentRequest(member2Id, "안녕"));
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 }

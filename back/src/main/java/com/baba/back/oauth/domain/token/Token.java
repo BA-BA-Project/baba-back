@@ -1,5 +1,6 @@
 package com.baba.back.oauth.domain.token;
 
+import com.baba.back.common.domain.BaseEntity;
 import com.baba.back.oauth.domain.member.Member;
 import com.baba.back.oauth.exception.TokenBadRequestException;
 import jakarta.persistence.Column;
@@ -15,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Token {
+public class Token extends BaseEntity {
 
     @Id
     private String id;

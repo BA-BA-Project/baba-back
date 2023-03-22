@@ -1,6 +1,6 @@
 package com.baba.back.baby.repository;
 
-import static com.baba.back.fixture.DomainFixture.초대코드;
+import static com.baba.back.fixture.DomainFixture.초대코드정보;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.baba.back.baby.domain.invitation.InvitationCode;
@@ -17,10 +17,10 @@ class InvitationCodeRepositoryTest {
     @Test
     void 코드_값으로_초대_코드를_조회한다() {
         // given
-        final InvitationCode savedInvitationCode = invitationCodeRepository.save(초대코드);
+        final InvitationCode savedInvitationCode = invitationCodeRepository.save(초대코드정보);
 
         // when
-        final InvitationCode invitationCode = invitationCodeRepository.findByCodeValue(초대코드.getCode().getValue())
+        final InvitationCode invitationCode = invitationCodeRepository.findByCodeValue(초대코드정보.getCode().getValue())
                 .orElseThrow();
 
         // then

@@ -2,7 +2,7 @@ package com.baba.back.content.repository;
 
 import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.DomainFixture.아기1;
-import static com.baba.back.fixture.DomainFixture.컨텐츠1;
+import static com.baba.back.fixture.DomainFixture.컨텐츠10;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.baba.back.baby.repository.BabyRepository;
@@ -34,7 +34,7 @@ class LikeRepositoryTest {
         // given
         final Member savedMember = memberRepository.save(멤버1);
         babyRepository.save(아기1);
-        final Content savedContent = contentRepository.save(컨텐츠1);
+        final Content savedContent = contentRepository.save(컨텐츠10);
         final Like savedLike = likeRepository.save(new Like(savedMember, savedContent));
 
         // when
@@ -49,7 +49,7 @@ class LikeRepositoryTest {
         // given
         final Member savedMember = memberRepository.save(멤버1);
         babyRepository.save(아기1);
-        final Content savedContent = contentRepository.save(컨텐츠1);
+        final Content savedContent = contentRepository.save(컨텐츠10);
         likeRepository.save(new Like(savedMember, savedContent));
 
         // when
@@ -64,7 +64,7 @@ class LikeRepositoryTest {
         // given
         final Member savedMember = memberRepository.save(멤버1);
         babyRepository.save(아기1);
-        final Content savedContent = contentRepository.save(컨텐츠1);
+        final Content savedContent = contentRepository.save(컨텐츠10);
 
         // when
         final boolean result = likeRepository.existsByContentAndMember(savedContent, savedMember);

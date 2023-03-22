@@ -2,7 +2,6 @@ package com.baba.back.oauth.acceptance;
 
 import static com.baba.back.SimpleRestAssured.post;
 import static com.baba.back.SimpleRestAssured.toObject;
-import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.RequestFixture.멤버_가입_요청_데이터;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -72,10 +71,11 @@ class MemberAcceptanceTest extends AcceptanceTest {
     @Test
     void 아기_등록_회원가입_요청_시_이미_가입한_유저가_회원가입을_요청하면_400을_던진다() {
         // given
-        아기_등록_회원가입_요청();
+        final String memberId = "memberId";
+        아기_등록_회원가입_요청(memberId);
 
         // when
-        final ExtractableResponse<Response> response = 아기_등록_회원가입_요청();
+        final ExtractableResponse<Response> response = 아기_등록_회원가입_요청(memberId);
 
         //  then
         assertAll(

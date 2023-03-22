@@ -38,8 +38,9 @@ class OAuthAcceptanceTest extends AcceptanceTest {
     @Test
     void 소셜_로그인_요청_시_이미_가입되어_있으면_access_token과_refresh_token_과_200을_응답한다() {
         // given
-        아기_등록_회원가입_요청();
-        given(oAuthClient.getMemberId(any())).willReturn("member");
+        final String memberId = "member";
+        아기_등록_회원가입_요청(memberId);
+        given(oAuthClient.getMemberId(any())).willReturn(memberId);
 
         // when
         final ExtractableResponse<Response> response = 소셜_로그인_요청();
@@ -68,8 +69,9 @@ class OAuthAcceptanceTest extends AcceptanceTest {
     @Test
     void 약관_조회_요청_시_이미_가입되어_있으면_400을_응답한다() {
         // given
-        아기_등록_회원가입_요청();
-        given(oAuthClient.getMemberId(any())).willReturn("member");
+        final String memberId = "member";
+        아기_등록_회원가입_요청(memberId);
+        given(oAuthClient.getMemberId(any())).willReturn(memberId);
 
         // when
         final ExtractableResponse<Response> response = 약관_조회_요청();
@@ -96,8 +98,10 @@ class OAuthAcceptanceTest extends AcceptanceTest {
     @Test
     void 약관_동의_요청_시_이미_가입되어_있으면_400을_응답한다() {
         // given
-        아기_등록_회원가입_요청(멤버_가입_요청_데이터);
-        given(oAuthClient.getMemberId(any())).willReturn("member");
+        final String memberId = "member";
+
+        아기_등록_회원가입_요청(memberId, 멤버_가입_요청_데이터);
+        given(oAuthClient.getMemberId(any())).willReturn(memberId);
 
         // when
         final ExtractableResponse<Response> response = 약관_동의_요청();

@@ -27,7 +27,7 @@ public class Expiration {
     }
 
     private static void validateNull(LocalDateTime now) {
-        if(Objects.isNull(now)) {
+        if (Objects.isNull(now)) {
             throw new ExpirationBadReqeustException("현재시각은 null일 수 없습니다.");
         }
     }

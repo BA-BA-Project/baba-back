@@ -1,5 +1,6 @@
 package com.baba.back.baby.domain.invitation;
 
+import com.baba.back.common.domain.BaseEntity;
 import com.baba.back.common.domain.Name;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
@@ -16,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class InvitationCode {
+public class InvitationCode extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

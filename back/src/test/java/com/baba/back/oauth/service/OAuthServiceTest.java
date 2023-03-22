@@ -1,7 +1,7 @@
 package com.baba.back.oauth.service;
 
 import static com.baba.back.fixture.DomainFixture.멤버1;
-import static com.baba.back.fixture.DomainFixture.토큰;
+import static com.baba.back.fixture.DomainFixture.토큰1;
 import static com.baba.back.fixture.RequestFixture.약관_동의_요청_데이터;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -339,7 +339,7 @@ class OAuthServiceTest {
         willDoNothing().given(refreshTokenProvider).validateToken(invalidToken);
         given(refreshTokenProvider.parseToken(invalidToken)).willReturn(멤버1.getId());
         given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
-        given(tokenRepository.existsByMemberAndValue(토큰.getMember(), invalidToken)).willReturn(false);
+        given(tokenRepository.existsByMemberAndValue(토큰1.getMember(), invalidToken)).willReturn(false);
 
         // when & then
         assertThatThrownBy(() -> oAuthService.refresh(new TokenRefreshRequest(invalidToken)))
@@ -351,20 +351,20 @@ class OAuthServiceTest {
         // given
         final String accessToken = "accessToken";
 
-        willDoNothing().given(refreshTokenProvider).validateToken(토큰.getValue());
-        given(refreshTokenProvider.parseToken(토큰.getValue())).willReturn(멤버1.getId());
+        willDoNothing().given(refreshTokenProvider).validateToken(토큰1.getValue());
+        given(refreshTokenProvider.parseToken(토큰1.getValue())).willReturn(멤버1.getId());
         given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
-        given(tokenRepository.existsByMemberAndValue(토큰.getMember(), 토큰.getValue())).willReturn(true);
+        given(tokenRepository.existsByMemberAndValue(토큰1.getMember(), 토큰1.getValue())).willReturn(true);
         given(accessTokenProvider.createToken(멤버1.getId())).willReturn(accessToken);
-        given(refreshTokenProvider.isExpiringSoon(토큰.getValue())).willReturn(false);
+        given(refreshTokenProvider.isExpiringSoon(토큰1.getValue())).willReturn(false);
 
         // when
-        final TokenRefreshResponse response = oAuthService.refresh(new TokenRefreshRequest(토큰.getValue()));
+        final TokenRefreshResponse response = oAuthService.refresh(new TokenRefreshRequest(토큰1.getValue()));
 
         // then
         Assertions.assertAll(
                 () -> assertThat(response.accessToken()).isNotBlank(),
-                () -> assertThat(response.refreshToken()).isEqualTo(토큰.getValue())
+                () -> assertThat(response.refreshToken()).isEqualTo(토큰1.getValue())
         );
     }
 
@@ -374,16 +374,16 @@ class OAuthServiceTest {
         final String accessToken = "accessToken";
         final String refreshToken = "refreshToken";
 
-        willDoNothing().given(refreshTokenProvider).validateToken(토큰.getValue());
-        given(refreshTokenProvider.parseToken(토큰.getValue())).willReturn(멤버1.getId());
+        willDoNothing().given(refreshTokenProvider).validateToken(토큰1.getValue());
+        given(refreshTokenProvider.parseToken(토큰1.getValue())).willReturn(멤버1.getId());
         given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
-        given(tokenRepository.existsByMemberAndValue(토큰.getMember(), 토큰.getValue())).willReturn(true);
+        given(tokenRepository.existsByMemberAndValue(토큰1.getMember(), 토큰1.getValue())).willReturn(true);
         given(accessTokenProvider.createToken(멤버1.getId())).willReturn(accessToken);
-        given(refreshTokenProvider.isExpiringSoon(토큰.getValue())).willReturn(true);
+        given(refreshTokenProvider.isExpiringSoon(토큰1.getValue())).willReturn(true);
         given(refreshTokenProvider.createToken(멤버1.getId())).willReturn(refreshToken);
 
         // when
-        final TokenRefreshResponse response = oAuthService.refresh(new TokenRefreshRequest(토큰.getValue()));
+        final TokenRefreshResponse response = oAuthService.refresh(new TokenRefreshRequest(토큰1.getValue()));
 
         // then
         Assertions.assertAll(

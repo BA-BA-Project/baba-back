@@ -2,7 +2,7 @@ package com.baba.back.baby.repository;
 
 import static com.baba.back.fixture.DomainFixture.아기1;
 import static com.baba.back.fixture.DomainFixture.아기2;
-import static com.baba.back.fixture.DomainFixture.초대코드;
+import static com.baba.back.fixture.DomainFixture.초대코드정보;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.baba.back.baby.domain.Baby;
@@ -47,7 +47,7 @@ class InvitationRepositoryTest {
                 .family(false)
                 .build());
 
-        final InvitationCode savedInvitationCode = invitationCodeRepository.save(초대코드);
+        final InvitationCode savedInvitationCode = invitationCodeRepository.save(초대코드정보);
 
         final Invitation savedInvitation = invitationRepository.save(Invitation.builder()
                 .invitationCode(savedInvitationCode)

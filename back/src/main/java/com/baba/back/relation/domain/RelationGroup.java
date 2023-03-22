@@ -1,8 +1,9 @@
 package com.baba.back.relation.domain;
 
 import com.baba.back.baby.domain.Baby;
-import com.baba.back.oauth.domain.member.Color;
+import com.baba.back.common.domain.BaseEntity;
 import com.baba.back.common.domain.Name;
+import com.baba.back.oauth.domain.member.Color;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -15,13 +16,15 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
-public class RelationGroup {
+public class RelationGroup extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -56,5 +59,17 @@ public class RelationGroup {
 
     public String getGroupColor() {
         return this.groupColor.getValue();
+    }
+
+    public String getRelationGroupName() {
+        return relationGroupName.getValue();
+    }
+
+    public boolean canShare(RelationGroup other) {
+
+        final boolean isSameBaby = this.baby.equals(other.baby);
+        final boolean canShareGroup = this.family || other.family || this.equals(other);
+
+        return isSameBaby && canShareGroup;
     }
 }

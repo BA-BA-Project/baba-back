@@ -1,18 +1,21 @@
 package com.baba.back.baby.domain;
 
+import com.baba.back.common.domain.BaseEntity;
 import com.baba.back.common.domain.Name;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import java.time.LocalDate;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
-public class Baby {
+public class Baby extends BaseEntity {
 
     @Id
     private String id;

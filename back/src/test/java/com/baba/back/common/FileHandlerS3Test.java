@@ -6,7 +6,7 @@ import static org.mockito.BDDMockito.given;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.baba.back.content.domain.ImageFile;
+import com.baba.back.content.domain.content.ImageFile;
 import com.baba.back.content.exception.FileHandlerServerException;
 import java.net.MalformedURLException;
 import java.net.URL;

@@ -1,7 +1,8 @@
 package com.baba.back.relation.domain;
 
-import com.baba.back.oauth.domain.member.Member;
+import com.baba.back.common.domain.BaseEntity;
 import com.baba.back.common.domain.Name;
+import com.baba.back.oauth.domain.member.Member;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -18,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Relation {
+public class Relation extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,7 +32,7 @@ public class Relation {
     @AttributeOverride(name = "value", column = @Column(name = "relation_name"))
     private Name relationName;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     private RelationGroup relationGroup;
 
     @Builder
