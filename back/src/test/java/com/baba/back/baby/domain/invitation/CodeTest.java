@@ -30,27 +30,21 @@ class CodeTest {
     @ValueSource(strings = {"abcddef", "가나다라마바사"})
     @NullAndEmptySource
     void 초대코드가_6자가_아니라면_예외를_던진다(String value) {
-        final CodeGenerator generator = (length, chars) -> value;
-
-        assertThatThrownBy(() -> Code.from(generator))
+        assertThatThrownBy(() -> Code.from(value))
                 .isInstanceOf(InviteCodeBadRequestException.class);
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"ABCDE가", "ABCDEa", "ABC@DE", "ABC/DE"})
     void 초대코드가_숫자_또는_대문자로_이루어지지_않았으면_예외를_던진다(String value) {
-        final CodeGenerator generator = (length, chars) -> value;
-
-        assertThatThrownBy(() -> Code.from(generator))
+        assertThatThrownBy(() -> Code.from(value))
                 .isInstanceOf(InviteCodeBadRequestException.class);
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"ABCDEF", "AB1D2F", "VSK18Z"})
     void 초대코드를_생성한다(String value) {
-        final CodeGenerator generator = (length, chars) -> value;
-
-        assertThatCode(() -> Code.from(generator))
+        assertThatCode(() -> Code.from(value))
                 .doesNotThrowAnyException();
     }
 }
