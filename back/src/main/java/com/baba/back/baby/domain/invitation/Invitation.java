@@ -33,4 +33,8 @@ public class Invitation extends BaseEntity {
         this.invitationCode = invitationCode;
         this.relationGroup = relationGroup;
     }
+
+    public void updateCode(String code) {
+        this.invitationCode.updateCode(code);
+    }
 }

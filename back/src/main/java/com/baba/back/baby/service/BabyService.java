@@ -27,6 +27,7 @@ import jakarta.transaction.Transactional;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -80,7 +81,7 @@ public class BabyService {
                 .now(LocalDateTime.now(clock))
                 .build();
 
-        createInvitation(groups, invitationCode);
+        saveInvitation(groups, invitationCode);
 
         return new CreateInviteCodeResponse(code.getValue());
     }
@@ -102,18 +103,24 @@ public class BabyService {
         return babies.stream()
                 .map(baby -> relationGroupRepository.findByBabyAndRelationGroupNameValue(baby, relationGroupName)
                         .orElseThrow(() -> new RelationGroupNotFoundException(
-                                "관계그룹 {" + relationGroupName + "}가 존재하지 않습니다."))
-                )
+                                "관계그룹 {" + relationGroupName + "}가 존재하지 않습니다.")))
                 .toList();
     }
 
-    private void createInvitation(List<RelationGroup> groups, InvitationCode invitationCode) {
-        groups.forEach(relationGroup -> invitationRepository.save(
-                Invitation.builder()
-                        .invitationCode(invitationCode)
-                        .relationGroup(relationGroup)
-                        .build())
-        );
+    private void saveInvitation(List<RelationGroup> groups, InvitationCode invitationCode) {
+        groups.forEach(relationGroup -> {
+            final Optional<Invitation> optionalInvitation = invitationRepository.findByRelationGroupAndRelationName(
+                    relationGroup, invitationCode.getRelationName());
+
+            optionalInvitation.ifPresent(invitation -> invitation.updateCode(invitationCode.getCode()));
+
+            final Invitation invitation = optionalInvitation.orElseGet(() -> Invitation.builder()
+                    .invitationCode(invitationCode)
+                    .relationGroup(relationGroup)
+                    .build());
+
+            invitationRepository.save(invitation);
+        });
     }
 
     public SearchInviteCodeResponse searchInviteCode(String code) {

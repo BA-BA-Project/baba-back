@@ -43,6 +43,7 @@ import com.baba.back.baby.exception.RelationGroupNotFoundException;
 import com.baba.back.baby.repository.InvitationRepository;
 import com.baba.back.oauth.exception.MemberNotFoundException;
 import com.baba.back.oauth.repository.MemberRepository;
+import com.baba.back.relation.domain.RelationGroup;
 import com.baba.back.relation.exception.RelationNotFoundException;
 import com.baba.back.relation.repository.RelationGroupRepository;
 import com.baba.back.relation.repository.RelationRepository;
@@ -150,7 +151,7 @@ class BabyServiceTest {
     }
 
     @Test
-    void 초대코드_생성_요청시_초대_코드를_생성한다() {
+    void 초대코드_생성_요청시_소속그룹과_관계명이_동일한_초대코드가_이미_존재하면_초대코드를_업데이트_한다() {
         // given
         final String inviteCode = "AAAAAA";
         final Clock now = Clock.systemDefaultZone();
@@ -164,7 +165,35 @@ class BabyServiceTest {
         given(codeGenerator.generate(anyInt(), anyString())).willReturn(inviteCode);
         given(clock.instant()).willReturn(now.instant());
         given(clock.getZone()).willReturn(now.getZone());
-        given(invitationRepository.save(any(Invitation.class))).willReturn(초대10, 초대20);
+        given(invitationRepository.findByRelationGroupAndRelationName(any(RelationGroup.class),
+                eq(초대코드_생성_요청_데이터1.getRelationName()))).willReturn(Optional.of(초대10), Optional.of(초대20));
+        given(invitationRepository.save(any(Invitation.class))).willReturn(any());
+
+        // when
+        final CreateInviteCodeResponse response = babyService.createInviteCode(초대코드_생성_요청_데이터1, 멤버1.getId());
+
+        // then
+        assertThat(response.inviteCode()).isEqualTo(inviteCode);
+    }
+
+    @Test
+    void 초대코드_생성_요청시_소속그룹과_관계명이_동일한_초대코드가_없으면_초대_코드를_생성한다() {
+        // given
+        final String inviteCode = "AAAAAA";
+        final Clock now = Clock.systemDefaultZone();
+
+        given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
+        given(relationRepository.findAllByMemberAndRelationGroupFamily(멤버1, true)).willReturn(List.of(관계10, 관계20));
+        given(relationGroupRepository.findByBabyAndRelationGroupNameValue(아기1, 초대코드_생성_요청_데이터1.getRelationGroup()))
+                .willReturn(Optional.of(관계그룹11));
+        given(relationGroupRepository.findByBabyAndRelationGroupNameValue(아기2, 초대코드_생성_요청_데이터1.getRelationGroup()))
+                .willReturn(Optional.of(관계그룹21));
+        given(codeGenerator.generate(anyInt(), anyString())).willReturn(inviteCode);
+        given(clock.instant()).willReturn(now.instant());
+        given(clock.getZone()).willReturn(now.getZone());
+        given(invitationRepository.findByRelationGroupAndRelationName(any(RelationGroup.class),
+                eq(초대코드_생성_요청_데이터1.getRelationName()))).willReturn(Optional.empty());
+        given(invitationRepository.save(any(Invitation.class))).willReturn(any());
 
         // when
         final CreateInviteCodeResponse response = babyService.createInviteCode(초대코드_생성_요청_데이터1, 멤버1.getId());
@@ -176,10 +205,10 @@ class BabyServiceTest {
     @Test
     void 초대장_조회_요청시_등록된_초대가_없으면_예외를_던진다() {
         // given
-        given(invitationRepository.findAllByCode(초대코드정보.getCode().getValue())).willReturn(List.of());
+        given(invitationRepository.findAllByCode(초대코드정보.getCode())).willReturn(List.of());
 
         // when & then
-        assertThatThrownBy(() -> babyService.searchInviteCode(초대코드정보.getCode().getValue()))
+        assertThatThrownBy(() -> babyService.searchInviteCode(초대코드정보.getCode()))
                 .isInstanceOf(InvitationNotFoundException.class);
     }
 
@@ -194,7 +223,7 @@ class BabyServiceTest {
         given(clock.getZone()).willReturn(nowClock.getZone());
 
         final InvitationCode invitationCode = InvitationCode.builder()
-                .code(Code.from((length, chars) -> validInviteCode))
+                .code(Code.from(validInviteCode))
                 .relationName("이모")
                 .now(LocalDateTime.now(clock))
                 .build();
@@ -227,7 +256,7 @@ class BabyServiceTest {
         given(clock.getZone()).willReturn(now.getZone());
 
         final InvitationCode invitationCode = InvitationCode.builder()
-                .code(Code.from((length, chars) -> validInviteCode))
+                .code(Code.from(validInviteCode))
                 .relationName("이모")
                 .now(LocalDateTime.now(clock))
                 .build();

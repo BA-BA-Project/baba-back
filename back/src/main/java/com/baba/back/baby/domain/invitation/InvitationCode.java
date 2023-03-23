@@ -28,11 +28,19 @@ public class InvitationCode {
         this.expiration = Expiration.from(now);
     }
 
+    public String getCode() {
+        return this.code.getValue();
+    }
+
     public String getRelationName() {
         return this.relationName.getValue();
     }
 
     public boolean isExpired(LocalDateTime now) {
         return this.expiration.isExpired(now);
+    }
+
+    public void updateCode(String code) {
+        this.code = Code.from(code);
     }
 }

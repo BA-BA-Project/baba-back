@@ -27,6 +27,29 @@ class InvitationRepositoryTest {
     private InvitationRepository invitationRepository;
 
     @Test
+    void 소속그룹과_관계명으로_초대_정보를_조회한다() {
+        // given
+        final Baby savedBaby = babyRepository.save(아기1);
+        final RelationGroup savedRelationGroup = relationGroupRepository.save(RelationGroup.builder()
+                .baby(savedBaby)
+                .relationGroupName("외가")
+                .family(false)
+                .build());
+
+        final Invitation savedInvitation = invitationRepository.save(Invitation.builder()
+                .invitationCode(초대코드정보)
+                .relationGroup(savedRelationGroup)
+                .build());
+
+        // when
+        final Invitation invitation = invitationRepository.findByRelationGroupAndRelationName(
+                savedRelationGroup, 초대코드정보.getRelationName()).orElseThrow();
+
+        // then
+        assertThat(invitation).isEqualTo(savedInvitation);
+    }
+
+    @Test
     void 코드로_초대_정보를_조회한다() {
         // given
         final Baby savedBaby = babyRepository.save(아기1);
@@ -54,7 +77,7 @@ class InvitationRepositoryTest {
                 .build());
 
         // when
-        final List<Invitation> invitations = invitationRepository.findAllByCode(초대코드정보.getCode().getValue());
+        final List<Invitation> invitations = invitationRepository.findAllByCode(초대코드정보.getCode());
 
         // then
         assertThat(invitations).containsExactly(savedInvitation, savedInvitation2);
