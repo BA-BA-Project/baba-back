@@ -5,11 +5,11 @@ import static com.baba.back.fixture.DomainFixture.관계20;
 import static com.baba.back.fixture.DomainFixture.관계30;
 import static com.baba.back.fixture.DomainFixture.관계40;
 import static com.baba.back.fixture.DomainFixture.관계그룹10;
+import static com.baba.back.fixture.DomainFixture.관계그룹11;
 import static com.baba.back.fixture.DomainFixture.관계그룹20;
+import static com.baba.back.fixture.DomainFixture.관계그룹21;
 import static com.baba.back.fixture.DomainFixture.관계그룹30;
 import static com.baba.back.fixture.DomainFixture.관계그룹40;
-import static com.baba.back.fixture.DomainFixture.관계그룹11;
-import static com.baba.back.fixture.DomainFixture.관계그룹21;
 import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.DomainFixture.아기1;
 import static com.baba.back.fixture.DomainFixture.아기2;
@@ -38,10 +38,8 @@ import com.baba.back.baby.dto.CreateInviteCodeResponse;
 import com.baba.back.baby.dto.InviteCodeBabyResponse;
 import com.baba.back.baby.dto.SearchInviteCodeResponse;
 import com.baba.back.baby.exception.InvitationCodeBadRequestException;
-import com.baba.back.baby.exception.InvitationCodeNotFoundException;
 import com.baba.back.baby.exception.InvitationNotFoundException;
 import com.baba.back.baby.exception.RelationGroupNotFoundException;
-import com.baba.back.baby.repository.InvitationCodeRepository;
 import com.baba.back.baby.repository.InvitationRepository;
 import com.baba.back.oauth.exception.MemberNotFoundException;
 import com.baba.back.oauth.repository.MemberRepository;
@@ -73,9 +71,6 @@ class BabyServiceTest {
 
     @Mock
     private RelationGroupRepository relationGroupRepository;
-
-    @Mock
-    private InvitationCodeRepository invitationCodeRepository;
 
     @Mock
     private InvitationRepository invitationRepository;
@@ -169,7 +164,6 @@ class BabyServiceTest {
         given(codeGenerator.generate(anyInt(), anyString())).willReturn(inviteCode);
         given(clock.instant()).willReturn(now.instant());
         given(clock.getZone()).willReturn(now.getZone());
-        given(invitationCodeRepository.save(any(InvitationCode.class))).willReturn(초대코드정보);
         given(invitationRepository.save(any(Invitation.class))).willReturn(초대10, 초대20);
 
         // when
@@ -180,18 +174,17 @@ class BabyServiceTest {
     }
 
     @Test
-    void 초대코드_조회_요청시_해당_초대코드가_존재하지_않으면_예외를_던진다() {
+    void 초대장_조회_요청시_등록된_초대가_없으면_예외를_던진다() {
         // given
-        given(invitationCodeRepository.findByCodeValue(초대코드정보.getCode().getValue()))
-                .willReturn(Optional.empty());
+        given(invitationRepository.findAllByCode(초대코드정보.getCode().getValue())).willReturn(List.of());
 
         // when & then
         assertThatThrownBy(() -> babyService.searchInviteCode(초대코드정보.getCode().getValue()))
-                .isInstanceOf(InvitationCodeNotFoundException.class);
+                .isInstanceOf(InvitationNotFoundException.class);
     }
 
     @Test
-    void 초대코드_조회_요청시_초대코드가_만료되었으면_예외를_던진다() {
+    void 초대장_조회_요청시_초대코드가_만료되었으면_예외를_던진다() {
         // given
         final String validInviteCode = "AAAAAA";
         final LocalDateTime now = LocalDateTime.now();
@@ -206,7 +199,12 @@ class BabyServiceTest {
                 .now(LocalDateTime.now(clock))
                 .build();
 
-        given(invitationCodeRepository.findByCodeValue(validInviteCode)).willReturn(Optional.of(invitationCode));
+        final Invitation invitation = Invitation.builder()
+                .invitationCode(invitationCode)
+                .relationGroup(관계그룹11)
+                .build();
+
+        given(invitationRepository.findAllByCode(validInviteCode)).willReturn(List.of(invitation));
 
         final Clock timeTravelClock = Clock.fixed(now.plusDays(10).plusSeconds(1)
                 .atZone(ZoneId.systemDefault()).toInstant(), ZoneId.systemDefault());
@@ -215,32 +213,8 @@ class BabyServiceTest {
         given(clock.getZone()).willReturn(timeTravelClock.getZone());
 
         // when & then
-        assertThatThrownBy(
-                () -> babyService.searchInviteCode(validInviteCode))
-                .isInstanceOf(InvitationCodeBadRequestException.class);
-    }
-
-    @Test
-    void 초대코드_조회_요청시_등록된_초대가_없으면_예외를_던진다() {
-        // given
-        final String validInviteCode = "AAAAAA";
-
-        final Clock now = Clock.systemDefaultZone();
-        given(clock.instant()).willReturn(now.instant());
-        given(clock.getZone()).willReturn(now.getZone());
-
-        final InvitationCode invitationCode = InvitationCode.builder()
-                .code(Code.from((length, chars) -> validInviteCode))
-                .relationName("이모")
-                .now(LocalDateTime.now(clock))
-                .build();
-
-        given(invitationCodeRepository.findByCodeValue(validInviteCode)).willReturn(Optional.of(invitationCode));
-        given(invitationRepository.findAllByInvitationCode(invitationCode)).willReturn(List.of());
-
-        // when & then
         assertThatThrownBy(() -> babyService.searchInviteCode(validInviteCode))
-                .isInstanceOf(InvitationNotFoundException.class);
+                .isInstanceOf(InvitationCodeBadRequestException.class);
     }
 
     @Test
@@ -258,8 +232,7 @@ class BabyServiceTest {
                 .now(LocalDateTime.now(clock))
                 .build();
 
-        given(invitationCodeRepository.findByCodeValue(validInviteCode)).willReturn(Optional.of(invitationCode));
-        given(invitationRepository.findAllByInvitationCode(invitationCode)).willReturn(List.of(초대10, 초대20));
+        given(invitationRepository.findAllByCode(validInviteCode)).willReturn(List.of(초대10, 초대20));
 
         // when
         final SearchInviteCodeResponse response = babyService.searchInviteCode(validInviteCode);

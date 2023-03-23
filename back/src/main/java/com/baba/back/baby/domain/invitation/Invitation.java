@@ -2,6 +2,7 @@ package com.baba.back.baby.domain.invitation;
 
 import com.baba.back.common.domain.BaseEntity;
 import com.baba.back.relation.domain.RelationGroup;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -19,13 +20,13 @@ public class Invitation extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    InvitationCode invitationCode;
+    @Embedded
+    private InvitationCode invitationCode;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    RelationGroup relationGroup;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private RelationGroup relationGroup;
 
     @Builder
     public Invitation(InvitationCode invitationCode, RelationGroup relationGroup) {

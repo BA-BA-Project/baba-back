@@ -7,7 +7,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.domain.invitation.Invitation;
-import com.baba.back.baby.domain.invitation.InvitationCode;
 import com.baba.back.relation.domain.RelationGroup;
 import com.baba.back.relation.repository.RelationGroupRepository;
 import java.util.List;
@@ -25,13 +24,10 @@ class InvitationRepositoryTest {
     private RelationGroupRepository relationGroupRepository;
 
     @Autowired
-    private InvitationCodeRepository invitationCodeRepository;
-
-    @Autowired
     private InvitationRepository invitationRepository;
 
     @Test
-    void 초대코드로_초대_정보를_조회한다() {
+    void 코드로_초대_정보를_조회한다() {
         // given
         final Baby savedBaby = babyRepository.save(아기1);
         final RelationGroup savedRelationGroup = relationGroupRepository.save(RelationGroup.builder()
@@ -47,20 +43,18 @@ class InvitationRepositoryTest {
                 .family(false)
                 .build());
 
-        final InvitationCode savedInvitationCode = invitationCodeRepository.save(초대코드정보);
-
         final Invitation savedInvitation = invitationRepository.save(Invitation.builder()
-                .invitationCode(savedInvitationCode)
+                .invitationCode(초대코드정보)
                 .relationGroup(savedRelationGroup)
                 .build());
 
         final Invitation savedInvitation2 = invitationRepository.save(Invitation.builder()
-                .invitationCode(savedInvitationCode)
+                .invitationCode(초대코드정보)
                 .relationGroup(savedRelationGroup2)
                 .build());
 
         // when
-        final List<Invitation> invitations = invitationRepository.findAllByInvitationCode(savedInvitationCode);
+        final List<Invitation> invitations = invitationRepository.findAllByCode(초대코드정보.getCode().getValue());
 
         // then
         assertThat(invitations).containsExactly(savedInvitation, savedInvitation2);
