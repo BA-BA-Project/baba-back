@@ -7,10 +7,12 @@ import static com.baba.back.fixture.RequestFixture.멤버_가입_요청_데이�
 import static com.baba.back.fixture.RequestFixture.소셜_토큰_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.약관_동의_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.초대코드_생성_요청_데이터2;
+import static com.baba.back.fixture.RequestFixture.초대코드로_멤버_가입_요청_데이터;
 
-import com.baba.back.content.dto.CreateCommentRequest;
 import com.baba.back.baby.dto.CreateInviteCodeRequest;
+import com.baba.back.content.dto.CreateCommentRequest;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
+import com.baba.back.oauth.dto.SignUpWithCodeRequest;
 import com.baba.back.oauth.dto.TokenRefreshRequest;
 import com.baba.back.oauth.service.SignTokenProvider;
 import io.restassured.RestAssured;
@@ -57,6 +59,12 @@ public class AcceptanceTest {
     protected ExtractableResponse<Response> 아기_등록_회원가입_요청(String memberId, MemberSignUpRequest request) {
         final String signToken = signTokenProvider.createToken(memberId);
         return post(MEMBER_BASE_PATH + "/baby", Map.of("Authorization", "Bearer " + signToken), request);
+    }
+
+    protected ExtractableResponse<Response> 초대코드로_회원가입_요청(String memberId, SignUpWithCodeRequest request) {
+        final String signToken = signTokenProvider.createToken(memberId);
+        return post(MEMBER_BASE_PATH + "/baby/invite-code",
+                Map.of("Authorization", "Bearer " + signToken), request);
     }
 
     protected ExtractableResponse<Response> 초대장_조회_요청(String code) {
