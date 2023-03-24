@@ -133,28 +133,40 @@ public class MemberService {
         );
     }
 
-    public MemberSignUpResponse signUpWithCode(SignUpWithCodeRequest request, String memberId) {
+    public SignUpWithBabyResponse signUpWithCode(SignUpWithCodeRequest request, String memberId) {
         validateSignUp(memberId);
 
-        final Invitations invitations = new Invitations(invitationRepository.findAllByCode(request.getInviteCode()));
+        final Invitations invitations = getInvitations(request);
         final InvitationCode invitationCode = invitations.getUnExpiredInvitationCode(LocalDateTime.now(clock));
 
         final Member member = saveMember(memberId, request.getName(), request.getIconName());
-        saveRelations(invitations.values(), invitationCode.getRelationName(), member);
+        final Babies babies = saveRelationsAndGetBabies(invitations.values(), invitationCode.getRelationName(), member);
 
         final String accessToken = accessTokenProvider.createToken(memberId);
         final String refreshToken = refreshTokenProvider.createToken(memberId);
         saveRefreshToken(member, refreshToken);
 
-        return new MemberSignUpResponse(accessToken, refreshToken);
+        return new SignUpWithBabyResponse(new MemberSignUpResponse(accessToken, refreshToken), babies.getFirstBabyId());
     }
 
-    private void saveRelations(List<Invitation> invitations, String relationName, Member member) {
-        invitations.forEach(
-                invitation -> relationRepository.save(Relation.builder()
-                        .relationGroup(invitation.getRelationGroup())
-                        .relationName(relationName)
-                        .member(member)
-                        .build()));
+    private Invitations getInvitations(SignUpWithCodeRequest request) {
+        return new Invitations(invitationRepository.findAllByCode(request.getInviteCode()));
+    }
+
+    private Babies saveRelationsAndGetBabies(List<Invitation> invitations, String relationName, Member member) {
+        return new Babies(invitations.stream()
+                .map(invitation -> {
+                    final RelationGroup relationGroup = invitation.getRelationGroup();
+                    final Baby baby = relationGroup.getBaby();
+
+                    relationRepository.save(Relation.builder()
+                            .relationGroup(relationGroup)
+                            .relationName(relationName)
+                            .member(member)
+                            .build());
+
+                    return baby;
+                })
+                .toList());
     }
 }

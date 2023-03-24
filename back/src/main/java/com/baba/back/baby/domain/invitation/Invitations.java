@@ -1,7 +1,7 @@
 package com.baba.back.baby.domain.invitation;
 
+import com.baba.back.baby.exception.InvitationBadRequestException;
 import com.baba.back.baby.exception.InvitationCodeBadRequestException;
-import com.baba.back.baby.exception.InvitationNotFoundException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,7 @@ public record Invitations(List<Invitation> values) {
 
     private void validateEmpty(List<Invitation> values) {
         if (values.isEmpty()) {
-            throw new InvitationNotFoundException("초대 정보가 존재하지 않습니다.");
+            throw new InvitationBadRequestException("invitations의 길이는 0일 수 없습니다.");
         }
     }
 

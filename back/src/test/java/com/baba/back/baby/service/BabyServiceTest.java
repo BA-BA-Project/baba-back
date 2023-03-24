@@ -37,8 +37,8 @@ import com.baba.back.baby.dto.BabyResponse;
 import com.baba.back.baby.dto.CreateInviteCodeResponse;
 import com.baba.back.baby.dto.InviteCodeBabyResponse;
 import com.baba.back.baby.dto.SearchInviteCodeResponse;
+import com.baba.back.baby.exception.InvitationBadRequestException;
 import com.baba.back.baby.exception.InvitationCodeBadRequestException;
-import com.baba.back.baby.exception.InvitationNotFoundException;
 import com.baba.back.baby.exception.RelationGroupNotFoundException;
 import com.baba.back.baby.repository.InvitationRepository;
 import com.baba.back.oauth.exception.MemberNotFoundException;
@@ -209,7 +209,7 @@ class BabyServiceTest {
 
         // when & then
         assertThatThrownBy(() -> babyService.searchInviteCode(초대코드정보.getCode()))
-                .isInstanceOf(InvitationNotFoundException.class);
+                .isInstanceOf(InvitationBadRequestException.class);
     }
 
     @Test

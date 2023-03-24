@@ -29,8 +29,8 @@ import com.baba.back.baby.domain.IdConstructor;
 import com.baba.back.baby.domain.invitation.Code;
 import com.baba.back.baby.domain.invitation.Invitation;
 import com.baba.back.baby.domain.invitation.InvitationCode;
+import com.baba.back.baby.exception.InvitationBadRequestException;
 import com.baba.back.baby.exception.InvitationCodeBadRequestException;
-import com.baba.back.baby.exception.InvitationNotFoundException;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.baby.repository.InvitationRepository;
 import com.baba.back.oauth.domain.Picker;
@@ -203,7 +203,7 @@ class MemberServiceTest {
 
         // when & then
         assertThatThrownBy(() -> memberService.signUpWithCode(초대코드로_멤버_가입_요청_데이터, memberId))
-                .isInstanceOf(InvitationNotFoundException.class);
+                .isInstanceOf(InvitationBadRequestException.class);
     }
 
     @Test
@@ -264,7 +264,8 @@ class MemberServiceTest {
         given(tokenRepository.save(any(Token.class))).willReturn(any());
 
         // when
-        final MemberSignUpResponse response = memberService.signUpWithCode(초대코드로_멤버_가입_요청_데이터, memberId);
+        final MemberSignUpResponse response = memberService.signUpWithCode(초대코드로_멤버_가입_요청_데이터, memberId)
+                .memberSignUpResponse();
 
         // then
         assertAll(
