@@ -6,12 +6,14 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.time.LocalDateTime;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Embeddable
 @Getter
 @NoArgsConstructor
+@EqualsAndHashCode
 public class InvitationCode {
 
     private Code code;
@@ -34,6 +36,10 @@ public class InvitationCode {
 
     public String getRelationName() {
         return this.relationName.getValue();
+    }
+
+    public LocalDateTime getExpiration() {
+        return this.expiration.getValue();
     }
 
     public boolean isExpired(LocalDateTime now) {
