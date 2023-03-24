@@ -9,6 +9,8 @@ import com.baba.back.content.domain.comment.Comment;
 import com.baba.back.content.domain.comment.Tag;
 import com.baba.back.content.domain.content.Content;
 import com.baba.back.content.domain.content.ImageFile;
+import com.baba.back.content.dto.CommentResponse;
+import com.baba.back.content.dto.ContentLikeCommentResponse;
 import com.baba.back.content.dto.ContentResponse;
 import com.baba.back.content.dto.ContentsResponse;
 import com.baba.back.content.dto.CreateCommentRequest;
@@ -202,5 +204,86 @@ public class ContentService {
                     )
             );
         }
+    }
+
+    public ContentLikeCommentResponse getContent(String memberId, Long contentId) {
+        final Member member = findMember(memberId);
+        final Content content = findContent(contentId);
+        final Baby baby = content.getBaby();
+
+        final Relation relation = findRelation(member, baby);
+        final RelationGroup relationGroup = relation.getRelationGroup();
+
+        final List<Like> likes = likeRepository.findAllByContent(content);
+        final List<Comment> comments = commentRepository.findAllByContent(content);
+
+        if (!relationGroup.isFamily()) {
+            final List<Like> sharedLikes = findSharedLikes(baby, relationGroup, likes);
+            final List<Comment> sharedComments = findSharedComments(baby, relationGroup, comments);
+            return getContentLikeCommentResponse(content, sharedLikes, sharedComments);
+        }
+
+        return getContentLikeCommentResponse(content, likes, comments);
+    }
+
+    private List<Comment> findSharedComments(Baby baby, RelationGroup relationGroup, List<Comment> comments) {
+        return comments.stream()
+                .filter(comment -> {
+                    final Relation commentMemberRelation = findRelation(comment.getOwner(), baby);
+                    return relationGroup.canShare(commentMemberRelation.getRelationGroup());
+                })
+                .toList();
+    }
+
+    private List<Like> findSharedLikes(Baby baby, RelationGroup relationGroup, List<Like> likes) {
+        return likes.stream()
+                .filter(like -> {
+                    final Relation likeMemberRelation = findRelation(like.getMember(), baby);
+                    return relationGroup.canShare(likeMemberRelation.getRelationGroup());
+                })
+                .toList();
+    }
+
+    private ContentLikeCommentResponse getContentLikeCommentResponse(Content content,
+                                                                     List<Like> likes,
+                                                                     List<Comment> comments) {
+        return new ContentLikeCommentResponse(
+                likes.size(),
+                likes.stream()
+                        .map(Like::getMember)
+                        .map(Member::getIconName)
+                        .sorted()
+                        .limit(3)
+                        .toList(),
+                comments.size(),
+                content.getCardStyle(),
+                comments.stream()
+                        .sorted()
+                        .map(comment -> {
+                                    final Member owner = comment.getOwner();
+                                    final Relation relation = findRelation(owner, content.getBaby());
+
+                                    return new CommentResponse(
+                                            comment.getId(),
+                                            owner.getId(),
+                                            owner.getName(),
+                                            relation.getRelationName().getValue(),
+                                            owner.getIconName(),
+                                            owner.getIconColor(),
+                                            findTagMemberName(comment),
+                                            comment.getText(),
+                                            comment.getCreatedAt());
+                                }
+                        )
+                        .toList()
+        );
+    }
+
+    public String findTagMemberName(Comment comment) {
+        final Optional<Tag> tag = tagRepository.findByComment(comment);
+        if (tag.isPresent()) {
+            return tag.get().getTagMember().getName();
+        }
+        return "";
     }
 }
