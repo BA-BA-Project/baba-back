@@ -17,7 +17,7 @@ import static com.baba.back.fixture.DomainFixture.아기3;
 import static com.baba.back.fixture.DomainFixture.아기4;
 import static com.baba.back.fixture.DomainFixture.초대10;
 import static com.baba.back.fixture.DomainFixture.초대20;
-import static com.baba.back.fixture.DomainFixture.초대코드정보;
+import static com.baba.back.fixture.DomainFixture.초대코드정보1;
 import static com.baba.back.fixture.RequestFixture.초대코드_생성_요청_데이터1;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -37,7 +37,7 @@ import com.baba.back.baby.dto.BabyResponse;
 import com.baba.back.baby.dto.CreateInviteCodeResponse;
 import com.baba.back.baby.dto.InviteCodeBabyResponse;
 import com.baba.back.baby.dto.SearchInviteCodeResponse;
-import com.baba.back.baby.exception.InvitationBadRequestException;
+import com.baba.back.baby.exception.InvitationsBadRequestException;
 import com.baba.back.baby.exception.InvitationCodeBadRequestException;
 import com.baba.back.baby.exception.RelationGroupNotFoundException;
 import com.baba.back.baby.repository.InvitationRepository;
@@ -205,11 +205,11 @@ class BabyServiceTest {
     @Test
     void 초대장_조회_요청시_등록된_초대가_없으면_예외를_던진다() {
         // given
-        given(invitationRepository.findAllByCode(초대코드정보.getCode())).willReturn(List.of());
+        given(invitationRepository.findAllByCode(초대코드정보1.getCode())).willReturn(List.of());
 
         // when & then
-        assertThatThrownBy(() -> babyService.searchInviteCode(초대코드정보.getCode()))
-                .isInstanceOf(InvitationBadRequestException.class);
+        assertThatThrownBy(() -> babyService.searchInviteCode(초대코드정보1.getCode()))
+                .isInstanceOf(InvitationsBadRequestException.class);
     }
 
     @Test
