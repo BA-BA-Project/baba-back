@@ -40,6 +40,13 @@ public class DomainFixture {
             .iconName(IconName.PROFILE_G_1.toString())
             .iconColor(Color.COLOR_1)
             .build();
+    public static final Member 멤버3 = Member.builder()
+            .id("member3")
+            .name("멤버3")
+            .introduction("안녕하세요")
+            .iconName(IconName.PROFILE_G_1.toString())
+            .iconColor(Color.COLOR_1)
+            .build();
     public static final Token 토큰1 = Token.builder()
             .member(멤버1)
             .value("토큰1")
@@ -107,16 +114,21 @@ public class DomainFixture {
             .owner(멤버1)
             .relation(관계10.getRelationName())
             .build();
-    public static final Relation 관계11 = Relation.builder()
-            .member(멤버2)
-            .relationName("엄마")
-            .relationGroup(관계그룹10)
-            .build();
     public static final RelationGroup 관계그룹11 = RelationGroup.builder()
             .baby(아기1)
             .relationGroupName("외가")
             .family(false)
             .groupColor(Color.COLOR_1)
+            .build();
+    public static final Relation 관계11 = Relation.builder()
+            .member(멤버2)
+            .relationName("엄마")
+            .relationGroup(관계그룹10)
+            .build();
+    public static final Relation 관계12 = Relation.builder()
+            .member(멤버3)
+            .relationName("이모")
+            .relationGroup(관계그룹11)
             .build();
     public static final Invitation 초대10 = Invitation.builder()
             .invitationCode(초대코드정보)
@@ -149,6 +161,11 @@ public class DomainFixture {
     public static final Relation 관계21 = Relation.builder()
             .member(멤버2)
             .relationName("사촌 형")
+            .relationGroup(관계그룹21)
+            .build();
+    public static final Relation 관계23 = Relation.builder()
+            .member(멤버3)
+            .relationName("이모")
             .relationGroup(관계그룹21)
             .build();
     public static final Invitation 초대20 = Invitation.builder()

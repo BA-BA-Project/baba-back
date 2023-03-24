@@ -166,7 +166,7 @@ class BabyServiceTest {
         given(clock.instant()).willReturn(now.instant());
         given(clock.getZone()).willReturn(now.getZone());
         given(invitationRepository.findByRelationGroupAndRelationName(any(RelationGroup.class),
-                eq(초대코드_생성_요청_데이터1.getRelationName()))).willReturn(Optional.of(초대10), Optional.of(초대20));
+                eq(초대코드_생성_요청_데이터1.getRelationName()))).willReturn(Optional.of(초대10));
         given(invitationRepository.save(any(Invitation.class))).willReturn(any());
 
         // when

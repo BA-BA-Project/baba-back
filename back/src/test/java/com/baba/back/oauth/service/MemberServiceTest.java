@@ -1,13 +1,20 @@
 package com.baba.back.oauth.service;
 
 import static com.baba.back.fixture.DomainFixture.관계10;
+import static com.baba.back.fixture.DomainFixture.관계12;
+import static com.baba.back.fixture.DomainFixture.관계23;
 import static com.baba.back.fixture.DomainFixture.관계30;
 import static com.baba.back.fixture.DomainFixture.관계그룹10;
+import static com.baba.back.fixture.DomainFixture.관계그룹11;
 import static com.baba.back.fixture.DomainFixture.관계그룹30;
 import static com.baba.back.fixture.DomainFixture.멤버1;
+import static com.baba.back.fixture.DomainFixture.멤버3;
 import static com.baba.back.fixture.DomainFixture.아기1;
 import static com.baba.back.fixture.DomainFixture.아기2;
+import static com.baba.back.fixture.DomainFixture.초대10;
+import static com.baba.back.fixture.DomainFixture.초대20;
 import static com.baba.back.fixture.RequestFixture.멤버_가입_요청_데이터;
+import static com.baba.back.fixture.RequestFixture.초대코드로_멤버_가입_요청_데이터;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -19,7 +26,13 @@ import static org.mockito.Mockito.times;
 
 import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.domain.IdConstructor;
+import com.baba.back.baby.domain.invitation.Code;
+import com.baba.back.baby.domain.invitation.Invitation;
+import com.baba.back.baby.domain.invitation.InvitationCode;
+import com.baba.back.baby.exception.InvitationCodeBadRequestException;
+import com.baba.back.baby.exception.InvitationNotFoundException;
 import com.baba.back.baby.repository.BabyRepository;
+import com.baba.back.baby.repository.InvitationRepository;
 import com.baba.back.oauth.domain.Picker;
 import com.baba.back.oauth.domain.member.Color;
 import com.baba.back.oauth.domain.member.Member;
@@ -28,6 +41,7 @@ import com.baba.back.oauth.dto.MemberResponse;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
 import com.baba.back.oauth.dto.SignUpWithBabyResponse;
+import com.baba.back.oauth.dto.SignUpWithCodeRequest;
 import com.baba.back.oauth.exception.MemberBadRequestException;
 import com.baba.back.oauth.exception.MemberNotFoundException;
 import com.baba.back.oauth.repository.MemberRepository;
@@ -37,6 +51,9 @@ import com.baba.back.relation.domain.RelationGroup;
 import com.baba.back.relation.repository.RelationGroupRepository;
 import com.baba.back.relation.repository.RelationRepository;
 import java.time.Clock;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -71,6 +88,9 @@ class MemberServiceTest {
 
     @Mock
     private IdConstructor idConstructor;
+
+    @Mock
+    private InvitationRepository invitationRepository;
 
     @Mock
     private AccessTokenProvider accessTokenProvider;
@@ -161,5 +181,95 @@ class MemberServiceTest {
 
         // when & then
         assertThatThrownBy(() -> memberService.findMember(invalidMemberId)).isInstanceOf(MemberNotFoundException.class);
+    }
+
+    @Test
+    void 초대코드로_회원가입시_이미_회원가입한_멤버는_회원가입할_수_없다() {
+        // given
+        final String memberId = "memberId";
+        given(memberRepository.existsById(memberId)).willReturn(true);
+
+        // when & then
+        assertThatThrownBy(() -> memberService.signUpWithCode(초대코드로_멤버_가입_요청_데이터, memberId))
+                .isInstanceOf(MemberBadRequestException.class);
+    }
+
+    @Test
+    void 초대코드로_회원가입시_요청한_초대코드에_해당하는_초대정보가_없으면_예외를_던진다() {
+        // given
+        final String memberId = "memberId";
+        given(memberRepository.existsById(memberId)).willReturn(false);
+        given(invitationRepository.findAllByCode(초대코드로_멤버_가입_요청_데이터.getInviteCode())).willReturn(List.of());
+
+        // when & then
+        assertThatThrownBy(() -> memberService.signUpWithCode(초대코드로_멤버_가입_요청_데이터, memberId))
+                .isInstanceOf(InvitationNotFoundException.class);
+    }
+
+    @Test
+    void 초대코드로_회원가입시_초대코드가_만료되었으면_예외를_던진다() {
+        // given
+        final String memberId = "memberId";
+        final String validCode = "AAAAAA";
+        final LocalDateTime now = LocalDateTime.now();
+        final SignUpWithCodeRequest request = new SignUpWithCodeRequest(validCode, "박재희", "PROFILE_W_1");
+
+        final Clock nowClock = Clock.fixed(now.atZone(ZoneId.systemDefault()).toInstant(), ZoneId.systemDefault());
+        given(clock.instant()).willReturn(nowClock.instant());
+        given(clock.getZone()).willReturn(nowClock.getZone());
+
+        final InvitationCode invitationCode = InvitationCode.builder()
+                .code(Code.from(validCode))
+                .relationName("이모")
+                .now(LocalDateTime.now(clock))
+                .build();
+
+        final Invitation invitation = Invitation.builder()
+                .invitationCode(invitationCode)
+                .relationGroup(관계그룹11)
+                .build();
+
+        final Clock timeTravelClock = Clock.fixed(now.plusDays(10).plusSeconds(1)
+                .atZone(ZoneId.systemDefault()).toInstant(), ZoneId.systemDefault());
+
+        given(memberRepository.existsById(memberId)).willReturn(false);
+        given(invitationRepository.findAllByCode(validCode)).willReturn(List.of(invitation));
+
+        given(clock.instant()).willReturn(timeTravelClock.instant());
+        given(clock.getZone()).willReturn(timeTravelClock.getZone());
+
+        // when & then
+        assertThatThrownBy(() -> memberService.signUpWithCode(request, memberId))
+                .isInstanceOf(InvitationCodeBadRequestException.class);
+    }
+
+    @Test
+    void 초대코드로_회원가입시_회원가입을_진행한다() {
+        // given
+        final String memberId = "memberId";
+        final String accessToken = "accessToken";
+        final String refreshToken = "refreshToken";
+
+        given(memberRepository.existsById(memberId)).willReturn(false);
+        given(invitationRepository.findAllByCode(초대코드로_멤버_가입_요청_데이터.getInviteCode()))
+                .willReturn(List.of(초대10, 초대20));
+
+        final Clock now = Clock.systemDefaultZone();
+        given(clock.instant()).willReturn(now.instant());
+        given(clock.getZone()).willReturn(now.getZone());
+        given(memberRepository.save(any(Member.class))).willReturn(멤버3);
+        given(relationRepository.save(any(Relation.class))).willReturn(관계12, 관계23);
+        given(accessTokenProvider.createToken(memberId)).willReturn(accessToken);
+        given(refreshTokenProvider.createToken(memberId)).willReturn(refreshToken);
+        given(tokenRepository.save(any(Token.class))).willReturn(any());
+
+        // when
+        final MemberSignUpResponse response = memberService.signUpWithCode(초대코드로_멤버_가입_요청_데이터, memberId);
+
+        // then
+        assertAll(
+                () -> assertThat(response.accessToken()).isEqualTo(accessToken),
+                () -> assertThat(response.refreshToken()).isEqualTo(refreshToken)
+        );
     }
 }

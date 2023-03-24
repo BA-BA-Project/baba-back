@@ -4,14 +4,13 @@ import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.domain.invitation.Code;
 import com.baba.back.baby.domain.invitation.Invitation;
 import com.baba.back.baby.domain.invitation.InvitationCode;
+import com.baba.back.baby.domain.invitation.Invitations;
 import com.baba.back.baby.dto.BabiesResponse;
 import com.baba.back.baby.dto.BabyResponse;
 import com.baba.back.baby.dto.CreateInviteCodeRequest;
 import com.baba.back.baby.dto.CreateInviteCodeResponse;
 import com.baba.back.baby.dto.InviteCodeBabyResponse;
 import com.baba.back.baby.dto.SearchInviteCodeResponse;
-import com.baba.back.baby.exception.InvitationCodeBadRequestException;
-import com.baba.back.baby.exception.InvitationNotFoundException;
 import com.baba.back.baby.exception.RelationGroupNotFoundException;
 import com.baba.back.baby.repository.InvitationRepository;
 import com.baba.back.oauth.domain.member.Member;
@@ -124,11 +123,11 @@ public class BabyService {
     }
 
     public SearchInviteCodeResponse searchInviteCode(String code) {
-        final List<Invitation> invitations = getInvitations(code);
-        InvitationCode invitationCode = getInvitationCode(invitations);
+        final Invitations invitations = new Invitations(invitationRepository.findAllByCode(code));
+        final InvitationCode invitationCode = invitations.getUnExpiredInvitationCode(LocalDateTime.now(clock));
 
         return new SearchInviteCodeResponse(
-                invitations.stream()
+                invitations.values().stream()
                         .map(invitation -> {
                             final RelationGroup relationGroup = invitation.getRelationGroup();
                             final Baby baby = relationGroup.getBaby();
@@ -137,22 +136,5 @@ public class BabyService {
                         })
                         .toList(),
                 invitationCode.getRelationName());
-    }
-
-    private List<Invitation> getInvitations(String code) {
-        final List<Invitation> invitations = invitationRepository.findAllByCode(code);
-        if (invitations.isEmpty()) {
-            throw new InvitationNotFoundException("초대 정보가 존재하지 않습니다.");
-        }
-
-        return invitations;
-    }
-
-    private InvitationCode getInvitationCode(List<Invitation> invitations) {
-        return invitations.stream()
-                .map(Invitation::getInvitationCode)
-                .filter(invitationCode -> !invitationCode.isExpired(LocalDateTime.now(clock)))
-                .findAny()
-                .orElseThrow(() -> new InvitationCodeBadRequestException("초대 코드가 만료되었습니다."));
     }
 }
