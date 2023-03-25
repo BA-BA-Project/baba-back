@@ -136,7 +136,7 @@ public class MemberService {
     public SignUpWithBabyResponse signUpWithCode(SignUpWithCodeRequest request, String memberId) {
         validateSignUp(memberId);
 
-        final Invitations invitations = getInvitations(request);
+        final Invitations invitations = getInvitations(request.getInviteCode());
         final InvitationCode invitationCode = invitations.getUnExpiredInvitationCode(LocalDateTime.now(clock));
 
         final Member member = saveMember(memberId, request.getName(), request.getIconName());
@@ -149,8 +149,8 @@ public class MemberService {
         return new SignUpWithBabyResponse(new MemberSignUpResponse(accessToken, refreshToken), babies.getFirstBabyId());
     }
 
-    private Invitations getInvitations(SignUpWithCodeRequest request) {
-        return new Invitations(invitationRepository.findAllByCode(request.getInviteCode()));
+    private Invitations getInvitations(String code) {
+        return new Invitations(invitationRepository.findAllByCode(code));
     }
 
     private Babies saveRelationsAndGetBabies(List<Invitation> invitations, String relationName, Member member) {
