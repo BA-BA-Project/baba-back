@@ -47,6 +47,6 @@ public class InvitationCode {
     }
 
     public void updateCode(String code) {
-        this.code = Code.from(code);
+        this.code = Code.from((length, chars) -> code);
     }
 }

@@ -20,10 +20,6 @@ public class Code {
         return new Code(generatedCode);
     }
 
-    public static Code from(String code) {
-        return new Code(code);
-    }
-
     @Column(name = "invite_code")
     private String value;
 

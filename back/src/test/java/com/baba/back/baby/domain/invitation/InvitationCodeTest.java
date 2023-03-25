@@ -14,7 +14,7 @@ class InvitationCodeTest {
     void 초대코드가_만료되지_않았으면_false를_반환한다() {
         // given
         final InvitationCode invitationCode = InvitationCode.builder()
-                .code(Code.from("AAAAAA"))
+                .code(Code.from((length, chars) -> "AAAAAA"))
                 .relationName("외가")
                 .now(now)
                 .build();
@@ -27,7 +27,7 @@ class InvitationCodeTest {
     void 초대코드가_만료되었으면_true를_반환한다() {
         // given
         final InvitationCode invitationCode = InvitationCode.builder()
-                .code(Code.from("AAAAAA"))
+                .code(Code.from((length, chars) -> "AAAAAA"))
                 .relationName("외가")
                 .now(now)
                 .build();
@@ -42,7 +42,7 @@ class InvitationCodeTest {
         final String beforeCode = "AAAAAA";
         final String afterCode = "BBBBBB";
         final InvitationCode invitationCode = InvitationCode.builder()
-                .code(Code.from(beforeCode))
+                .code(Code.from((length, chars) -> beforeCode))
                 .relationName("외가")
                 .now(now)
                 .build();

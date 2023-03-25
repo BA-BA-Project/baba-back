@@ -21,12 +21,12 @@ public class DomainFixture {
     public static final LocalDate nowDate = LocalDate.of(2023, 3, 12);
     public static final LocalDateTime nowDateTime = LocalDateTime.now();
     public static final InvitationCode 초대코드정보1 = InvitationCode.builder()
-            .code(Code.from("AAAAAA"))
+            .code(Code.from((length, chars) -> "AAAAAA"))
             .relationName("이모")
             .now(nowDateTime)
             .build();
     public static final InvitationCode 초대코드정보2 = InvitationCode.builder()
-            .code(Code.from("BBBBBB"))
+            .code(Code.from((length, chars) -> "AAAAAA"))
             .relationName("고모")
             .now(nowDateTime)
             .build();

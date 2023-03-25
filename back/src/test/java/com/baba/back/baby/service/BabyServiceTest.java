@@ -223,7 +223,7 @@ class BabyServiceTest {
         given(clock.getZone()).willReturn(nowClock.getZone());
 
         final InvitationCode invitationCode = InvitationCode.builder()
-                .code(Code.from(validInviteCode))
+                .code(Code.from((length, chars) -> validInviteCode))
                 .relationName("이모")
                 .now(LocalDateTime.now(clock))
                 .build();
@@ -256,7 +256,7 @@ class BabyServiceTest {
         given(clock.getZone()).willReturn(now.getZone());
 
         final InvitationCode invitationCode = InvitationCode.builder()
-                .code(Code.from(validInviteCode))
+                .code(Code.from((length, chars) -> validInviteCode))
                 .relationName("이모")
                 .now(LocalDateTime.now(clock))
                 .build();

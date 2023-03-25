@@ -219,7 +219,7 @@ class MemberServiceTest {
         given(clock.getZone()).willReturn(nowClock.getZone());
 
         final InvitationCode invitationCode = InvitationCode.builder()
-                .code(Code.from(validCode))
+                .code(Code.from((length, chars) -> validCode))
                 .relationName("이모")
                 .now(LocalDateTime.now(clock))
                 .build();
