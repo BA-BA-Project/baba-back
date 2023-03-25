@@ -7,7 +7,6 @@ import static com.baba.back.fixture.RequestFixture.멤버_가입_요청_데이�
 import static com.baba.back.fixture.RequestFixture.소셜_토큰_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.약관_동의_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.초대코드_생성_요청_데이터2;
-import static com.baba.back.fixture.RequestFixture.초대코드로_멤버_가입_요청_데이터;
 
 import com.baba.back.baby.dto.CreateInviteCodeRequest;
 import com.baba.back.content.dto.CreateCommentRequest;

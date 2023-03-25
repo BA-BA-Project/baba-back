@@ -64,7 +64,7 @@ public class MemberController {
     @IntervalServerErrorResponse
     @PostMapping("/members/baby/invite-code")
     public ResponseEntity<MemberSignUpResponse> signUpWithCode(@RequestBody @Valid SignUpWithCodeRequest request,
-                                                           @SignUp String memberId) {
+                                                               @SignUp String memberId) {
         final SignUpWithBabyResponse response = memberService.signUpWithCode(request, memberId);
         return ResponseEntity.created(URI.create("/baby/" + response.babyId()))
                 .body(response.memberSignUpResponse());
