@@ -6,6 +6,7 @@ import com.baba.back.baby.domain.invitation.Invitation;
 import com.baba.back.baby.domain.invitation.InvitationCode;
 import com.baba.back.content.domain.Like;
 import com.baba.back.content.domain.comment.Comment;
+import com.baba.back.content.domain.comment.Tag;
 import com.baba.back.content.domain.content.CardStyle;
 import com.baba.back.content.domain.content.Content;
 import com.baba.back.oauth.domain.member.Color;
@@ -37,6 +38,14 @@ public class DomainFixture {
     public static final Member 멤버2 = Member.builder()
             .id("member2")
             .name("멤버2")
+            .introduction("안녕하세요")
+            .iconName(IconName.PROFILE_G_1.toString())
+            .iconColor(Color.COLOR_1)
+            .build();
+
+    public static final Member 멤버3 = Member.builder()
+            .id("member3")
+            .name("멤버3")
             .introduction("안녕하세요")
             .iconName(IconName.PROFILE_G_1.toString())
             .iconColor(Color.COLOR_1)
@@ -80,6 +89,11 @@ public class DomainFixture {
             .owner(멤버1)
             .content(컨텐츠10)
             .text("댓글!")
+            .build();
+
+    public static final Tag 태그10 = Tag.builder()
+            .tagMember(멤버1)
+            .comment(댓글10)
             .build();
     public static final Content 컨텐츠11 = Content.builder()
             .title("제목2")
@@ -141,6 +155,42 @@ public class DomainFixture {
             .relationName("아빠")
             .relationGroup(관계그룹20)
             .build();
+    public static final Content 컨텐츠20 = Content.builder()
+            .title("제목2")
+            .contentDate(nowDate)
+            .now(nowDate)
+            .cardStyle(CardStyle.CARD_BASIC_1.toString())
+            .baby(아기2)
+            .owner(멤버1)
+            .relation(관계20.getRelationName())
+            .build();
+    public static final Comment 댓글20 = Comment.builder()
+            .owner(멤버1)
+            .content(컨텐츠20)
+            .text("댓글!")
+            .build();
+    public static final Comment 댓글21 = Comment.builder()
+            .owner(멤버2)
+            .content(컨텐츠20)
+            .text("댓글!")
+            .build();
+    public static final Comment 댓글22 = Comment.builder()
+            .owner(멤버3)
+            .content(컨텐츠20)
+            .text("댓글!")
+            .build();
+    public static final Like 좋아요20 = Like.builder()
+            .member(멤버1)
+            .content(컨텐츠20)
+            .build();
+    public static final Like 좋아요21 = Like.builder()
+            .member(멤버2)
+            .content(컨텐츠20)
+            .build();
+    public static final Like 좋아요22 = Like.builder()
+            .member(멤버3)
+            .content(컨텐츠20)
+            .build();
     public static final RelationGroup 관계그룹21 = RelationGroup.builder()
             .baby(아기2)
             .relationGroupName("외가")
@@ -163,10 +213,11 @@ public class DomainFixture {
             .groupColor(Color.COLOR_1)
             .build();
     public static final Relation 관계22 = Relation.builder()
-            .member(멤버1)
+            .member(멤버3)
             .relationName("친척 형")
             .relationGroup(관계그룹22)
             .build();
+
     public static final Baby 아기3 = Baby.builder()
             .id("baby3")
             .name("아기3")

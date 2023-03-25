@@ -226,20 +226,20 @@ public class ContentService {
         return getContentLikeCommentResponse(content, likes, comments);
     }
 
-    private List<Comment> findSharedComments(Baby baby, RelationGroup relationGroup, List<Comment> comments) {
-        return comments.stream()
-                .filter(comment -> {
-                    final Relation commentMemberRelation = findRelation(comment.getOwner(), baby);
-                    return relationGroup.canShare(commentMemberRelation.getRelationGroup());
-                })
-                .toList();
-    }
-
     private List<Like> findSharedLikes(Baby baby, RelationGroup relationGroup, List<Like> likes) {
         return likes.stream()
                 .filter(like -> {
                     final Relation likeMemberRelation = findRelation(like.getMember(), baby);
                     return relationGroup.canShare(likeMemberRelation.getRelationGroup());
+                })
+                .toList();
+    }
+
+    private List<Comment> findSharedComments(Baby baby, RelationGroup relationGroup, List<Comment> comments) {
+        return comments.stream()
+                .filter(comment -> {
+                    final Relation commentMemberRelation = findRelation(comment.getOwner(), baby);
+                    return relationGroup.canShare(commentMemberRelation.getRelationGroup());
                 })
                 .toList();
     }
@@ -252,13 +252,12 @@ public class ContentService {
                 likes.stream()
                         .map(Like::getMember)
                         .map(Member::getIconName)
-                        .sorted()
                         .limit(3)
+                        .sorted()
                         .toList(),
                 comments.size(),
                 content.getCardStyle(),
                 comments.stream()
-                        .sorted()
                         .map(comment -> {
                                     final Member owner = comment.getOwner();
                                     final Relation relation = findRelation(owner, content.getBaby());
@@ -275,6 +274,7 @@ public class ContentService {
                                             comment.getCreatedAt());
                                 }
                         )
+                        .sorted()
                         .toList()
         );
     }

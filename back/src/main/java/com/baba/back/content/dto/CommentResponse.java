@@ -2,7 +2,7 @@ package com.baba.back.content.dto;
 
 import java.time.LocalDateTime;
 
-public record CommentResponse(
+public record CommentResponse (
         Long commentId,
         String memberId,
         String name,
@@ -11,5 +11,10 @@ public record CommentResponse(
         String iconColor,
         String tag,
         String comment,
-        LocalDateTime createAt) {
+        LocalDateTime createAt) implements Comparable<CommentResponse> {
+
+    @Override
+    public int compareTo(CommentResponse o) {
+        return this.createAt.compareTo(o.createAt);
+    }
 }

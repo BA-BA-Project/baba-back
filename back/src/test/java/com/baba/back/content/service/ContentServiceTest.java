@@ -1,20 +1,32 @@
 package com.baba.back.content.service;
 
 import static com.baba.back.fixture.DomainFixture.관계10;
-import static com.baba.back.fixture.DomainFixture.관계30;
-import static com.baba.back.fixture.DomainFixture.관계21;
 import static com.baba.back.fixture.DomainFixture.관계11;
+import static com.baba.back.fixture.DomainFixture.관계20;
+import static com.baba.back.fixture.DomainFixture.관계21;
 import static com.baba.back.fixture.DomainFixture.관계22;
+import static com.baba.back.fixture.DomainFixture.관계30;
 import static com.baba.back.fixture.DomainFixture.댓글10;
+import static com.baba.back.fixture.DomainFixture.댓글20;
+import static com.baba.back.fixture.DomainFixture.댓글21;
+import static com.baba.back.fixture.DomainFixture.댓글22;
 import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.DomainFixture.멤버2;
+import static com.baba.back.fixture.DomainFixture.멤버3;
 import static com.baba.back.fixture.DomainFixture.아기1;
+import static com.baba.back.fixture.DomainFixture.아기2;
 import static com.baba.back.fixture.DomainFixture.좋아요10;
+import static com.baba.back.fixture.DomainFixture.좋아요20;
+import static com.baba.back.fixture.DomainFixture.좋아요21;
+import static com.baba.back.fixture.DomainFixture.좋아요22;
 import static com.baba.back.fixture.DomainFixture.컨텐츠10;
 import static com.baba.back.fixture.DomainFixture.컨텐츠11;
+import static com.baba.back.fixture.DomainFixture.컨텐츠20;
+import static com.baba.back.fixture.DomainFixture.태그10;
 import static com.baba.back.fixture.RequestFixture.댓글_생성_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.컨텐츠_생성_요청_데이터;
-import static com.baba.back.fixture.RequestFixture.태그_댓글_생성_요청_데이터;
+import static com.baba.back.fixture.RequestFixture.태그_댓글_생성_요청_데이터1;
+import static com.baba.back.fixture.RequestFixture.태그_댓글_생성_요청_데이터2;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -30,6 +42,8 @@ import com.baba.back.content.domain.comment.Comment;
 import com.baba.back.content.domain.comment.Tag;
 import com.baba.back.content.domain.content.Content;
 import com.baba.back.content.domain.content.ImageFile;
+import com.baba.back.content.dto.CommentResponse;
+import com.baba.back.content.dto.ContentLikeCommentResponse;
 import com.baba.back.content.dto.ContentResponse;
 import com.baba.back.content.dto.ContentsResponse;
 import com.baba.back.content.dto.LikeContentResponse;
@@ -364,7 +378,7 @@ class ContentServiceTest {
         given(memberRepository.findById(멤버1.getId())).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> contentService.createComment(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId(), 태그_댓글_생성_요청_데이터))
+        assertThatThrownBy(() -> contentService.createComment(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId(), 태그_댓글_생성_요청_데이터1))
                 .isInstanceOf(MemberNotFoundException.class);
     }
 
@@ -375,7 +389,7 @@ class ContentServiceTest {
         given(babyRepository.findById(아기1.getId())).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> contentService.createComment(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId(), 태그_댓글_생성_요청_데이터))
+        assertThatThrownBy(() -> contentService.createComment(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId(), 태그_댓글_생성_요청_데이터1))
                 .isInstanceOf(BabyNotFoundException.class);
     }
 
@@ -387,7 +401,7 @@ class ContentServiceTest {
         given(relationRepository.findByMemberAndBaby(멤버1, 아기1)).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> contentService.createComment(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId(), 태그_댓글_생성_요청_데이터))
+        assertThatThrownBy(() -> contentService.createComment(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId(), 태그_댓글_생성_요청_데이터1))
                 .isInstanceOf(RelationNotFoundException.class);
     }
 
@@ -400,7 +414,7 @@ class ContentServiceTest {
         given(contentRepository.findById(컨텐츠10.getId())).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> contentService.createComment(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId(), 태그_댓글_생성_요청_데이터))
+        assertThatThrownBy(() -> contentService.createComment(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId(), 태그_댓글_생성_요청_데이터1))
                 .isInstanceOf(ContentNotFountException.class);
     }
 
@@ -429,7 +443,7 @@ class ContentServiceTest {
         given(memberRepository.findById(멤버2.getId())).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> contentService.createComment(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId(), 태그_댓글_생성_요청_데이터))
+        assertThatThrownBy(() -> contentService.createComment(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId(), 태그_댓글_생성_요청_데이터1))
                 .isInstanceOf(MemberNotFoundException.class);
     }
 
@@ -445,23 +459,23 @@ class ContentServiceTest {
         given(relationRepository.findByMemberAndBaby(멤버2, 아기1)).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> contentService.createComment(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId(), 태그_댓글_생성_요청_데이터))
+        assertThatThrownBy(() -> contentService.createComment(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId(), 태그_댓글_생성_요청_데이터1))
                 .isInstanceOf(RelationNotFoundException.class);
     }
 
     @Test
     void 댓글_추가_시_태그한_멤버를_태그할_수_없으면_예외를_던진다() {
         // given
-        given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
+        given(memberRepository.findById(멤버2.getId())).willReturn(Optional.of(멤버2));
         given(babyRepository.findById(아기1.getId())).willReturn(Optional.of(아기1));
-        given(relationRepository.findByMemberAndBaby(멤버1, 아기1)).willReturn(Optional.of(관계22));
+        given(relationRepository.findByMemberAndBaby(멤버2, 아기1)).willReturn(Optional.of(관계21));
         given(contentRepository.findById(컨텐츠10.getId())).willReturn(Optional.of(컨텐츠10));
         given(commentRepository.save(any(Comment.class))).willReturn(댓글10);
-        given(memberRepository.findById(멤버2.getId())).willReturn(Optional.of(멤버2));
-        given(relationRepository.findByMemberAndBaby(멤버2, 아기1)).willReturn(Optional.of(관계21));
+        given(memberRepository.findById(멤버3.getId())).willReturn(Optional.of(멤버3));
+        given(relationRepository.findByMemberAndBaby(멤버3, 아기1)).willReturn(Optional.of(관계22));
 
         // when & then
-        assertThatThrownBy(() -> contentService.createComment(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId(), 태그_댓글_생성_요청_데이터))
+        assertThatThrownBy(() -> contentService.createComment(멤버2.getId(), 아기1.getId(), 컨텐츠10.getId(), 태그_댓글_생성_요청_데이터2))
                 .isInstanceOf(TagBadRequestException.class);
     }
 
@@ -478,7 +492,151 @@ class ContentServiceTest {
         given(tagRepository.save(any(Tag.class))).willReturn(any(Tag.class));
 
         // when & then
-        assertThat(contentService.createComment(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId(), 태그_댓글_생성_요청_데이터))
+        assertThat(contentService.createComment(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId(), 태그_댓글_생성_요청_데이터1))
                 .isEqualTo(댓글10.getId());
+    }
+
+    @Test
+    void 성장앨범_자세히보기_시_존재하지_않는_멤버가_요청하면_예외를_던진다() {
+        // given
+        given(memberRepository.findById(멤버1.getId())).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> contentService.getContent(멤버1.getId(), 컨텐츠10.getId()))
+                .isInstanceOf(MemberNotFoundException.class);
+    }
+
+    @Test
+    void 성장앨범_자세히보기_시_존재하지_않는_콘텐츠를_요청하면_예외를_던진다() {
+        // given
+        given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
+        given(contentRepository.findById(컨텐츠10.getId())).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> contentService.getContent(멤버1.getId(), 컨텐츠10.getId()))
+                .isInstanceOf(ContentNotFountException.class);
+    }
+
+    @Test
+    void 성장앨범_자세히보기_시_멤버과_아기가_관계가_없으면_예외를_던진다() {
+        // given
+        given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
+        given(contentRepository.findById(컨텐츠10.getId())).willReturn(Optional.of(컨텐츠10));
+        given(relationRepository.findByMemberAndBaby(멤버1, 아기1)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> contentService.getContent(멤버1.getId(), 컨텐츠10.getId()))
+                .isInstanceOf(RelationNotFoundException.class);
+    }
+
+    @Test
+    void 성장앨범_자세히보기_시_가족_그룹의_멤버가_요청했다면_모든_좋아요_댓글을_확인할_수_있다() {
+        // given
+        given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
+        given(contentRepository.findById(컨텐츠10.getId())).willReturn(Optional.of(컨텐츠10));
+        given(relationRepository.findByMemberAndBaby(멤버1, 아기1)).willReturn(Optional.of(관계10));
+        given(likeRepository.findAllByContent(컨텐츠10)).willReturn(List.of(좋아요10));
+        given(commentRepository.findAllByContent(컨텐츠10)).willReturn(List.of(댓글10));
+        given(tagRepository.findByComment(댓글10)).willReturn(Optional.empty());
+
+        // when & then
+        assertThat(contentService.getContent(멤버1.getId(), 컨텐츠10.getId()))
+                .isEqualTo(new ContentLikeCommentResponse(
+                        1,
+                        List.of(멤버1.getIconName()),
+                        1,
+                        컨텐츠10.getCardStyle(),
+                        List.of(new CommentResponse(
+                                        댓글10.getId(),
+                                        멤버1.getId(),
+                                        멤버1.getName(),
+                                        관계10.getRelationName().getValue(),
+                                        멤버1.getIconName(),
+                                        멤버1.getIconColor(),
+                                        "",
+                                        댓글10.getText(),
+                                        댓글10.getCreatedAt()
+                                )
+
+                        )));
+    }
+
+    @Test
+    void 성장앨범_자세히보기_시_모든_좋아요_태그_댓글을_확인할_수_있다() {
+        // given
+        given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
+        given(contentRepository.findById(컨텐츠10.getId())).willReturn(Optional.of(컨텐츠10));
+        given(relationRepository.findByMemberAndBaby(멤버1, 아기1)).willReturn(Optional.of(관계10));
+        given(likeRepository.findAllByContent(컨텐츠10)).willReturn(List.of(좋아요10));
+        given(commentRepository.findAllByContent(컨텐츠10)).willReturn(List.of(댓글10));
+        given(tagRepository.findByComment(댓글10)).willReturn(Optional.of(태그10));
+
+        // when & then
+        assertThat(contentService.getContent(멤버1.getId(), 컨텐츠10.getId()))
+                .isEqualTo(new ContentLikeCommentResponse(
+                        1,
+                        List.of(멤버1.getIconName()),
+                        1,
+                        컨텐츠10.getCardStyle(),
+                        List.of(new CommentResponse(
+                                        댓글10.getId(),
+                                        멤버1.getId(),
+                                        멤버1.getName(),
+                                        관계10.getRelationName().getValue(),
+                                        멤버1.getIconName(),
+                                        멤버1.getIconColor(),
+                                        태그10.getTagMember().getName(),
+                                        댓글10.getText(),
+                                        댓글10.getCreatedAt()
+                                )
+
+                        )));
+    }
+
+    @Test
+    void 성장앨범_자세히보기_시_가족이_아니라면_가족_그룹과_같은_그룹의_좋아요_댓글만_확인할_수_있다() {
+        // given
+        given(memberRepository.findById(멤버2.getId())).willReturn(Optional.of(멤버2));
+        given(contentRepository.findById(컨텐츠20.getId())).willReturn(Optional.of(컨텐츠20));
+        given(relationRepository.findByMemberAndBaby(멤버1, 아기2)).willReturn(Optional.of(관계20));
+        given(relationRepository.findByMemberAndBaby(멤버2, 아기2)).willReturn(Optional.of(관계21));
+        given(relationRepository.findByMemberAndBaby(멤버3, 아기2)).willReturn(Optional.of(관계22));
+        given(likeRepository.findAllByContent(컨텐츠20)).willReturn(List.of(좋아요20, 좋아요21, 좋아요22));
+        given(commentRepository.findAllByContent(컨텐츠20)).willReturn(List.of(댓글20, 댓글21, 댓글22));
+        given(tagRepository.findByComment(댓글20)).willReturn(Optional.empty());
+        given(tagRepository.findByComment(댓글21)).willReturn(Optional.empty());
+
+        // when & then
+        assertThat(contentService.getContent(멤버2.getId(), 컨텐츠20.getId()))
+                .isEqualTo(new ContentLikeCommentResponse(
+                                2,
+                                List.of(멤버1.getIconName(), 멤버2.getIconName()),
+                                2,
+                                컨텐츠20.getCardStyle(),
+                                List.of(new CommentResponse(
+                                                댓글20.getId(),
+                                                멤버1.getId(),
+                                                멤버1.getName(),
+                                                관계20.getRelationName().getValue(),
+                                                멤버1.getIconName(),
+                                                멤버1.getIconColor(),
+                                                "",
+                                                댓글20.getText(),
+                                                댓글20.getCreatedAt()
+                                        ),
+                                        new CommentResponse(
+                                                댓글20.getId(),
+                                                멤버2.getId(),
+                                                멤버2.getName(),
+                                                관계21.getRelationName().getValue(),
+                                                멤버2.getIconName(),
+                                                멤버2.getIconColor(),
+                                                "",
+                                                댓글21.getText(),
+                                                댓글21.getCreatedAt()
+                                        )
+                                )
+                        )
+                );
     }
 }
