@@ -119,16 +119,16 @@ public class DomainFixture {
             .owner(멤버1)
             .relation(관계10.getRelationName())
             .build();
+    public static final Relation 관계11 = Relation.builder()
+            .member(멤버2)
+            .relationName("엄마")
+            .relationGroup(관계그룹10)
+            .build();
     public static final RelationGroup 관계그룹11 = RelationGroup.builder()
             .baby(아기1)
             .relationGroupName("외가")
             .family(false)
             .groupColor(Color.COLOR_1)
-            .build();
-    public static final Relation 관계11 = Relation.builder()
-            .member(멤버2)
-            .relationName("엄마")
-            .relationGroup(관계그룹10)
             .build();
     public static final Relation 관계12 = Relation.builder()
             .member(멤버3)
