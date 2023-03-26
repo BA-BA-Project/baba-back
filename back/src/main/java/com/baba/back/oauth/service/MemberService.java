@@ -3,7 +3,11 @@ package com.baba.back.oauth.service;
 import com.baba.back.baby.domain.Babies;
 import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.domain.IdConstructor;
+import com.baba.back.baby.domain.invitation.Invitation;
+import com.baba.back.baby.domain.invitation.InvitationCode;
+import com.baba.back.baby.domain.invitation.Invitations;
 import com.baba.back.baby.repository.BabyRepository;
+import com.baba.back.baby.repository.InvitationRepository;
 import com.baba.back.oauth.domain.Picker;
 import com.baba.back.oauth.domain.member.Color;
 import com.baba.back.oauth.domain.member.Member;
@@ -12,6 +16,7 @@ import com.baba.back.oauth.dto.MemberResponse;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
 import com.baba.back.oauth.dto.SignUpWithBabyResponse;
+import com.baba.back.oauth.dto.SignUpWithCodeRequest;
 import com.baba.back.oauth.exception.MemberBadRequestException;
 import com.baba.back.oauth.exception.MemberNotFoundException;
 import com.baba.back.oauth.repository.MemberRepository;
@@ -23,6 +28,8 @@ import com.baba.back.relation.repository.RelationRepository;
 import jakarta.transaction.Transactional;
 import java.time.Clock;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -40,11 +47,12 @@ public class MemberService {
     private final AccessTokenProvider accessTokenProvider;
     private final RefreshTokenProvider refreshTokenProvider;
     private final TokenRepository tokenRepository;
+    private final InvitationRepository invitationRepository;
     private final Clock clock;
 
     public SignUpWithBabyResponse signUpWithBaby(MemberSignUpRequest request, String memberId) {
         validateSignUp(memberId);
-        final Member member = saveMember(memberId, request);
+        final Member member = saveMember(memberId, request.getName(), request.getIconName());
 
         final Babies babies = saveBabies(request);
         saveRelations(babies, member, request.getRelationName());
@@ -62,12 +70,12 @@ public class MemberService {
         }
     }
 
-    private Member saveMember(String memberId, MemberSignUpRequest request) {
+    private Member saveMember(String memberId, String name, String iconName) {
         return memberRepository.save(Member.builder()
                 .id(memberId)
-                .name(request.getName())
+                .name(name)
                 .introduction("")
-                .iconName(request.getIconName())
+                .iconName(iconName)
                 .iconColor(Color.from(picker))
                 .build());
     }
@@ -123,5 +131,42 @@ public class MemberService {
                 member.getIconName(),
                 member.getIconColor()
         );
+    }
+
+    public SignUpWithBabyResponse signUpWithCode(SignUpWithCodeRequest request, String memberId) {
+        validateSignUp(memberId);
+
+        final Invitations invitations = getInvitations(request.getInviteCode());
+        final InvitationCode invitationCode = invitations.getUnExpiredInvitationCode(LocalDateTime.now(clock));
+
+        final Member member = saveMember(memberId, request.getName(), request.getIconName());
+        final Babies babies = saveRelationsAndGetBabies(invitations.values(), invitationCode.getRelationName(), member);
+
+        final String accessToken = accessTokenProvider.createToken(memberId);
+        final String refreshToken = refreshTokenProvider.createToken(memberId);
+        saveRefreshToken(member, refreshToken);
+
+        return new SignUpWithBabyResponse(new MemberSignUpResponse(accessToken, refreshToken), babies.getFirstBabyId());
+    }
+
+    private Invitations getInvitations(String code) {
+        return new Invitations(invitationRepository.findAllByCode(code));
+    }
+
+    private Babies saveRelationsAndGetBabies(List<Invitation> invitations, String relationName, Member member) {
+        return new Babies(invitations.stream()
+                .map(invitation -> {
+                    final RelationGroup relationGroup = invitation.getRelationGroup();
+                    final Baby baby = relationGroup.getBaby();
+
+                    relationRepository.save(Relation.builder()
+                            .relationGroup(relationGroup)
+                            .relationName(relationName)
+                            .member(member)
+                            .build());
+
+                    return baby;
+                })
+                .toList());
     }
 }

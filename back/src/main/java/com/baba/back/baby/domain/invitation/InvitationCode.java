@@ -1,35 +1,26 @@
 package com.baba.back.baby.domain.invitation;
 
-import com.baba.back.common.domain.BaseEntity;
 import com.baba.back.common.domain.Name;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.Embeddable;
 import java.time.LocalDateTime;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity
+@Embeddable
 @Getter
 @NoArgsConstructor
-public class InvitationCode extends BaseEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@EqualsAndHashCode
+public class InvitationCode {
 
-    @Embedded
     private Code code;
 
-    @Embedded
-    @AttributeOverride(name = "name", column = @Column(name = "relation_name"))
+    @AttributeOverride(name = "value", column = @Column(name = "relation_name"))
     private Name relationName;
 
-    @Embedded
     private Expiration expiration;
 
     @Builder
@@ -39,11 +30,23 @@ public class InvitationCode extends BaseEntity {
         this.expiration = Expiration.from(now);
     }
 
+    public String getCode() {
+        return this.code.getValue();
+    }
+
     public String getRelationName() {
         return this.relationName.getValue();
     }
 
+    public LocalDateTime getExpiration() {
+        return this.expiration.getValue();
+    }
+
     public boolean isExpired(LocalDateTime now) {
         return this.expiration.isExpired(now);
+    }
+
+    public void updateCode(String code) {
+        this.code = Code.from((length, chars) -> code);
     }
 }

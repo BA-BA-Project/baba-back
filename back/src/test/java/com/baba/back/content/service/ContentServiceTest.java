@@ -1,10 +1,10 @@
 package com.baba.back.content.service;
 
 import static com.baba.back.fixture.DomainFixture.관계10;
-import static com.baba.back.fixture.DomainFixture.관계30;
-import static com.baba.back.fixture.DomainFixture.관계21;
 import static com.baba.back.fixture.DomainFixture.관계11;
+import static com.baba.back.fixture.DomainFixture.관계21;
 import static com.baba.back.fixture.DomainFixture.관계22;
+import static com.baba.back.fixture.DomainFixture.관계30;
 import static com.baba.back.fixture.DomainFixture.댓글10;
 import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.DomainFixture.멤버2;

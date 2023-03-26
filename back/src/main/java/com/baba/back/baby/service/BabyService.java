@@ -4,17 +4,14 @@ import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.domain.invitation.Code;
 import com.baba.back.baby.domain.invitation.Invitation;
 import com.baba.back.baby.domain.invitation.InvitationCode;
+import com.baba.back.baby.domain.invitation.Invitations;
 import com.baba.back.baby.dto.BabiesResponse;
 import com.baba.back.baby.dto.BabyResponse;
 import com.baba.back.baby.dto.CreateInviteCodeRequest;
 import com.baba.back.baby.dto.CreateInviteCodeResponse;
 import com.baba.back.baby.dto.InviteCodeBabyResponse;
 import com.baba.back.baby.dto.SearchInviteCodeResponse;
-import com.baba.back.baby.exception.InvitationCodeBadRequestException;
-import com.baba.back.baby.exception.InvitationCodeNotFoundException;
-import com.baba.back.baby.exception.InvitationNotFoundException;
 import com.baba.back.baby.exception.RelationGroupNotFoundException;
-import com.baba.back.baby.repository.InvitationCodeRepository;
 import com.baba.back.baby.repository.InvitationRepository;
 import com.baba.back.oauth.domain.member.Member;
 import com.baba.back.oauth.exception.MemberNotFoundException;
@@ -29,6 +26,7 @@ import jakarta.transaction.Transactional;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -40,7 +38,6 @@ public class BabyService {
     private final MemberRepository memberRepository;
     private final RelationRepository relationRepository;
     private final RelationGroupRepository relationGroupRepository;
-    private final InvitationCodeRepository invitationCodeRepository;
     private final InvitationRepository invitationRepository;
     private final CodeGenerator randomCodeGenerator;
     private final Clock clock;
@@ -77,8 +74,13 @@ public class BabyService {
         final List<RelationGroup> groups = findRelationGroups(relations, request.getRelationGroup());
 
         final Code code = Code.from(randomCodeGenerator);
-        final InvitationCode invitationCode = saveInvitationCode(request.getRelationName(), code);
-        createInvitation(groups, invitationCode);
+        final InvitationCode invitationCode = InvitationCode.builder()
+                .code(code)
+                .relationName(request.getRelationName())
+                .now(LocalDateTime.now(clock))
+                .build();
+
+        saveInvitation(groups, invitationCode);
 
         return new CreateInviteCodeResponse(code.getValue());
     }
@@ -91,16 +93,6 @@ public class BabyService {
         return relations;
     }
 
-    private InvitationCode saveInvitationCode(String relationName, Code code) {
-        return invitationCodeRepository.save(
-                InvitationCode.builder()
-                        .code(code)
-                        .relationName(relationName)
-                        .now(LocalDateTime.now(clock))
-                        .build()
-        );
-    }
-
     private List<RelationGroup> findRelationGroups(List<Relation> relations, String relationGroupName) {
         final List<Baby> babies = relations.stream()
                 .map(Relation::getRelationGroup)
@@ -110,28 +102,32 @@ public class BabyService {
         return babies.stream()
                 .map(baby -> relationGroupRepository.findByBabyAndRelationGroupNameValue(baby, relationGroupName)
                         .orElseThrow(() -> new RelationGroupNotFoundException(
-                                "관계그룹 {" + relationGroupName + "}가 존재하지 않습니다."))
-                )
+                                "관계그룹 {" + relationGroupName + "}가 존재하지 않습니다.")))
                 .toList();
     }
 
-    private void createInvitation(List<RelationGroup> groups, InvitationCode invitationCode) {
-        groups.forEach(relationGroup -> invitationRepository.save(
-                Invitation.builder()
-                        .invitationCode(invitationCode)
-                        .relationGroup(relationGroup)
-                        .build())
-        );
+    private void saveInvitation(List<RelationGroup> groups, InvitationCode invitationCode) {
+        groups.forEach(relationGroup -> {
+            final Optional<Invitation> optionalInvitation = invitationRepository.findByRelationGroupAndRelationName(
+                    relationGroup, invitationCode.getRelationName());
+
+            optionalInvitation.ifPresent(invitation -> invitation.updateCode(invitationCode.getCode()));
+
+            final Invitation invitation = optionalInvitation.orElseGet(() -> Invitation.builder()
+                    .invitationCode(invitationCode)
+                    .relationGroup(relationGroup)
+                    .build());
+
+            invitationRepository.save(invitation);
+        });
     }
 
     public SearchInviteCodeResponse searchInviteCode(String code) {
-        final InvitationCode invitationCode = getInvitationCode(code);
-        validateInvitationCode(invitationCode);
-
-        final List<Invitation> invitations = getInvitations(invitationCode);
+        final Invitations invitations = new Invitations(invitationRepository.findAllByCode(code));
+        final InvitationCode invitationCode = invitations.getUnExpiredInvitationCode(LocalDateTime.now(clock));
 
         return new SearchInviteCodeResponse(
-                invitations.stream()
+                invitations.values().stream()
                         .map(invitation -> {
                             final RelationGroup relationGroup = invitation.getRelationGroup();
                             final Baby baby = relationGroup.getBaby();
@@ -140,25 +136,5 @@ public class BabyService {
                         })
                         .toList(),
                 invitationCode.getRelationName());
-    }
-
-    private InvitationCode getInvitationCode(String code) {
-        return invitationCodeRepository.findByCodeValue(code)
-                .orElseThrow(() -> new InvitationCodeNotFoundException(code + "는 존재하지 않는 초대 코드입니다."));
-    }
-
-    private void validateInvitationCode(InvitationCode invitationCode) {
-        if (invitationCode.isExpired(LocalDateTime.now(clock))) {
-            throw new InvitationCodeBadRequestException("초대 코드가 만료되었습니다.");
-        }
-    }
-
-    private List<Invitation> getInvitations(InvitationCode invitationCode) {
-        final List<Invitation> invitations = invitationRepository.findAllByInvitationCode(invitationCode);
-        if (invitations.isEmpty()) {
-            throw new InvitationNotFoundException("초대 정보가 존재하지 않습니다.");
-        }
-
-        return invitations;
     }
 }

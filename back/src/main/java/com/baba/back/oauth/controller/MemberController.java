@@ -4,6 +4,7 @@ import com.baba.back.oauth.dto.MemberResponse;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
 import com.baba.back.oauth.dto.SignUpWithBabyResponse;
+import com.baba.back.oauth.dto.SignUpWithCodeRequest;
 import com.baba.back.oauth.service.MemberService;
 import com.baba.back.oauth.support.Login;
 import com.baba.back.oauth.support.SignUp;
@@ -53,5 +54,19 @@ public class MemberController {
     @GetMapping("/members")
     public ResponseEntity<MemberResponse> findMember(@Login String memberId) {
         return ResponseEntity.ok(memberService.findMember(memberId));
+    }
+
+    @Operation(summary = "초대코드로 멤버 생성 요청")
+    @CreatedResponse
+    @BadRequestResponse
+    @UnAuthorizedResponse
+    @NotFoundResponse
+    @IntervalServerErrorResponse
+    @PostMapping("/members/baby/invite-code")
+    public ResponseEntity<MemberSignUpResponse> signUpWithCode(@RequestBody @Valid SignUpWithCodeRequest request,
+                                                               @SignUp String memberId) {
+        final SignUpWithBabyResponse response = memberService.signUpWithCode(request, memberId);
+        return ResponseEntity.created(URI.create("/baby/" + response.babyId()))
+                .body(response.memberSignUpResponse());
     }
 }

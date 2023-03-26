@@ -10,6 +10,7 @@ import com.baba.back.content.dto.CreateContentRequest;
 import com.baba.back.oauth.domain.Terms;
 import com.baba.back.oauth.dto.AgreeTermsRequest;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
+import com.baba.back.oauth.dto.SignUpWithCodeRequest;
 import com.baba.back.oauth.dto.SocialTokenRequest;
 import com.baba.back.oauth.dto.TermsRequest;
 import java.time.LocalDate;
@@ -29,6 +30,9 @@ public class RequestFixture {
     public static final BabyRequest 아기_생성_요청_데이터_2 = new BabyRequest("아기2", LocalDate.now());
     public static final MemberSignUpRequest 멤버_가입_요청_데이터 = new MemberSignUpRequest(
             "박재희", "PROFILE_W_1", "엄마", List.of(아기_생성_요청_데이터_1, 아기_생성_요청_데이터_2)
+    );
+    public static final SignUpWithCodeRequest 초대코드로_멤버_가입_요청_데이터 = new SignUpWithCodeRequest(
+            "AAAAAA", "박재희", "PROFILE_W_1"
     );
 
     public static final SocialTokenRequest 소셜_토큰_요청_데이터 = new SocialTokenRequest("socialToken");
