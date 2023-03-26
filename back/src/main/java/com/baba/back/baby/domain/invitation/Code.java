@@ -14,12 +14,6 @@ import lombok.NoArgsConstructor;
 public class Code {
     private static final int INVITE_CODE_LENGTH = 6;
     private static final String ALLOWED_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-
-    public static Code from(CodeGenerator generator) {
-        final String generatedCode = generator.generate(INVITE_CODE_LENGTH, ALLOWED_CHARS);
-        return new Code(generatedCode);
-    }
-
     @Column(name = "invite_code")
     private String value;
 
@@ -28,6 +22,11 @@ public class Code {
         validateLength(value);
         validateCode(value);
         this.value = value;
+    }
+
+    public static Code from(CodeGenerator generator) {
+        final String generatedCode = generator.generate(INVITE_CODE_LENGTH, ALLOWED_CHARS);
+        return new Code(generatedCode);
     }
 
     private void validateNull(String value) {

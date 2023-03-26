@@ -17,7 +17,6 @@ import com.baba.back.content.dto.ContentResponse;
 import com.baba.back.content.dto.ContentsResponse;
 import com.baba.back.content.dto.CreateCommentRequest;
 import com.baba.back.content.dto.LikeContentResponse;
-import com.baba.back.oauth.dto.MemberResponse;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
 import com.baba.back.oauth.service.AccessTokenProvider;
 import io.restassured.RestAssured;

@@ -2,7 +2,7 @@ package com.baba.back.content.dto;
 
 import java.time.LocalDateTime;
 
-public record CommentResponse (
+public record CommentResponse(
         Long commentId,
         String memberId,
         String name,
