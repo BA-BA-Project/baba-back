@@ -8,12 +8,14 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.baba.back.AcceptanceTest;
 import com.baba.back.baby.dto.BabyRequest;
+import com.baba.back.baby.dto.CreateInviteCodeResponse;
 import com.baba.back.common.dto.ExceptionResponse;
 import com.baba.back.oauth.domain.Picker;
 import com.baba.back.oauth.domain.member.Color;
 import com.baba.back.oauth.dto.MemberResponse;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
+import com.baba.back.oauth.dto.SignUpWithCodeRequest;
 import com.baba.back.oauth.service.AccessTokenProvider;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -126,6 +128,51 @@ class MemberAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+    }
+
+    @Test
+    void 초대코드로_회원가입을_진행한다() {
+        // given
+        final ExtractableResponse<Response> 아기_등록_회원가입_응답 = 아기_등록_회원가입_요청(멤버_가입_요청_데이터);
+        final String accessToken = toObject(아기_등록_회원가입_응답, MemberSignUpResponse.class).accessToken();
+
+        final ExtractableResponse<Response> 가족_초대_코드_생성_응답 = 가족_초대_코드_생성_요청(accessToken);
+        final String code = toObject(가족_초대_코드_생성_응답, CreateInviteCodeResponse.class).inviteCode();
+
+        final SignUpWithCodeRequest request = new SignUpWithCodeRequest(code, "박재희", "PROFILE_W_1");
+
+        // when
+        final ExtractableResponse<Response> response = 초대코드로_회원가입_요청(MEMBER_ID, request);
+
+        // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                () -> assertThat(getBabyId(response)).isNotBlank(),
+                () -> assertThat(response.as(MemberSignUpResponse.class).accessToken()).isNotBlank(),
+                () -> assertThat(response.as(MemberSignUpResponse.class).refreshToken()).isNotBlank()
+        );
+    }
+
+    @Test
+    void 초대코드로_회원가입_요청_시_이미_회원가입_되어있으면_400을_던진다() {
+        // given
+        final ExtractableResponse<Response> 아기_등록_회원가입_응답 = 아기_등록_회원가입_요청(멤버_가입_요청_데이터);
+        final String accessToken = toObject(아기_등록_회원가입_응답, MemberSignUpResponse.class).accessToken();
+
+        final ExtractableResponse<Response> 가족_초대_코드_생성_응답 = 가족_초대_코드_생성_요청(accessToken);
+        final String code = toObject(가족_초대_코드_생성_응답, CreateInviteCodeResponse.class).inviteCode();
+
+        final SignUpWithCodeRequest request = new SignUpWithCodeRequest(code, "박재희", "PROFILE_W_1");
+        초대코드로_회원가입_요청(MEMBER_ID, request);
+
+        // when
+        final ExtractableResponse<Response> response = 초대코드로_회원가입_요청(MEMBER_ID, request);
+
+        // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
+                () -> assertThat(toObject(response, ExceptionResponse.class).message()).isNotBlank()
+        );
     }
 
     @TestConfiguration

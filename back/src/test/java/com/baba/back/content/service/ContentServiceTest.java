@@ -378,7 +378,8 @@ class ContentServiceTest {
         given(memberRepository.findById(멤버1.getId())).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> contentService.createComment(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId(), 태그_댓글_생성_요청_데이터1))
+        assertThatThrownBy(
+                () -> contentService.createComment(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId(), 태그_댓글_생성_요청_데이터1))
                 .isInstanceOf(MemberNotFoundException.class);
     }
 
@@ -389,7 +390,8 @@ class ContentServiceTest {
         given(babyRepository.findById(아기1.getId())).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> contentService.createComment(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId(), 태그_댓글_생성_요청_데이터1))
+        assertThatThrownBy(
+                () -> contentService.createComment(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId(), 태그_댓글_생성_요청_데이터1))
                 .isInstanceOf(BabyNotFoundException.class);
     }
 
@@ -401,7 +403,8 @@ class ContentServiceTest {
         given(relationRepository.findByMemberAndBaby(멤버1, 아기1)).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> contentService.createComment(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId(), 태그_댓글_생성_요청_데이터1))
+        assertThatThrownBy(
+                () -> contentService.createComment(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId(), 태그_댓글_생성_요청_데이터1))
                 .isInstanceOf(RelationNotFoundException.class);
     }
 
@@ -414,7 +417,8 @@ class ContentServiceTest {
         given(contentRepository.findById(컨텐츠10.getId())).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> contentService.createComment(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId(), 태그_댓글_생성_요청_데이터1))
+        assertThatThrownBy(
+                () -> contentService.createComment(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId(), 태그_댓글_생성_요청_데이터1))
                 .isInstanceOf(ContentNotFountException.class);
     }
 
@@ -443,7 +447,8 @@ class ContentServiceTest {
         given(memberRepository.findById(멤버2.getId())).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> contentService.createComment(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId(), 태그_댓글_생성_요청_데이터1))
+        assertThatThrownBy(
+                () -> contentService.createComment(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId(), 태그_댓글_생성_요청_데이터1))
                 .isInstanceOf(MemberNotFoundException.class);
     }
 
@@ -459,7 +464,8 @@ class ContentServiceTest {
         given(relationRepository.findByMemberAndBaby(멤버2, 아기1)).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> contentService.createComment(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId(), 태그_댓글_생성_요청_데이터1))
+        assertThatThrownBy(
+                () -> contentService.createComment(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId(), 태그_댓글_생성_요청_데이터1))
                 .isInstanceOf(RelationNotFoundException.class);
     }
 
@@ -475,7 +481,8 @@ class ContentServiceTest {
         given(relationRepository.findByMemberAndBaby(멤버3, 아기1)).willReturn(Optional.of(관계22));
 
         // when & then
-        assertThatThrownBy(() -> contentService.createComment(멤버2.getId(), 아기1.getId(), 컨텐츠10.getId(), 태그_댓글_생성_요청_데이터2))
+        assertThatThrownBy(
+                () -> contentService.createComment(멤버2.getId(), 아기1.getId(), 컨텐츠10.getId(), 태그_댓글_생성_요청_데이터2))
                 .isInstanceOf(TagBadRequestException.class);
     }
 

@@ -17,14 +17,18 @@ import com.baba.back.relation.domain.Relation;
 import com.baba.back.relation.domain.RelationGroup;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 public class DomainFixture {
     public static final LocalDate nowDate = LocalDate.of(2023, 3, 12);
-    public static final LocalDateTime nowDateTime = LocalDateTime.of(nowDate, LocalTime.NOON);
-    public static final InvitationCode 초대코드정보 = InvitationCode.builder()
-            .code(Code.from(((length, chars) -> "AAAAAA")))
+    public static final LocalDateTime nowDateTime = LocalDateTime.now();
+    public static final InvitationCode 초대코드정보1 = InvitationCode.builder()
+            .code(Code.from((length, chars) -> "AAAAAA"))
             .relationName("이모")
+            .now(nowDateTime)
+            .build();
+    public static final InvitationCode 초대코드정보2 = InvitationCode.builder()
+            .code(Code.from((length, chars) -> "AAAAAA"))
+            .relationName("고모")
             .now(nowDateTime)
             .build();
 
@@ -133,8 +137,13 @@ public class DomainFixture {
             .family(false)
             .groupColor(Color.COLOR_1)
             .build();
+    public static final Relation 관계12 = Relation.builder()
+            .member(멤버3)
+            .relationName("이모")
+            .relationGroup(관계그룹11)
+            .build();
     public static final Invitation 초대10 = Invitation.builder()
-            .invitationCode(초대코드정보)
+            .invitationCode(초대코드정보1)
             .relationGroup(관계그룹11)
             .build();
 
@@ -202,8 +211,13 @@ public class DomainFixture {
             .relationName("사촌 형")
             .relationGroup(관계그룹21)
             .build();
+    public static final Relation 관계23 = Relation.builder()
+            .member(멤버3)
+            .relationName("이모")
+            .relationGroup(관계그룹21)
+            .build();
     public static final Invitation 초대20 = Invitation.builder()
-            .invitationCode(초대코드정보)
+            .invitationCode(초대코드정보1)
             .relationGroup(관계그룹21)
             .build();
     public static final RelationGroup 관계그룹22 = RelationGroup.builder()
@@ -215,6 +229,11 @@ public class DomainFixture {
     public static final Relation 관계22 = Relation.builder()
             .member(멤버3)
             .relationName("친척 형")
+            .relationGroup(관계그룹22)
+            .build();
+
+    public static final Invitation 초대21 = Invitation.builder()
+            .invitationCode(초대코드정보2)
             .relationGroup(관계그룹22)
             .build();
 

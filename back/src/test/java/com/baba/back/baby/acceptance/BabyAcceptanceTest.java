@@ -68,6 +68,22 @@ class BabyAcceptanceTest extends AcceptanceTest {
         );
     }
 
+    @Test
+    void 초대코드_생성_요청시_소속그룹과_관계명이_동일한_초대코드가_이미_존재하면_초대코드를_업데이트_한다() {
+        // given
+        final String accessToken = toObject(아기_등록_회원가입_요청(), MemberSignUpResponse.class).accessToken();
+        가족_초대_코드_생성_요청(accessToken);
+
+        // when
+        final ExtractableResponse<Response> response = 가족_초대_코드_생성_요청(accessToken);
+
+        // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                () -> assertThat(toObject(response, CreateInviteCodeResponse.class).inviteCode()).isNotBlank()
+        );
+    }
+
     // TODO: 2023/03/16 관계그룹 생성 로직 추가 이후 다른 그룹의 초대 코드 생성 테스트를 추가한다.
     @Test
     void 초대_코드_생성_요청_시_가족_그룹_이외의_초대_코드도_생성할수_있다() {
