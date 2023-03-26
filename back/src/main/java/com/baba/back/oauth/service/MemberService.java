@@ -15,6 +15,9 @@ import com.baba.back.oauth.domain.token.Token;
 import com.baba.back.oauth.dto.MemberResponse;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
+import com.baba.back.oauth.dto.MyGroupResponse;
+import com.baba.back.oauth.dto.MyGroupMemberResponse;
+import com.baba.back.oauth.dto.MyProfileResponse;
 import com.baba.back.oauth.dto.SignUpWithBabyResponse;
 import com.baba.back.oauth.dto.SignUpWithCodeRequest;
 import com.baba.back.oauth.exception.MemberBadRequestException;
@@ -23,6 +26,7 @@ import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.oauth.repository.TokenRepository;
 import com.baba.back.relation.domain.Relation;
 import com.baba.back.relation.domain.RelationGroup;
+import com.baba.back.relation.exception.RelationNotFoundException;
 import com.baba.back.relation.repository.RelationGroupRepository;
 import com.baba.back.relation.repository.RelationRepository;
 import jakarta.transaction.Transactional;
@@ -122,8 +126,7 @@ public class MemberService {
     }
 
     public MemberResponse findMember(String memberId) {
-        final Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberNotFoundException(memberId + "에 해당하는 멤버가 존재하지 않습니다."));
+        final Member member = getMember(memberId);
 
         return new MemberResponse(
                 member.getName(),
@@ -131,6 +134,11 @@ public class MemberService {
                 member.getIconName(),
                 member.getIconColor()
         );
+    }
+
+    private Member getMember(String memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberNotFoundException(memberId + "에 해당하는 멤버가 존재하지 않습니다."));
     }
 
     public SignUpWithBabyResponse signUpWithCode(SignUpWithCodeRequest request, String memberId) {
@@ -168,5 +176,57 @@ public class MemberService {
                     return baby;
                 })
                 .toList());
+    }
+
+    public MyProfileResponse searchMyGroups(String memberId) {
+        final Member member = getMember(memberId);
+        final Baby firstBaby = findFirstBaby(member);
+
+        final List<RelationGroup> relationGroups = getRelationGroupsByBaby(firstBaby);
+        final List<Relation> relations = getRelationsByRelationGroups(relationGroups);
+        final List<MyGroupResponse> groups = getMyGroups(relationGroups, relations);
+
+        return new MyProfileResponse(groups);
+    }
+
+    private Baby findFirstBaby(Member member) {
+        final Relation relation = relationRepository.findFirstByMemberAndRelationGroupFamily(member, true)
+                .orElseThrow(() -> new RelationNotFoundException("멤버와 가족 관계인 아기가 존재하지 않습니다."));
+        final RelationGroup relationGroup = relation.getRelationGroup();
+
+        return relationGroup.getBaby();
+    }
+
+    private List<RelationGroup> getRelationGroupsByBaby(Baby firstBaby) {
+        return relationGroupRepository.findAllByBaby(firstBaby);
+    }
+
+    private List<Relation> getRelationsByRelationGroups(List<RelationGroup> relationGroups) {
+        return relationRepository.findAllByRelationGroupIn(relationGroups);
+    }
+
+    private List<MyGroupResponse> getMyGroups(List<RelationGroup> relationGroups, List<Relation> relations) {
+        return relationGroups.stream()
+                .map(relationGroup -> {
+                    final List<Relation> relationsByGroup = relations.stream()
+                            .filter(relation -> relation.hasSameRelationGroup(relationGroup))
+                            .toList();
+
+                    return new MyGroupResponse(relationGroup.getRelationGroupName(), relationGroup.isFamily(),
+                            getGroupMembers(relationsByGroup));
+                }).toList();
+    }
+
+    private List<MyGroupMemberResponse> getGroupMembers(List<Relation> relations) {
+        return relations.stream()
+                .map(relation -> {
+                    final Member member = relation.getMember();
+                    return new MyGroupMemberResponse(
+                            member.getId(),
+                            member.getName(),
+                            relation.getRelationName(),
+                            member.getIconName(),
+                            member.getIconColor());
+                }).toList();
     }
 }

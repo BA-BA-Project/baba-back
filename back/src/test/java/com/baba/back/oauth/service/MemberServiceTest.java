@@ -1,6 +1,7 @@
 package com.baba.back.oauth.service;
 
 import static com.baba.back.fixture.DomainFixture.관계10;
+import static com.baba.back.fixture.DomainFixture.관계11;
 import static com.baba.back.fixture.DomainFixture.관계12;
 import static com.baba.back.fixture.DomainFixture.관계23;
 import static com.baba.back.fixture.DomainFixture.관계30;
@@ -8,6 +9,7 @@ import static com.baba.back.fixture.DomainFixture.관계그룹10;
 import static com.baba.back.fixture.DomainFixture.관계그룹11;
 import static com.baba.back.fixture.DomainFixture.관계그룹30;
 import static com.baba.back.fixture.DomainFixture.멤버1;
+import static com.baba.back.fixture.DomainFixture.멤버2;
 import static com.baba.back.fixture.DomainFixture.멤버3;
 import static com.baba.back.fixture.DomainFixture.아기1;
 import static com.baba.back.fixture.DomainFixture.아기2;
@@ -40,6 +42,9 @@ import com.baba.back.oauth.domain.token.Token;
 import com.baba.back.oauth.dto.MemberResponse;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
+import com.baba.back.oauth.dto.MyGroupResponse;
+import com.baba.back.oauth.dto.MyGroupMemberResponse;
+import com.baba.back.oauth.dto.MyProfileResponse;
 import com.baba.back.oauth.dto.SignUpWithBabyResponse;
 import com.baba.back.oauth.dto.SignUpWithCodeRequest;
 import com.baba.back.oauth.exception.MemberBadRequestException;
@@ -48,6 +53,7 @@ import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.oauth.repository.TokenRepository;
 import com.baba.back.relation.domain.Relation;
 import com.baba.back.relation.domain.RelationGroup;
+import com.baba.back.relation.exception.RelationNotFoundException;
 import com.baba.back.relation.repository.RelationGroupRepository;
 import com.baba.back.relation.repository.RelationRepository;
 import java.time.Clock;
@@ -271,6 +277,74 @@ class MemberServiceTest {
         assertAll(
                 () -> assertThat(response.accessToken()).isEqualTo(accessToken),
                 () -> assertThat(response.refreshToken()).isEqualTo(refreshToken)
+        );
+    }
+
+    @Test
+    void 마이_프로필_조회시_멤버가_없으면_예외를_던진다() {
+        // given
+        final String memberId = 멤버1.getId();
+        given(memberRepository.findById(memberId)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> memberService.searchMyGroups(memberId))
+                .isInstanceOf(MemberNotFoundException.class);
+    }
+
+    @Test
+    void 마이_프로필_조회시_자신의_아기가_없으면_예외를_던진다() {
+        // given
+        final String memberId = 멤버1.getId();
+        given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
+        given(relationRepository.findFirstByMemberAndRelationGroupFamily(멤버1, true)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> memberService.searchMyGroups(memberId))
+                .isInstanceOf(RelationNotFoundException.class);
+    }
+
+    @Test
+    void 마이_프로필_조회시_그룹별_멤버들을_조회할_수_있다() {
+        // given
+        final String memberId = 멤버1.getId();
+        given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
+        given(relationRepository.findFirstByMemberAndRelationGroupFamily(멤버1, true))
+                .willReturn(Optional.of(관계10));
+        given(relationGroupRepository.findAllByBaby(any(Baby.class))).willReturn(List.of(관계그룹10, 관계그룹11));
+        given(relationRepository.findAllByRelationGroupIn(anyList())).willReturn(List.of(관계10, 관계11, 관계12));
+
+        // when
+        final MyProfileResponse response = memberService.searchMyGroups(memberId);
+
+        // then
+        assertThat(response.groups()).containsExactly(
+                new MyGroupResponse(관계그룹10.getRelationGroupName(), 관계그룹10.isFamily(),
+                        List.of(new MyGroupMemberResponse(
+                                        멤버1.getId(),
+                                        멤버1.getName(),
+                                        관계10.getRelationName(),
+                                        멤버1.getIconName(),
+                                        멤버1.getIconColor()
+                                ),
+                                new MyGroupMemberResponse(
+                                        멤버2.getId(),
+                                        멤버2.getName(),
+                                        관계11.getRelationName(),
+                                        멤버2.getIconName(),
+                                        멤버2.getIconColor()
+                                )
+                        )
+                ),
+                new MyGroupResponse(관계그룹11.getRelationGroupName(), 관계그룹11.isFamily(),
+                        List.of(new MyGroupMemberResponse(
+                                        멤버3.getId(),
+                                        멤버3.getName(),
+                                        관계12.getRelationName(),
+                                        멤버3.getIconName(),
+                                        멤버3.getIconColor()
+                                )
+                        )
+                )
         );
     }
 }
