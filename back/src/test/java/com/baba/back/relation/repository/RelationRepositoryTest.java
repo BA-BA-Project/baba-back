@@ -14,6 +14,7 @@ import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.relation.domain.Relation;
 import com.baba.back.relation.domain.RelationGroup;
 import java.util.List;
+import java.util.Optional;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,6 +130,31 @@ class RelationRepositoryTest {
 
         // then
         assertThat(relations).containsExactly(savedRelation1, savedRelation2);
+    }
+
+    @Test
+    void findFirstByMemberAndRelationGroupFamily_메서드_호출_시_멤버의_가족관계가_없으면_비어있는_Optional_객체를_반환한다() {
+        // given
+        final Member savedMember = memberRepository.save(멤버1);
+        final Baby savedBaby = babyRepository.save(아기1);
+        final RelationGroup savedRelationGroup = relationGroupRepository.save(RelationGroup.builder()
+                .baby(savedBaby)
+                .relationGroupName("외가")
+                .family(false)
+                .build());
+
+        relationRepository.save(Relation.builder()
+                .member(savedMember)
+                .relationName("아빠")
+                .relationGroup(savedRelationGroup)
+                .build());
+
+        // when
+        final Optional<Relation> relation = relationRepository.findFirstByMemberAndRelationGroupFamily(
+                savedMember, true);
+
+        // then
+        assertThat(relation).isEmpty();
     }
 
     @Test
