@@ -34,6 +34,7 @@ import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -184,7 +185,7 @@ public class MemberService {
 
         final List<RelationGroup> relationGroups = getRelationGroupsByBaby(firstBaby);
         final List<Relation> relations = getRelationsByRelationGroups(relationGroups);
-        final List<MyGroupResponse> groups = getMyGroups(relationGroups, relations);
+        final List<MyGroupResponse> groups = getMyGroups(relations);
 
         return new MyProfileResponse(groups);
     }
@@ -205,16 +206,19 @@ public class MemberService {
         return relationRepository.findAllByRelationGroupIn(relationGroups);
     }
 
-    private List<MyGroupResponse> getMyGroups(List<RelationGroup> relationGroups, List<Relation> relations) {
-        return relationGroups.stream()
-                .map(relationGroup -> {
-                    final List<Relation> relationsByGroup = relations.stream()
-                            .filter(relation -> relation.hasSameRelationGroup(relationGroup))
-                            .toList();
+    private List<MyGroupResponse> getMyGroups(List<Relation> relations) {
+        return relations.stream()
+                .collect(Collectors.groupingBy(Relation::getRelationGroup))
+                .entrySet()
+                .stream()
+                .map(entry -> {
+                    final RelationGroup relationGroup = entry.getKey();
+                    final List<Relation> relationsByGroup = entry.getValue();
 
                     return new MyGroupResponse(relationGroup.getRelationGroupName(), relationGroup.isFamily(),
                             getGroupMembers(relationsByGroup));
-                }).toList();
+                })
+                .toList();
     }
 
     private List<MyGroupMemberResponse> getGroupMembers(List<Relation> relations) {
