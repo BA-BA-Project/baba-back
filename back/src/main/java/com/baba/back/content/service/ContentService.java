@@ -223,7 +223,16 @@ public class ContentService {
                 .stream()
                 .filter(comment -> {
                     final Relation commentMemberRelation = findRelation(comment.getOwner(), baby);
-                    return relationGroup.canShare(commentMemberRelation.getRelationGroup());
+                    final boolean canShareCommentMemberGroup = relationGroup.canShare(
+                            commentMemberRelation.getRelationGroup());
+                    if (canShareCommentMemberGroup) {
+                        final Optional<Tag> tag = tagRepository.findByComment(comment);
+                        if (tag.isPresent()) {
+                            final Relation tagMemberRelation = findRelation(tag.get().getTagMember(), baby);
+                            return relationGroup.canShare(tagMemberRelation.getRelationGroup());
+                        }
+                    }
+                    return canShareCommentMemberGroup;
                 })
                 .toList();
     }

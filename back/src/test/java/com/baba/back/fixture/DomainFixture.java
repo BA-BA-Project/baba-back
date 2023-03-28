@@ -188,6 +188,18 @@ public class DomainFixture {
             .content(컨텐츠20)
             .text("댓글!")
             .build();
+
+    public static final Comment 댓글23 = Comment.builder()
+            .owner(멤버1)
+            .content(컨텐츠20)
+            .text("댓글!")
+            .build();
+
+    public static final Tag 태그20 = Tag.builder()
+            .tagMember(멤버3)
+            .comment(댓글23)
+            .build();
+
     public static final Like 좋아요20 = Like.builder()
             .member(멤버1)
             .content(컨텐츠20)
@@ -209,11 +221,6 @@ public class DomainFixture {
     public static final Relation 관계21 = Relation.builder()
             .member(멤버2)
             .relationName("사촌 형")
-            .relationGroup(관계그룹21)
-            .build();
-    public static final Relation 관계23 = Relation.builder()
-            .member(멤버3)
-            .relationName("이모")
             .relationGroup(관계그룹21)
             .build();
     public static final Invitation 초대20 = Invitation.builder()

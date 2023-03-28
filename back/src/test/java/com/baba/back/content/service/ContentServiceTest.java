@@ -10,6 +10,7 @@ import static com.baba.back.fixture.DomainFixture.댓글10;
 import static com.baba.back.fixture.DomainFixture.댓글20;
 import static com.baba.back.fixture.DomainFixture.댓글21;
 import static com.baba.back.fixture.DomainFixture.댓글22;
+import static com.baba.back.fixture.DomainFixture.댓글23;
 import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.DomainFixture.멤버2;
 import static com.baba.back.fixture.DomainFixture.멤버3;
@@ -23,6 +24,7 @@ import static com.baba.back.fixture.DomainFixture.컨텐츠10;
 import static com.baba.back.fixture.DomainFixture.컨텐츠11;
 import static com.baba.back.fixture.DomainFixture.컨텐츠20;
 import static com.baba.back.fixture.DomainFixture.태그10;
+import static com.baba.back.fixture.DomainFixture.태그20;
 import static com.baba.back.fixture.RequestFixture.댓글_생성_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.컨텐츠_생성_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.태그_댓글_생성_요청_데이터1;
@@ -591,16 +593,17 @@ class ContentServiceTest {
     }
 
     @Test
-    void 성장앨범_댓글_요청_시_가족이_아니라면_가족_그룹과_같은_그룹의_좋아요_댓글만_확인할_수_있다() {
+    void 성장앨범_댓글_요청_시_가족이_아니라면_가족_그룹과_같은_그룹의_좋아요_댓글_태그_댓글만_확인할_수_있다() {
         // given
         given(memberRepository.findById(멤버2.getId())).willReturn(Optional.of(멤버2));
         given(contentRepository.findById(컨텐츠20.getId())).willReturn(Optional.of(컨텐츠20));
         given(relationRepository.findByMemberAndBaby(멤버1, 아기2)).willReturn(Optional.of(관계20));
         given(relationRepository.findByMemberAndBaby(멤버2, 아기2)).willReturn(Optional.of(관계21));
         given(relationRepository.findByMemberAndBaby(멤버3, 아기2)).willReturn(Optional.of(관계22));
-        given(commentRepository.findAllByContent(컨텐츠20)).willReturn(List.of(댓글20, 댓글21, 댓글22));
+        given(commentRepository.findAllByContent(컨텐츠20)).willReturn(List.of(댓글20, 댓글21, 댓글22, 댓글23));
         given(tagRepository.findByComment(댓글20)).willReturn(Optional.empty());
         given(tagRepository.findByComment(댓글21)).willReturn(Optional.empty());
+        given(tagRepository.findByComment(댓글23)).willReturn(Optional.of(태그20));
 
         // when & then
         assertThat(contentService.getComments(멤버2.getId(), 컨텐츠20.getId()))
