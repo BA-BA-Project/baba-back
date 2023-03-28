@@ -10,7 +10,7 @@ import com.baba.back.content.domain.comment.Tag;
 import com.baba.back.content.domain.content.Content;
 import com.baba.back.content.domain.content.ImageFile;
 import com.baba.back.content.dto.CommentResponse;
-import com.baba.back.content.dto.ContentLikeCommentResponse;
+import com.baba.back.content.dto.CommentsResponse;
 import com.baba.back.content.dto.ContentResponse;
 import com.baba.back.content.dto.ContentsResponse;
 import com.baba.back.content.dto.CreateCommentRequest;
@@ -206,37 +206,21 @@ public class ContentService {
         }
     }
 
-    public ContentLikeCommentResponse getContent(String memberId, Long contentId) {
+    public CommentsResponse getComments(String memberId, Long contentId) {
         final Member member = findMember(memberId);
         final Content content = findContent(contentId);
         final Baby baby = content.getBaby();
 
         final Relation relation = findRelation(member, baby);
         final RelationGroup relationGroup = relation.getRelationGroup();
+        final List<Comment> comments = findSharedComments(content, baby, relationGroup);
 
-        final List<Like> likes = likeRepository.findAllByContent(content);
-        final List<Comment> comments = commentRepository.findAllByContent(content);
-
-        if (!relationGroup.isFamily()) {
-            final List<Like> sharedLikes = findSharedLikes(baby, relationGroup, likes);
-            final List<Comment> sharedComments = findSharedComments(baby, relationGroup, comments);
-            return getContentLikeCommentResponse(content, sharedLikes, sharedComments);
-        }
-
-        return getContentLikeCommentResponse(content, likes, comments);
+        return getCommentsResponse(content, comments);
     }
 
-    private List<Like> findSharedLikes(Baby baby, RelationGroup relationGroup, List<Like> likes) {
-        return likes.stream()
-                .filter(like -> {
-                    final Relation likeMemberRelation = findRelation(like.getMember(), baby);
-                    return relationGroup.canShare(likeMemberRelation.getRelationGroup());
-                })
-                .toList();
-    }
-
-    private List<Comment> findSharedComments(Baby baby, RelationGroup relationGroup, List<Comment> comments) {
-        return comments.stream()
+    private List<Comment> findSharedComments(Content content, Baby baby, RelationGroup relationGroup) {
+        return commentRepository.findAllByContent(content)
+                .stream()
                 .filter(comment -> {
                     final Relation commentMemberRelation = findRelation(comment.getOwner(), baby);
                     return relationGroup.canShare(commentMemberRelation.getRelationGroup());
@@ -244,19 +228,9 @@ public class ContentService {
                 .toList();
     }
 
-    private ContentLikeCommentResponse getContentLikeCommentResponse(Content content,
-                                                                     List<Like> likes,
-                                                                     List<Comment> comments) {
-        return new ContentLikeCommentResponse(
-                likes.size(),
-                likes.stream()
-                        .map(Like::getMember)
-                        .map(Member::getIconName)
-                        .limit(3)
-                        .sorted()
-                        .toList(),
-                comments.size(),
-                content.getCardStyle(),
+    private CommentsResponse getCommentsResponse(Content content,
+                                                 List<Comment> comments) {
+        return new CommentsResponse(
                 comments.stream()
                         .map(comment -> {
                                     final Member owner = comment.getOwner();

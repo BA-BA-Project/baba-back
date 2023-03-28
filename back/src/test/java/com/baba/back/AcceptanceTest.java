@@ -138,8 +138,8 @@ public class AcceptanceTest {
         return post(BABY_BASE_PATH + "/invite-code", Map.of("Authorization", "Bearer " + accessToken), request);
     }
 
-    protected ExtractableResponse<Response> 성장앨범_자세히보기_요청(String accessToken, Long contentId) {
-        return get(CONTENT_BASE_PATH + "/contents/" + contentId, Map.of("Authorization", "Bearer " + accessToken));
+    protected ExtractableResponse<Response> 성장앨범_댓글_보기_요청(String accessToken, Long contentId) {
+        return get(CONTENT_BASE_PATH + "/" + contentId +"/comments", Map.of("Authorization", "Bearer " + accessToken));
     }
 
     protected Long getContentId(ExtractableResponse<Response> response) {

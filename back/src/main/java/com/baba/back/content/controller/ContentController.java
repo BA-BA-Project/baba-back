@@ -1,6 +1,6 @@
 package com.baba.back.content.controller;
 
-import com.baba.back.content.dto.ContentLikeCommentResponse;
+import com.baba.back.content.dto.CommentsResponse;
 import com.baba.back.content.dto.ContentsResponse;
 import com.baba.back.content.dto.CreateCommentRequest;
 import com.baba.back.content.dto.CreateContentRequest;
@@ -78,15 +78,15 @@ public class ContentController {
         return ResponseEntity.ok(contentService.getContents(memberId, babyId, year, month));
     }
 
-    @Operation(summary = "성장 앨범 자세히 보기 조회 요청")
+    @Operation(summary = "성장 앨범 댓글 보기 조회 요청")
     @OkResponse
     @UnAuthorizedResponse
     @NotFoundResponse
     @IntervalServerErrorResponse
-    @GetMapping("/album/contents/{contentId}")
-    public ResponseEntity<ContentLikeCommentResponse> getContent(@Login String memberId,
-                                                                 @PathVariable("contentId") Long contentId) {
-        return ResponseEntity.ok(contentService.getContent(memberId, contentId));
+    @GetMapping("/album/{contentId}/comments")
+    public ResponseEntity<CommentsResponse> getContent(@Login String memberId,
+                                                       @PathVariable("contentId") Long contentId) {
+        return ResponseEntity.ok(contentService.getComments(memberId, contentId));
     }
 
 
@@ -104,7 +104,7 @@ public class ContentController {
 
         Long commentId = contentService.createComment(memberId, babyId, contentId, request);
         return ResponseEntity
-                .created(URI.create("/album/" + babyId + "/" + commentId + "/comment/" + commentId))
+                .created(URI.create("/album/" + babyId + "/" + contentId + "/comment/" + commentId))
                 .build();
     }
 }

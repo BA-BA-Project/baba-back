@@ -32,7 +32,7 @@ public class Relation extends BaseEntity {
     @AttributeOverride(name = "value", column = @Column(name = "relation_name"))
     private Name relationName;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private RelationGroup relationGroup;
 
     @Builder

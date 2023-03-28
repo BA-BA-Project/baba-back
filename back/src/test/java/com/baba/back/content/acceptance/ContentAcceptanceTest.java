@@ -12,7 +12,7 @@ import static org.mockito.BDDMockito.given;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.baba.back.AcceptanceTest;
-import com.baba.back.content.dto.ContentLikeCommentResponse;
+import com.baba.back.content.dto.CommentsResponse;
 import com.baba.back.content.dto.ContentResponse;
 import com.baba.back.content.dto.ContentsResponse;
 import com.baba.back.content.dto.CreateCommentRequest;
@@ -243,7 +243,7 @@ public class ContentAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    void 성장_앨범을_자세히_볼_수_있다() throws MalformedURLException {
+    void 성장_앨범_댓글을_볼_수_있다() throws MalformedURLException {
         // given
         final ExtractableResponse<Response> signUpResponse1 = 아기_등록_회원가입_요청();
         final String accessToken = toObject(signUpResponse1, MemberSignUpResponse.class).accessToken();
@@ -252,16 +252,14 @@ public class ContentAcceptanceTest extends AcceptanceTest {
         final Long contentId = getContentId(성장앨범_생성_요청(accessToken, babyId, nowDate));
         댓글_생성_요청(accessToken, babyId, contentId, new CreateCommentRequest("", "테스트"));
         댓글_생성_요청(accessToken, babyId, contentId, new CreateCommentRequest("", "짜기싫다"));
-        좋아요_요청(accessToken, babyId, contentId);
 
         // when
-        final ExtractableResponse<Response> httpResponse = 성장앨범_자세히보기_요청(accessToken, contentId);
+        final ExtractableResponse<Response> httpResponse = 성장앨범_댓글_보기_요청(accessToken, contentId);
 
         // then
-        final ContentLikeCommentResponse response = toObject(httpResponse, ContentLikeCommentResponse.class);
+        final CommentsResponse response = toObject(httpResponse, CommentsResponse.class);
         assertAll(
                 () -> assertThat(httpResponse.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(response.likeCount()).isEqualTo(1),
                 () -> assertThat(response.comments()).hasSize(2)
         );
     }
