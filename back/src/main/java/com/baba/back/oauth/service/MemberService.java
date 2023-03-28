@@ -126,6 +126,7 @@ public class MemberService {
                 .orElseThrow(() -> new MemberNotFoundException(memberId + "에 해당하는 멤버가 존재하지 않습니다."));
 
         return new MemberResponse(
+                memberId,
                 member.getName(),
                 member.getIntroduction(),
                 member.getIconName(),
