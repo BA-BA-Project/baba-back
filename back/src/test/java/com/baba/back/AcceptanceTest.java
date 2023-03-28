@@ -60,10 +60,11 @@ public class AcceptanceTest {
         return post(MEMBER_BASE_PATH + "/baby", Map.of("Authorization", "Bearer " + signToken), request);
     }
 
-    protected ExtractableResponse<Response> 초대코드로_회원가입_요청(String memberId, SignUpWithCodeRequest request) {
+    protected ExtractableResponse<Response> 초대코드로_회원가입_요청(String memberId, String code) {
         final String signToken = signTokenProvider.createToken(memberId);
         return post(MEMBER_BASE_PATH + "/baby/invite-code",
-                Map.of("Authorization", "Bearer " + signToken), request);
+                Map.of("Authorization", "Bearer " + signToken),
+                new SignUpWithCodeRequest(code, "박재희", "PROFILE_W_1"));
     }
 
     protected ExtractableResponse<Response> 초대장_조회_요청(String code) {
@@ -136,6 +137,10 @@ public class AcceptanceTest {
 
     private ExtractableResponse<Response> 초대_코드_생성_요청(String accessToken, CreateInviteCodeRequest request) {
         return post(BABY_BASE_PATH + "/invite-code", Map.of("Authorization", "Bearer " + accessToken), request);
+    }
+
+    protected ExtractableResponse<Response> 마이_그룹별_조회_요청(String accessToken) {
+        return get(MEMBER_BASE_PATH + "/my-page", Map.of("Authorization", "Bearer " + accessToken));
     }
 
     protected Long getContentId(ExtractableResponse<Response> response) {

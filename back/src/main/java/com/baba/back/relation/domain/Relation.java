@@ -42,7 +42,15 @@ public class Relation extends BaseEntity {
         this.relationGroup = relationGroup;
     }
 
+    public String getRelationName() {
+        return this.relationName.getValue();
+    }
+
     public boolean isFamily() {
-        return relationGroup.isFamily();
+        return this.relationGroup.isFamily();
+    }
+
+    public boolean hasSameRelationGroup(RelationGroup relationGroup) {
+        return this.relationGroup.equals(relationGroup);
     }
 }

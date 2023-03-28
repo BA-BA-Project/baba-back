@@ -5,7 +5,6 @@ import static com.baba.back.fixture.DomainFixture.아기1;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import com.baba.back.common.domain.Name;
 import java.time.LocalDate;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -28,7 +27,7 @@ class ContentTest {
                         .now(NOW)
                         .cardStyle(CARD_STYLE)
                         .baby(아기1)
-                        .relation(new Name("엄마"))
+                        .relation("엄마")
                         .owner(멤버1)
                         .build())
                 .doesNotThrowAnyException();
@@ -44,7 +43,7 @@ class ContentTest {
                 .cardStyle(CARD_STYLE)
                 .baby(아기1)
                 .owner(멤버1)
-                .relation(new Name("엄마"))
+                .relation("엄마")
                 .build();
 
         // when
@@ -59,7 +58,7 @@ class ContentTest {
     @Test
     void 컨텐츠에_저장된_정보를_조회할_수_있다() {
         // given
-        final Name relationName = new Name("엄마");
+        final String relationName = "엄마";
         Content content = Content.builder()
                 .title(TITLE)
                 .contentDate(CONTENT_DATE)
@@ -76,7 +75,7 @@ class ContentTest {
                 () -> assertThat(content.getContentDate()).isEqualTo(CONTENT_DATE),
                 () -> assertThat(content.getCardStyle()).isEqualTo(CARD_STYLE),
                 () -> assertThat(content.getOwnerName()).isEqualTo(멤버1.getName()),
-                () -> assertThat(content.getRelationName()).isEqualTo(relationName.getValue()),
+                () -> assertThat(content.getRelationName()).isEqualTo(relationName),
                 () -> assertThat(content.getImageSource()).isEmpty()
         );
     }
