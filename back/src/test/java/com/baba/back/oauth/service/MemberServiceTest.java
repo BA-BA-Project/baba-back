@@ -19,7 +19,7 @@ import static com.baba.back.fixture.DomainFixture.아기1;
 import static com.baba.back.fixture.DomainFixture.아기2;
 import static com.baba.back.fixture.DomainFixture.초대10;
 import static com.baba.back.fixture.DomainFixture.초대20;
-import static com.baba.back.fixture.RequestFixture.그룹_생성_요청_데이터;
+import static com.baba.back.fixture.RequestFixture.그룹_추가_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.멤버_가입_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.초대코드로_멤버_가입_요청_데이터;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,7 +36,6 @@ import com.baba.back.baby.domain.IdConstructor;
 import com.baba.back.baby.domain.invitation.Code;
 import com.baba.back.baby.domain.invitation.Invitation;
 import com.baba.back.baby.domain.invitation.InvitationCode;
-import com.baba.back.baby.exception.BabiesBadRequestException;
 import com.baba.back.baby.exception.InvitationCodeBadRequestException;
 import com.baba.back.baby.exception.InvitationsBadRequestException;
 import com.baba.back.baby.repository.BabyRepository;
@@ -294,7 +293,7 @@ class MemberServiceTest {
         given(memberRepository.findById(멤버1.getId())).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> memberService.createGroup(멤버1.getId(), 그룹_생성_요청_데이터))
+        assertThatThrownBy(() -> memberService.createGroup(멤버1.getId(), 그룹_추가_요청_데이터))
                 .isInstanceOf(MemberNotFoundException.class);
     }
 
@@ -305,7 +304,7 @@ class MemberServiceTest {
         given(relationRepository.findAllByMember(멤버1)).willReturn(List.of(관계22));
 
         // when & then
-        assertThatThrownBy(() -> memberService.createGroup(멤버1.getId(), 그룹_생성_요청_데이터))
+        assertThatThrownBy(() -> memberService.createGroup(멤버1.getId(), 그룹_추가_요청_데이터))
                 .isInstanceOf(RelationNotFoundException.class);
     }
 
@@ -333,7 +332,7 @@ class MemberServiceTest {
         given(relationGroupRepository.findAllByBabyIn(anyList())).willReturn(List.of(관계그룹10, 관계그룹11, 관계그룹20, 관계그룹21));
 
         // when
-        memberService.createGroup(memberId, 그룹_생성_요청_데이터);
+        memberService.createGroup(memberId, 그룹_추가_요청_데이터);
 
         // when & then
         then(relationGroupRepository).should(times(2)).save(any(RelationGroup.class));

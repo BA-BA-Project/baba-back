@@ -1,5 +1,6 @@
 package com.baba.back.oauth.controller;
 
+import com.baba.back.oauth.dto.CreateGroupRequest;
 import com.baba.back.oauth.dto.MemberResponse;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
@@ -20,6 +21,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -69,6 +71,19 @@ public class MemberController {
         final SignUpWithBabyResponse response = memberService.signUpWithCode(request, memberId);
         return ResponseEntity.created(URI.create("/baby/" + response.babyId()))
                 .body(response.memberSignUpResponse());
+    }
+
+    @Operation(summary = "그룹 추가 요청")
+    @CreatedResponse
+    @BadRequestResponse
+    @UnAuthorizedResponse
+    @NotFoundResponse
+    @IntervalServerErrorResponse
+    @PostMapping("/members/groups")
+    public ResponseEntity<Void> createGroup(@RequestBody @Valid CreateGroupRequest request,
+                                              @Login String memberId) {
+        memberService.createGroup(memberId, request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @Operation(summary = "마이 그룹별 조회 요청")
