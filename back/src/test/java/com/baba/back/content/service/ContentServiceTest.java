@@ -620,7 +620,7 @@ class ContentServiceTest {
                                                 댓글20.getCreatedAt()
                                         ),
                                         new CommentResponse(
-                                                댓글20.getId(),
+                                                댓글21.getId(),
                                                 멤버2.getId(),
                                                 멤버2.getName(),
                                                 관계21.getRelationName().getValue(),
