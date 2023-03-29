@@ -159,17 +159,16 @@ class MemberServiceTest {
 
     @Test
     void 멤버의_정보를_조회한다() {
-        final String memberId = "memberId";
-
         // given
-        given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
+        given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
 
         // when
-        final MemberResponse response = memberService.findMember(memberId);
+        final MemberResponse response = memberService.findMember(멤버1.getId());
 
         // then
         assertThat(response).isEqualTo(
                 new MemberResponse(
+                        멤버1.getId(),
                         멤버1.getName(),
                         멤버1.getIntroduction(),
                         멤버1.getIconName(),
