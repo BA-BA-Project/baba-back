@@ -102,5 +102,32 @@ class RelationGroupTest {
         // then
         assertThat(result).isFalse();
     }
+
+    @Test
+    void hasEqualName_호출_시_관계_그룹명이_같으면_true를_반환한다() {
+        // given
+        final String relationGroupName = "가족";
+        final RelationGroup relationGroup = new RelationGroup(아기1, relationGroupName, Color.COLOR_1, true);
+
+        // when
+        final boolean result = relationGroup.hasEqualName(relationGroupName);
+
+        // then
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    void hasEqualName_호출_시_관계_그룹명이_다르면_false를_반환한다() {
+        // given
+        final String relationGroupName = "가족";
+        final String anotherRelationGroupName = "외가";
+        final RelationGroup relationGroup = new RelationGroup(아기1, relationGroupName, Color.COLOR_1, true);
+
+        // when
+        final boolean result = relationGroup.hasEqualName(anotherRelationGroupName);
+
+        // then
+        assertThat(result).isFalse();
+    }
 }
 
