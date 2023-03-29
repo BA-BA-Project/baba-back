@@ -251,7 +251,7 @@ public class ContentService {
                                             comment.getId(),
                                             owner.getId(),
                                             owner.getName(),
-                                            relation.getRelationName().getValue(),
+                                            relation.getRelationName(),
                                             owner.getIconName(),
                                             owner.getIconColor(),
                                             findTagMemberName(comment),

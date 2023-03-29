@@ -52,14 +52,14 @@ public class Content extends BaseEntity {
 
     @Builder
     public Content(String title, LocalDate contentDate, LocalDate now, String cardStyle, Baby baby, Member owner,
-                   Name relation) {
+                   String relation) {
         this.title = new Title(title);
         this.contentDate = ContentDate.of(contentDate, now, baby.getBirthday());
         this.cardStyle = CardStyle.from(cardStyle);
         this.imageSource = new ImageSource("");
         this.baby = baby;
         this.owner = owner;
-        this.relation = relation;
+        this.relation = new Name(relation);
     }
 
     public void updateURL(String imageSource) {

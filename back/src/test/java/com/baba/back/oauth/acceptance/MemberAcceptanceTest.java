@@ -15,7 +15,9 @@ import com.baba.back.oauth.domain.member.Color;
 import com.baba.back.oauth.dto.MemberResponse;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
-import com.baba.back.oauth.dto.SignUpWithCodeRequest;
+import com.baba.back.oauth.dto.MyGroupMemberResponse;
+import com.baba.back.oauth.dto.MyGroupResponse;
+import com.baba.back.oauth.dto.MyProfileResponse;
 import com.baba.back.oauth.service.AccessTokenProvider;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -112,9 +114,9 @@ class MemberAcceptanceTest extends AcceptanceTest {
         // then
         Assertions.assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(toObject(response, MemberResponse.class)).isEqualTo(
-                        new MemberResponse(멤버_가입_요청_데이터.getName(), "", 멤버_가입_요청_데이터.getIconName(), Color.COLOR_1.name())
-                )
+                () -> assertThat(toObject(response, MemberResponse.class)).extracting("name", "introduction",
+                                "iconName", "iconColor")
+                        .containsExactly(멤버_가입_요청_데이터.getName(), "", 멤버_가입_요청_데이터.getIconName(), Color.COLOR_1.name())
         );
     }
 
@@ -139,10 +141,8 @@ class MemberAcceptanceTest extends AcceptanceTest {
         final ExtractableResponse<Response> 가족_초대_코드_생성_응답 = 가족_초대_코드_생성_요청(accessToken);
         final String code = toObject(가족_초대_코드_생성_응답, CreateInviteCodeResponse.class).inviteCode();
 
-        final SignUpWithCodeRequest request = new SignUpWithCodeRequest(code, "박재희", "PROFILE_W_1");
-
         // when
-        final ExtractableResponse<Response> response = 초대코드로_회원가입_요청(MEMBER_ID, request);
+        final ExtractableResponse<Response> response = 초대코드로_회원가입_요청(MEMBER_ID, code);
 
         // then
         assertAll(
@@ -162,17 +162,63 @@ class MemberAcceptanceTest extends AcceptanceTest {
         final ExtractableResponse<Response> 가족_초대_코드_생성_응답 = 가족_초대_코드_생성_요청(accessToken);
         final String code = toObject(가족_초대_코드_생성_응답, CreateInviteCodeResponse.class).inviteCode();
 
-        final SignUpWithCodeRequest request = new SignUpWithCodeRequest(code, "박재희", "PROFILE_W_1");
-        초대코드로_회원가입_요청(MEMBER_ID, request);
+        초대코드로_회원가입_요청(MEMBER_ID, code);
 
         // when
-        final ExtractableResponse<Response> response = 초대코드로_회원가입_요청(MEMBER_ID, request);
+        final ExtractableResponse<Response> response = 초대코드로_회원가입_요청(MEMBER_ID, code);
 
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
                 () -> assertThat(toObject(response, ExceptionResponse.class).message()).isNotBlank()
         );
+    }
+
+    // TODO: 2023/03/26 관계그룹 생성 로직 추가 이후 테스트를 작성한다.
+    @Test
+    void 마이_그룹별_조회_요청_시_자신의_아기가_없으면_400을_던진다() {
+        // given
+
+        // when
+
+        // then
+    }
+
+    @Test
+    void 마이_그룹별_조회_요청_시_가족_그룹의_멤버들을_조회한다() {
+        // given
+        final String memberId1 = "memberId1";
+        final String memberId2 = "memberId2";
+
+        final ExtractableResponse<Response> 아기_등록_회원가입_응답 = 아기_등록_회원가입_요청(memberId1);
+        final String accessToken = toObject(아기_등록_회원가입_응답, MemberSignUpResponse.class).accessToken();
+
+        final ExtractableResponse<Response> 가족_초대_코드_생성_응답 = 가족_초대_코드_생성_요청(accessToken);
+        final String code = toObject(가족_초대_코드_생성_응답, CreateInviteCodeResponse.class).inviteCode();
+
+        초대코드로_회원가입_요청(memberId2, code);
+
+        // when
+        final ExtractableResponse<Response> response = 마이_그룹별_조회_요청(accessToken);
+        final List<MyGroupResponse> groups = toObject(response, MyProfileResponse.class).groups();
+
+        // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(groups).hasSize(1),
+                () -> assertThat(groups.get(0).members().stream().map(MyGroupMemberResponse::memberId).toList())
+                        .containsExactly(memberId1, memberId2)
+        );
+    }
+
+    // TODO: 2023/03/26 관계그룹 생성 로직 추가 이후 테스트를 작성한다.
+    @Test
+    void 마이_그룹별_조회_요청_시_가족_그룹과_다른_그룹의_멤버들을_조회한다() {
+        // given
+
+        // when
+
+        // then
     }
 
     @TestConfiguration

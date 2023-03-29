@@ -3,6 +3,7 @@ package com.baba.back.oauth.controller;
 import com.baba.back.oauth.dto.MemberResponse;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
+import com.baba.back.oauth.dto.MyProfileResponse;
 import com.baba.back.oauth.dto.SignUpWithBabyResponse;
 import com.baba.back.oauth.dto.SignUpWithCodeRequest;
 import com.baba.back.oauth.service.MemberService;
@@ -68,5 +69,15 @@ public class MemberController {
         final SignUpWithBabyResponse response = memberService.signUpWithCode(request, memberId);
         return ResponseEntity.created(URI.create("/baby/" + response.babyId()))
                 .body(response.memberSignUpResponse());
+    }
+
+    @Operation(summary = "마이 그룹별 조회 요청")
+    @OkResponse
+    @UnAuthorizedResponse
+    @NotFoundResponse
+    @IntervalServerErrorResponse
+    @GetMapping("/members/my-page")
+    public ResponseEntity<MyProfileResponse> searchMyProfile(@Login String memberId) {
+        return ResponseEntity.ok(memberService.searchMyGroups(memberId));
     }
 }
