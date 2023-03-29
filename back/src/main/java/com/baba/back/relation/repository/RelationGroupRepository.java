@@ -11,4 +11,6 @@ public interface RelationGroupRepository extends JpaRepository<RelationGroup, Lo
     Optional<RelationGroup> findByBabyAndRelationGroupNameValue(Baby baby, String relationGroupName);
 
     List<RelationGroup> findAllByBaby(Baby baby);
+
+    List<RelationGroup> findAllByBabyIn(List<Baby> babies);
 }
