@@ -225,14 +225,16 @@ public class ContentService {
                     final Relation commentMemberRelation = findRelation(comment.getOwner(), baby);
                     final boolean canShareCommentMemberGroup = relationGroup.canShare(
                             commentMemberRelation.getRelationGroup());
-                    if (canShareCommentMemberGroup) {
-                        final Optional<Tag> tag = tagRepository.findByComment(comment);
-                        if (tag.isPresent()) {
-                            final Relation tagMemberRelation = findRelation(tag.get().getTagMember(), baby);
-                            return relationGroup.canShare(tagMemberRelation.getRelationGroup());
-                        }
+                    if (!canShareCommentMemberGroup) {
+                        return false;
                     }
-                    return canShareCommentMemberGroup;
+                    final Optional<Tag> tag = tagRepository.findByComment(comment);
+                    if (tag.isEmpty()) {
+                        return true;
+                    }
+
+                    final Relation tagMemberRelation = findRelation(tag.get().getTagMember(), baby);
+                    return relationGroup.canShare(tagMemberRelation.getRelationGroup());
                 })
                 .toList();
     }
