@@ -133,6 +133,7 @@ public class MemberService {
         final Member member = getMember(memberId);
 
         return new MemberResponse(
+                memberId,
                 member.getName(),
                 member.getIntroduction(),
                 member.getIconName(),

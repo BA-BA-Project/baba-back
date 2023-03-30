@@ -5,7 +5,6 @@ import static com.baba.back.fixture.DomainFixture.관계11;
 import static com.baba.back.fixture.DomainFixture.관계12;
 import static com.baba.back.fixture.DomainFixture.관계20;
 import static com.baba.back.fixture.DomainFixture.관계22;
-import static com.baba.back.fixture.DomainFixture.관계23;
 import static com.baba.back.fixture.DomainFixture.관계30;
 import static com.baba.back.fixture.DomainFixture.관계그룹10;
 import static com.baba.back.fixture.DomainFixture.관계그룹11;
@@ -166,17 +165,16 @@ class MemberServiceTest {
 
     @Test
     void 멤버의_정보를_조회한다() {
-        final String memberId = "memberId";
-
         // given
-        given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
+        given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
 
         // when
-        final MemberResponse response = memberService.findMember(memberId);
+        final MemberResponse response = memberService.findMember(멤버1.getId());
 
         // then
         assertThat(response).isEqualTo(
                 new MemberResponse(
+                        멤버1.getId(),
                         멤버1.getName(),
                         멤버1.getIntroduction(),
                         멤버1.getIconName(),
@@ -271,7 +269,7 @@ class MemberServiceTest {
         given(clock.instant()).willReturn(now.instant());
         given(clock.getZone()).willReturn(now.getZone());
         given(memberRepository.save(any(Member.class))).willReturn(멤버3);
-        given(relationRepository.save(any(Relation.class))).willReturn(관계12, 관계23);
+        given(relationRepository.save(any(Relation.class))).willReturn(관계12, 관계22);
         given(accessTokenProvider.createToken(memberId)).willReturn(accessToken);
         given(refreshTokenProvider.createToken(memberId)).willReturn(refreshToken);
         given(tokenRepository.save(any(Token.class))).willReturn(any());

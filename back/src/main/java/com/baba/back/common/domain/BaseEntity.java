@@ -12,10 +12,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Getter
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public abstract class BaseEntity {
+public abstract class BaseEntity implements Comparable<BaseEntity> {
 
     @CreatedDate
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
@@ -24,5 +24,10 @@ public abstract class BaseEntity {
 
     public void updateDeleted() {
         this.deleted = !this.deleted;
+    }
+
+    @Override
+    public int compareTo(BaseEntity o) {
+        return this.createdAt.compareTo(o.createdAt);
     }
 }

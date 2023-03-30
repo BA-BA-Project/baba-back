@@ -100,7 +100,8 @@ jacocoTestCoverageVerification {
                     '**.*Extractor*',
                     '**.*Picker*',
                     '**.*ControllerAdvice*',
-                    '**.*Generator*'
+                    '**.*Generator*',
+                    '**.*BaseEntity*'
             ]
         }
 

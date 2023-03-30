@@ -39,4 +39,8 @@ public class Comment extends BaseEntity {
         this.content = content;
         this.text = new Text(text);
     }
+
+    public String getText() {
+        return text.getValue();
+    }
 }

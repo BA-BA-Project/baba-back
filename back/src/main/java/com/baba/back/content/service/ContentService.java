@@ -9,6 +9,8 @@ import com.baba.back.content.domain.comment.Comment;
 import com.baba.back.content.domain.comment.Tag;
 import com.baba.back.content.domain.content.Content;
 import com.baba.back.content.domain.content.ImageFile;
+import com.baba.back.content.dto.CommentResponse;
+import com.baba.back.content.dto.CommentsResponse;
 import com.baba.back.content.dto.ContentResponse;
 import com.baba.back.content.dto.ContentsResponse;
 import com.baba.back.content.dto.CreateCommentRequest;
@@ -202,5 +204,71 @@ public class ContentService {
                     )
             );
         }
+    }
+
+    public CommentsResponse getComments(String memberId, Long contentId) {
+        final Member member = findMember(memberId);
+        final Content content = findContent(contentId);
+        final Baby baby = content.getBaby();
+
+        final Relation relation = findRelation(member, baby);
+        final RelationGroup relationGroup = relation.getRelationGroup();
+        final List<Comment> comments = findSharedComments(content, baby, relationGroup);
+
+        return getCommentsResponse(content, comments);
+    }
+
+    private List<Comment> findSharedComments(Content content, Baby baby, RelationGroup relationGroup) {
+        return commentRepository.findAllByContent(content)
+                .stream()
+                .filter(comment -> {
+                    final Relation commentMemberRelation = findRelation(comment.getOwner(), baby);
+                    final boolean canShareCommentMemberGroup = relationGroup.canShare(
+                            commentMemberRelation.getRelationGroup());
+                    if (!canShareCommentMemberGroup) {
+                        return false;
+                    }
+                    final Optional<Tag> tag = tagRepository.findByComment(comment);
+                    if (tag.isEmpty()) {
+                        return true;
+                    }
+
+                    final Relation tagMemberRelation = findRelation(tag.get().getTagMember(), baby);
+                    return relationGroup.canShare(tagMemberRelation.getRelationGroup());
+                })
+                .toList();
+    }
+
+    private CommentsResponse getCommentsResponse(Content content,
+                                                 List<Comment> comments) {
+        return new CommentsResponse(
+                comments.stream()
+                        .map(comment -> {
+                                    final Member owner = comment.getOwner();
+                                    final Relation relation = findRelation(owner, content.getBaby());
+
+                                    return new CommentResponse(
+                                            comment.getId(),
+                                            owner.getId(),
+                                            owner.getName(),
+                                            relation.getRelationName(),
+                                            owner.getIconName(),
+                                            owner.getIconColor(),
+                                            findTagMemberName(comment),
+                                            comment.getText(),
+                                            comment.getCreatedAt());
+                                }
+                        )
+                        .sorted()
+                        .toList()
+        );
+    }
+
+    public String findTagMemberName(Comment comment) {
+        final Optional<Tag> tag = tagRepository.findByComment(comment);
+        if (tag.isPresent()) {
+            return tag.get().getTagMember().getName();
+        }
+        return "";
     }
 }
