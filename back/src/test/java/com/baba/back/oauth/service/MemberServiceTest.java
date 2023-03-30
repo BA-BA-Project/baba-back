@@ -3,10 +3,13 @@ package com.baba.back.oauth.service;
 import static com.baba.back.fixture.DomainFixture.관계10;
 import static com.baba.back.fixture.DomainFixture.관계11;
 import static com.baba.back.fixture.DomainFixture.관계12;
+import static com.baba.back.fixture.DomainFixture.관계20;
 import static com.baba.back.fixture.DomainFixture.관계22;
 import static com.baba.back.fixture.DomainFixture.관계30;
 import static com.baba.back.fixture.DomainFixture.관계그룹10;
 import static com.baba.back.fixture.DomainFixture.관계그룹11;
+import static com.baba.back.fixture.DomainFixture.관계그룹20;
+import static com.baba.back.fixture.DomainFixture.관계그룹21;
 import static com.baba.back.fixture.DomainFixture.관계그룹30;
 import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.DomainFixture.멤버2;
@@ -15,6 +18,7 @@ import static com.baba.back.fixture.DomainFixture.아기1;
 import static com.baba.back.fixture.DomainFixture.아기2;
 import static com.baba.back.fixture.DomainFixture.초대10;
 import static com.baba.back.fixture.DomainFixture.초대20;
+import static com.baba.back.fixture.RequestFixture.그룹_추가_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.멤버_가입_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.초대코드로_멤버_가입_요청_데이터;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,6 +43,7 @@ import com.baba.back.oauth.domain.Picker;
 import com.baba.back.oauth.domain.member.Color;
 import com.baba.back.oauth.domain.member.Member;
 import com.baba.back.oauth.domain.token.Token;
+import com.baba.back.oauth.dto.CreateGroupRequest;
 import com.baba.back.oauth.dto.MemberResponse;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
@@ -53,6 +58,7 @@ import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.oauth.repository.TokenRepository;
 import com.baba.back.relation.domain.Relation;
 import com.baba.back.relation.domain.RelationGroup;
+import com.baba.back.relation.exception.RelationGroupBadRequestException;
 import com.baba.back.relation.exception.RelationNotFoundException;
 import com.baba.back.relation.repository.RelationGroupRepository;
 import com.baba.back.relation.repository.RelationRepository;
@@ -277,6 +283,57 @@ class MemberServiceTest {
                 () -> assertThat(response.accessToken()).isEqualTo(accessToken),
                 () -> assertThat(response.refreshToken()).isEqualTo(refreshToken)
         );
+    }
+
+    @Test
+    void 그룹_추가시_멤버가_없으면_예외를_던진다() {
+        // given
+        given(memberRepository.findById(멤버1.getId())).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> memberService.createGroup(멤버1.getId(), 그룹_추가_요청_데이터))
+                .isInstanceOf(MemberNotFoundException.class);
+    }
+
+    @Test
+    void 그룹_추가시_자신의_아기가_없으면_예외를_던진다() {
+        // given
+        given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
+        given(relationRepository.findAllByMember(멤버1)).willReturn(List.of(관계22));
+
+        // when & then
+        assertThatThrownBy(() -> memberService.createGroup(멤버1.getId(), 그룹_추가_요청_데이터))
+                .isInstanceOf(RelationNotFoundException.class);
+    }
+
+    @Test
+    void 그룹_추가시_같은_이름의_그룹이_이미_존재하면_예외를_던진다() {
+        // given
+        final String memberId = 멤버1.getId();
+        given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
+        given(relationRepository.findAllByMember(멤버1)).willReturn(List.of(관계10, 관계20, 관계22));
+        given(relationGroupRepository.findAllByBabyIn(anyList())).willReturn(List.of(관계그룹10, 관계그룹11, 관계그룹20, 관계그룹21));
+
+        final CreateGroupRequest invalidRequest = new CreateGroupRequest("외가", "FFAEBA");
+
+        // when & then
+        assertThatThrownBy(() -> memberService.createGroup(memberId, invalidRequest))
+                .isInstanceOf(RelationGroupBadRequestException.class);
+    }
+
+    @Test
+    void 그룹_추가시_자신의_아기들의_관계그룹을_각각_생성한다() {
+        // given
+        final String memberId = 멤버1.getId();
+        given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
+        given(relationRepository.findAllByMember(멤버1)).willReturn(List.of(관계10, 관계20, 관계22));
+        given(relationGroupRepository.findAllByBabyIn(anyList())).willReturn(List.of(관계그룹10, 관계그룹11, 관계그룹20, 관계그룹21));
+
+        // when
+        memberService.createGroup(memberId, 그룹_추가_요청_데이터);
+
+        // when & then
+        then(relationGroupRepository).should(times(2)).save(any(RelationGroup.class));
     }
 
     @Test

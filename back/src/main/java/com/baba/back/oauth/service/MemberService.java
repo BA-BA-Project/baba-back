@@ -12,6 +12,7 @@ import com.baba.back.oauth.domain.Picker;
 import com.baba.back.oauth.domain.member.Color;
 import com.baba.back.oauth.domain.member.Member;
 import com.baba.back.oauth.domain.token.Token;
+import com.baba.back.oauth.dto.CreateGroupRequest;
 import com.baba.back.oauth.dto.MemberResponse;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
@@ -26,6 +27,8 @@ import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.oauth.repository.TokenRepository;
 import com.baba.back.relation.domain.Relation;
 import com.baba.back.relation.domain.RelationGroup;
+import com.baba.back.relation.domain.Relations;
+import com.baba.back.relation.exception.RelationGroupBadRequestException;
 import com.baba.back.relation.exception.RelationNotFoundException;
 import com.baba.back.relation.repository.RelationGroupRepository;
 import com.baba.back.relation.repository.RelationRepository;
@@ -178,6 +181,53 @@ public class MemberService {
                     return baby;
                 })
                 .toList());
+    }
+
+    public void createGroup(String memberId, CreateGroupRequest request) {
+        final Member member = getMember(memberId);
+        final List<Baby> myBabies = getMyBabies(member);
+        final List<RelationGroup> relationGroups = getRelationGroupsByBabies(myBabies);
+
+        validateRelationGroup(relationGroups, request.getRelationGroup());
+
+        saveRelationGroups(request, myBabies);
+    }
+
+    private List<Baby> getMyBabies(Member member) {
+        final Relations relations = new Relations(relationRepository.findAllByMember(member));
+        final List<RelationGroup> myFamilyGroup = relations.getMyFamilyGroup();
+
+        final List<Baby> babies = myFamilyGroup.stream()
+                .map(RelationGroup::getBaby)
+                .toList();
+
+        if (babies.isEmpty()) {
+            throw new RelationNotFoundException("가족 관계인 아기가 존재하지 않습니다.");
+        }
+
+        return babies;
+    }
+
+    private List<RelationGroup> getRelationGroupsByBabies(List<Baby> babies) {
+        return relationGroupRepository.findAllByBabyIn(babies);
+    }
+
+    private void validateRelationGroup(List<RelationGroup> relationGroups, String relationGroupName) {
+        relationGroups.forEach(relationGroup -> {
+                    if (relationGroup.hasEqualName(relationGroupName)) {
+                        throw new RelationGroupBadRequestException("이미 존재하는 그룹 이름입니다.");
+                    }
+                });
+    }
+
+    private void saveRelationGroups(CreateGroupRequest request, List<Baby> myBabies) {
+        myBabies.forEach(baby -> relationGroupRepository.save(
+                RelationGroup.builder()
+                        .baby(baby)
+                        .relationGroupName(request.getRelationGroup())
+                        .groupColor(Color.from(request.getIconColor()))
+                        .family(false)
+                        .build()));
     }
 
     public MyProfileResponse searchMyGroups(String memberId) {

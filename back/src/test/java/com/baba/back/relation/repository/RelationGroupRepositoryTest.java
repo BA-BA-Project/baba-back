@@ -2,6 +2,7 @@ package com.baba.back.relation.repository;
 
 import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.DomainFixture.아기1;
+import static com.baba.back.fixture.DomainFixture.아기2;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.baba.back.baby.domain.Baby;
@@ -66,5 +67,43 @@ class RelationGroupRepositoryTest {
 
         // then
         assertThat(relationGroups).containsExactly(savedRelationGroup, savedRelationGroup2);
+    }
+
+    @Test
+    void findAllByBabyIn_메서드_호출_시_각각의_아기에_해당하는_모든_그룹관계를_조회한다() {
+        // given
+        memberRepository.save(멤버1);
+        final Baby savedBaby = babyRepository.save(아기1);
+        final RelationGroup savedRelationGroup = relationGroupRepository.save(RelationGroup.builder()
+                .baby(savedBaby)
+                .relationGroupName("가족")
+                .family(true)
+                .build());
+
+        final RelationGroup savedRelationGroup2 = relationGroupRepository.save(RelationGroup.builder()
+                .baby(savedBaby)
+                .relationGroupName("외가")
+                .family(false)
+                .build());
+        final Baby savedBaby2 = babyRepository.save(아기2);
+        final RelationGroup savedRelationGroup3 = relationGroupRepository.save(RelationGroup.builder()
+                .baby(savedBaby2)
+                .relationGroupName("가족")
+                .family(true)
+                .build());
+
+        final RelationGroup savedRelationGroup4 = relationGroupRepository.save(RelationGroup.builder()
+                .baby(savedBaby2)
+                .relationGroupName("외가")
+                .family(false)
+                .build());
+
+        // when
+        final List<RelationGroup> relationGroups = relationGroupRepository.findAllByBabyIn(
+                List.of(savedBaby, savedBaby2));
+
+        // then
+        assertThat(relationGroups).containsExactly(
+                savedRelationGroup, savedRelationGroup2, savedRelationGroup3, savedRelationGroup4);
     }
 }

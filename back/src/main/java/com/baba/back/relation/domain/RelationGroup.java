@@ -62,7 +62,7 @@ public class RelationGroup extends BaseEntity {
     }
 
     public String getRelationGroupName() {
-        return relationGroupName.getValue();
+        return this.relationGroupName.getValue();
     }
 
     public boolean canShare(RelationGroup other) {
@@ -71,5 +71,9 @@ public class RelationGroup extends BaseEntity {
         final boolean canShareGroup = this.family || other.family || this.equals(other);
 
         return isSameBaby && canShareGroup;
+    }
+
+    public boolean hasEqualName(String relationGroupName) {
+        return getRelationGroupName().equals(relationGroupName);
     }
 }

@@ -174,6 +174,34 @@ class MemberAcceptanceTest extends AcceptanceTest {
         );
     }
 
+    @Test
+    void 그룹_추가_요청_시_그룹을_생성하고_201을_응답한다() {
+        // given
+        final ExtractableResponse<Response> 아기_등록_회원가입_응답 = 아기_등록_회원가입_요청(멤버_가입_요청_데이터);
+        final String accessToken = toObject(아기_등록_회원가입_응답, MemberSignUpResponse.class).accessToken();
+
+        // when
+        final ExtractableResponse<Response> response = 그룹_추가_요청(accessToken);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    }
+
+    @Test
+    void 그룹_추가_요청시_동일한_그룹을_생성한다면_400을_던진다() {
+        // given
+        final ExtractableResponse<Response> 아기_등록_회원가입_응답 = 아기_등록_회원가입_요청(멤버_가입_요청_데이터);
+        final String accessToken = toObject(아기_등록_회원가입_응답, MemberSignUpResponse.class).accessToken();
+        그룹_추가_요청(accessToken);
+
+        // when
+        final ExtractableResponse<Response> response = 그룹_추가_요청(accessToken);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+
     // TODO: 2023/03/26 관계그룹 생성 로직 추가 이후 테스트를 작성한다.
     @Test
     void 마이_그룹별_조회_요청_시_자신의_아기가_없으면_400을_던진다() {
