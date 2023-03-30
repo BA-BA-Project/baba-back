@@ -3,7 +3,7 @@ package com.baba.back.oauth.service;
 import static com.baba.back.fixture.DomainFixture.관계10;
 import static com.baba.back.fixture.DomainFixture.관계11;
 import static com.baba.back.fixture.DomainFixture.관계12;
-import static com.baba.back.fixture.DomainFixture.관계23;
+import static com.baba.back.fixture.DomainFixture.관계22;
 import static com.baba.back.fixture.DomainFixture.관계30;
 import static com.baba.back.fixture.DomainFixture.관계그룹10;
 import static com.baba.back.fixture.DomainFixture.관계그룹11;
@@ -263,7 +263,7 @@ class MemberServiceTest {
         given(clock.instant()).willReturn(now.instant());
         given(clock.getZone()).willReturn(now.getZone());
         given(memberRepository.save(any(Member.class))).willReturn(멤버3);
-        given(relationRepository.save(any(Relation.class))).willReturn(관계12, 관계23);
+        given(relationRepository.save(any(Relation.class))).willReturn(관계12, 관계22);
         given(accessTokenProvider.createToken(memberId)).willReturn(accessToken);
         given(refreshTokenProvider.createToken(memberId)).willReturn(refreshToken);
         given(tokenRepository.save(any(Token.class))).willReturn(any());

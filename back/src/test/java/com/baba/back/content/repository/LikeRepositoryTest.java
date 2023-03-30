@@ -2,6 +2,7 @@ package com.baba.back.content.repository;
 
 import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.DomainFixture.아기1;
+import static com.baba.back.fixture.DomainFixture.좋아요10;
 import static com.baba.back.fixture.DomainFixture.컨텐츠10;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -10,6 +11,7 @@ import com.baba.back.content.domain.Like;
 import com.baba.back.content.domain.content.Content;
 import com.baba.back.oauth.domain.member.Member;
 import com.baba.back.oauth.repository.MemberRepository;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -71,5 +73,20 @@ class LikeRepositoryTest {
 
         // then
         assertThat(result).isFalse();
+    }
+
+    @Test
+    void 성장_앨범에_존재하는_좋아요를_모두_조회한다() {
+        // given
+        final Member savedMember = memberRepository.save(멤버1);
+        babyRepository.save(아기1);
+        final Content savedContent = contentRepository.save(컨텐츠10);
+        final Like savedLike = likeRepository.save(Like.builder().member(savedMember).content(savedContent).build());
+
+        // when
+        final List<Like> result = likeRepository.findAllByContent(savedContent);
+
+        // then
+        assertThat(result).isEqualTo(List.of(savedLike));
     }
 }

@@ -139,6 +139,10 @@ public class AcceptanceTest {
         return post(BABY_BASE_PATH + "/invite-code", Map.of("Authorization", "Bearer " + accessToken), request);
     }
 
+    protected ExtractableResponse<Response> 성장앨범_댓글_보기_요청(String accessToken, Long contentId) {
+        return get(CONTENT_BASE_PATH + "/" + contentId + "/comments", Map.of("Authorization", "Bearer " + accessToken));
+    }
+
     protected ExtractableResponse<Response> 마이_그룹별_조회_요청(String accessToken) {
         return get(MEMBER_BASE_PATH + "/my-page", Map.of("Authorization", "Bearer " + accessToken));
     }
