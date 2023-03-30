@@ -212,14 +212,11 @@ public class MemberService {
     }
 
     private void validateRelationGroup(List<RelationGroup> relationGroups, String relationGroupName) {
-        relationGroups.stream()
-                .collect(Collectors.groupingBy(RelationGroup::getBaby))
-                .forEach((baby, groupsByBaby) -> groupsByBaby.stream()
-                        .filter(relationGroup -> relationGroup.hasEqualName(relationGroupName))
-                        .findAny()
-                        .ifPresent(relationGroup -> {
-                            throw new RelationGroupBadRequestException("이미 존재하는 그룹 이름입니다.");
-                        }));
+        relationGroups.forEach(relationGroup -> {
+                    if (relationGroup.hasEqualName(relationGroupName)) {
+                        throw new RelationGroupBadRequestException("이미 존재하는 그룹 이름입니다.");
+                    }
+                });
     }
 
     private void saveRelationGroups(CreateGroupRequest request, List<Baby> myBabies) {
