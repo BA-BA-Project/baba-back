@@ -85,8 +85,9 @@ public class ContentController {
     @IntervalServerErrorResponse
     @GetMapping("/baby/{babyId}/album/{contentId}/comments")
     public ResponseEntity<CommentsResponse> getContent(@Login String memberId,
+                                                       @PathVariable("babyId") String babyId,
                                                        @PathVariable("contentId") Long contentId) {
-        return ResponseEntity.ok(contentService.getComments(memberId, contentId));
+        return ResponseEntity.ok(contentService.getComments(memberId, babyId, contentId));
     }
 
 
