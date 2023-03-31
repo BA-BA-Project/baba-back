@@ -44,12 +44,12 @@ public class ContentController {
     @ForbiddenResponse
     @NotFoundResponse
     @IntervalServerErrorResponse
-    @PostMapping(value = "/album/{babyId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/baby/{babyId}/album", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> createContent(@ModelAttribute @Valid CreateContentRequest request,
                                               @Login String memberId,
                                               @PathVariable("babyId") String babyId) {
         final Long contentId = contentService.createContent(request, memberId, babyId);
-        return ResponseEntity.created(URI.create("/album/" + babyId + "/" + contentId)).build();
+        return ResponseEntity.created(URI.create("/baby/" + babyId + "/album/" + contentId)).build();
     }
 
     @Operation(summary = "좋아요 추가 요청")
@@ -58,7 +58,7 @@ public class ContentController {
     @UnAuthorizedResponse
     @NotFoundResponse
     @IntervalServerErrorResponse
-    @PostMapping("/album/{babyId}/{contentId}/like")
+    @PostMapping("/baby/{babyId}/album/{contentId}/like")
     public ResponseEntity<LikeContentResponse> likeContent(@Login String memberId,
                                                            @PathVariable("babyId") String babyId,
                                                            @PathVariable("contentId") Long contentId) {
@@ -70,7 +70,7 @@ public class ContentController {
     @UnAuthorizedResponse
     @NotFoundResponse
     @IntervalServerErrorResponse
-    @GetMapping("/album/{babyId}")
+    @GetMapping("/baby/{babyId}/album")
     public ResponseEntity<ContentsResponse> getContents(@Login String memberId,
                                                         @PathVariable("babyId") String babyId,
                                                         @RequestParam("year") int year,
@@ -83,7 +83,7 @@ public class ContentController {
     @UnAuthorizedResponse
     @NotFoundResponse
     @IntervalServerErrorResponse
-    @GetMapping("/album/{contentId}/comments")
+    @GetMapping("/baby/{babyId}/album/{contentId}/comments")
     public ResponseEntity<CommentsResponse> getContent(@Login String memberId,
                                                        @PathVariable("contentId") Long contentId) {
         return ResponseEntity.ok(contentService.getComments(memberId, contentId));
@@ -96,7 +96,7 @@ public class ContentController {
     @UnAuthorizedResponse
     @NotFoundResponse
     @IntervalServerErrorResponse
-    @PostMapping("/album/{babyId}/{contentId}/comment")
+    @PostMapping("/baby/{babyId}/album/{contentId}/comment")
     public ResponseEntity<Void> createComment(@Login String memberId,
                                               @PathVariable("babyId") String babyId,
                                               @PathVariable("contentId") Long contentId,

@@ -18,7 +18,6 @@ import com.baba.back.oauth.service.SignTokenProvider;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.UUID;
@@ -37,7 +36,7 @@ public class AcceptanceTest {
     private static final String MEMBER_BASE_PATH = BASE_PATH + "/members";
     private static final String AUTH_BASE_PATH = BASE_PATH + "/auth";
     private static final String BABY_BASE_PATH = BASE_PATH + "/baby";
-    private static final String CONTENT_BASE_PATH = BASE_PATH + "/album";
+    private static final String CONTENT_BASE_PATH = "/album";
 
     @Autowired
     protected SignTokenProvider signTokenProvider;
@@ -110,13 +109,12 @@ public class AcceptanceTest {
                         .multiPart("title", "title")
                         .multiPart("cardStyle", "CARD_BASIC_1")
                         .when()
-                        .post(CONTENT_BASE_PATH + "/" + babyId)
+                        .post(BABY_BASE_PATH + "/" + babyId + CONTENT_BASE_PATH)
         );
     }
 
     protected ExtractableResponse<Response> 좋아요_요청(String accessToken, String babyId, Long contentId) {
-        return post(
-                Paths.get(CONTENT_BASE_PATH, babyId, contentId.toString(), "like").toString(),
+        return post(BABY_BASE_PATH + "/" + babyId + CONTENT_BASE_PATH + "/" + contentId.toString() + "/like",
                 Map.of("Authorization", "Bearer " + accessToken)
         );
     }
@@ -124,15 +122,14 @@ public class AcceptanceTest {
     protected ExtractableResponse<Response> 댓글_생성_요청(String accessToken, String babyId, Long contentId,
                                                      CreateCommentRequest request) {
         return post(
-                Paths.get(CONTENT_BASE_PATH, babyId, contentId.toString(), "comment").toString(),
+                String.format("%s/%s%s/%s/comment", BABY_BASE_PATH, babyId, CONTENT_BASE_PATH, contentId.toString()),
                 Map.of("Authorization", "Bearer " + accessToken),
                 request
         );
     }
 
     protected ExtractableResponse<Response> 성장_앨범_메인_요청(String accessToken, String babyId, int year, int month) {
-        return get(
-                CONTENT_BASE_PATH + "/" + babyId + "?year=" + year + "&month=" + month,
+        return get(String.format("%s/%s%s?year=%d&month=%d", BABY_BASE_PATH, babyId, CONTENT_BASE_PATH, year, month),
                 Map.of("Authorization", "Bearer " + accessToken)
         );
     }
@@ -145,8 +142,9 @@ public class AcceptanceTest {
         return post(BABY_BASE_PATH + "/invite-code", Map.of("Authorization", "Bearer " + accessToken), request);
     }
 
-    protected ExtractableResponse<Response> 성장앨범_댓글_보기_요청(String accessToken, Long contentId) {
-        return get(CONTENT_BASE_PATH + "/" + contentId + "/comments", Map.of("Authorization", "Bearer " + accessToken));
+    protected ExtractableResponse<Response> 성장앨범_댓글_보기_요청(String accessToken, String babyId, Long contentId) {
+        return get(String.format("%s/%s%s/%s/comments", BABY_BASE_PATH, babyId, CONTENT_BASE_PATH, contentId),
+                Map.of("Authorization", "Bearer " + accessToken));
     }
 
     protected ExtractableResponse<Response> 마이_그룹별_조회_요청(String accessToken) {
@@ -155,7 +153,7 @@ public class AcceptanceTest {
 
     protected Long getContentId(ExtractableResponse<Response> response) {
         final String location = getLocation(response);
-        final String id = location.split("/")[3];
+        final String id = location.split("/")[4];
         return Long.parseLong(id);
     }
 
