@@ -81,7 +81,7 @@ public class MemberController {
     @IntervalServerErrorResponse
     @PostMapping("/members/groups")
     public ResponseEntity<Void> createGroup(@RequestBody @Valid CreateGroupRequest request,
-                                              @Login String memberId) {
+                                            @Login String memberId) {
         memberService.createGroup(memberId, request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

@@ -151,7 +151,8 @@ public class AcceptanceTest {
     }
 
     protected ExtractableResponse<Response> 성장앨범_댓글_보기_요청(String accessToken, String babyId, Long contentId) {
-        return get(String.format("/%s/%s/%s/%s/%s/comments", BASE_PATH, BABY_BASE_PATH, babyId, CONTENT_BASE_PATH, contentId),
+        return get(String.format("/%s/%s/%s/%s/%s/comments",
+                        BASE_PATH, BABY_BASE_PATH, babyId, CONTENT_BASE_PATH, contentId),
                 Map.of("Authorization", "Bearer " + accessToken));
     }
 
