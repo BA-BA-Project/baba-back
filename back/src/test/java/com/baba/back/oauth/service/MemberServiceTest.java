@@ -26,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
@@ -35,20 +36,26 @@ import com.baba.back.baby.domain.IdConstructor;
 import com.baba.back.baby.domain.invitation.Code;
 import com.baba.back.baby.domain.invitation.Invitation;
 import com.baba.back.baby.domain.invitation.InvitationCode;
+import com.baba.back.baby.dto.BabyResponse;
+import com.baba.back.baby.exception.BabyNotFoundException;
 import com.baba.back.baby.exception.InvitationCodeBadRequestException;
 import com.baba.back.baby.exception.InvitationsBadRequestException;
+import com.baba.back.baby.exception.RelationGroupNotFoundException;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.baby.repository.InvitationRepository;
 import com.baba.back.oauth.domain.Picker;
 import com.baba.back.oauth.domain.member.Color;
 import com.baba.back.oauth.domain.member.Member;
 import com.baba.back.oauth.domain.token.Token;
+import com.baba.back.oauth.dto.BabyProfileResponse;
 import com.baba.back.oauth.dto.CreateGroupRequest;
+import com.baba.back.oauth.dto.FamilyGroupResponse;
+import com.baba.back.oauth.dto.GroupMemberResponse;
+import com.baba.back.oauth.dto.GroupResponse;
+import com.baba.back.oauth.dto.GroupResponseWithFamily;
 import com.baba.back.oauth.dto.MemberResponse;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
-import com.baba.back.oauth.dto.MyGroupMemberResponse;
-import com.baba.back.oauth.dto.MyGroupResponse;
 import com.baba.back.oauth.dto.MyProfileResponse;
 import com.baba.back.oauth.dto.SignUpWithBabyResponse;
 import com.baba.back.oauth.dto.SignUpWithCodeRequest;
@@ -67,6 +74,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -374,15 +382,15 @@ class MemberServiceTest {
 
         // then
         assertThat(response.groups()).containsExactly(
-                new MyGroupResponse(관계그룹10.getRelationGroupName(), 관계그룹10.isFamily(),
-                        List.of(new MyGroupMemberResponse(
+                new GroupResponseWithFamily(관계그룹10.getRelationGroupName(), 관계그룹10.isFamily(),
+                        List.of(new GroupMemberResponse(
                                         멤버1.getId(),
                                         멤버1.getName(),
                                         관계10.getRelationName(),
                                         멤버1.getIconName(),
                                         멤버1.getIconColor()
                                 ),
-                                new MyGroupMemberResponse(
+                                new GroupMemberResponse(
                                         멤버2.getId(),
                                         멤버2.getName(),
                                         관계11.getRelationName(),
@@ -391,8 +399,8 @@ class MemberServiceTest {
                                 )
                         )
                 ),
-                new MyGroupResponse(관계그룹11.getRelationGroupName(), 관계그룹11.isFamily(),
-                        List.of(new MyGroupMemberResponse(
+                new GroupResponseWithFamily(관계그룹11.getRelationGroupName(), 관계그룹11.isFamily(),
+                        List.of(new GroupMemberResponse(
                                         멤버3.getId(),
                                         멤버3.getName(),
                                         관계12.getRelationName(),
@@ -402,5 +410,197 @@ class MemberServiceTest {
                         )
                 )
         );
+    }
+
+    @Nested
+    class 다른_아기_프로필_조회_시 {
+
+        final String memberId = 멤버1.getId();
+        final String babyId = 아기1.getId();
+
+        @Test
+        void 멤버가_없으면_예외를_던진다() {
+            // given
+            given(memberRepository.findById(memberId)).willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> memberService.searchBabyGroups(memberId, babyId))
+                    .isInstanceOf(MemberNotFoundException.class);
+        }
+
+        @Test
+        void 아기가_없으면_예외를_던진다() {
+            // given
+            given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
+            given(babyRepository.findById(babyId)).willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> memberService.searchBabyGroups(memberId, babyId))
+                    .isInstanceOf(BabyNotFoundException.class);
+        }
+
+        @Test
+        void 멤버가_아기와_관계가_없으면_예외를_던진다() {
+            // given
+            given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
+            given(babyRepository.findById(babyId)).willReturn(Optional.of(아기1));
+            given(relationRepository.findByMemberAndBaby(any(Member.class), any(Baby.class)))
+                    .willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> memberService.searchBabyGroups(memberId, babyId))
+                    .isInstanceOf(RelationNotFoundException.class);
+        }
+
+        @Test
+        void 아기의_가족그룹이_없으면_예외를_던진다() {
+            // given
+            given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
+            given(babyRepository.findById(babyId)).willReturn(Optional.of(아기1));
+            given(relationRepository.findByMemberAndBaby(any(Member.class), any(Baby.class)))
+                    .willReturn(Optional.of(관계10));
+            given(relationGroupRepository.findByBabyAndFamily(any(Baby.class), eq(true)))
+                    .willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> memberService.searchBabyGroups(memberId, babyId))
+                    .isInstanceOf(RelationGroupNotFoundException.class);
+        }
+
+        @Test
+        void 아기와_가족_관계인_멤버가_없으면_예외를_던진다() {
+            // given
+            given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
+            given(babyRepository.findById(babyId)).willReturn(Optional.of(아기1));
+            given(relationRepository.findByMemberAndBaby(any(Member.class), any(Baby.class)))
+                    .willReturn(Optional.of(관계10));
+            given(relationGroupRepository.findByBabyAndFamily(any(Baby.class), eq(true)))
+                    .willReturn(Optional.of(관계그룹10));
+
+            given(relationRepository.findFirstByRelationGroup(any(RelationGroup.class))).willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> memberService.searchBabyGroups(memberId, babyId))
+                    .isInstanceOf(RelationNotFoundException.class);
+        }
+
+        @Test
+        void 자신의_아기를_조회했다면_가족_그룹의_정보만_조회할_수_있다() {
+            // given
+            given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
+            given(babyRepository.findById(babyId)).willReturn(Optional.of(아기1));
+            given(relationRepository.findByMemberAndBaby(any(Member.class), any(Baby.class)))
+                    .willReturn(Optional.of(관계10));
+            given(relationGroupRepository.findByBabyAndFamily(any(Baby.class), eq(true)))
+                    .willReturn(Optional.of(관계그룹10));
+
+            given(relationRepository.findFirstByRelationGroup(any(RelationGroup.class))).willReturn(Optional.of(관계10));
+            given(relationRepository.findAllByMember(any(Member.class))).willReturn(List.of(관계10, 관계20));
+            given(relationRepository.findAllByRelationGroup(any(RelationGroup.class))).willReturn(List.of(관계10, 관계11));
+
+            // when
+            final BabyProfileResponse response = memberService.searchBabyGroups(memberId, babyId);
+            final FamilyGroupResponse familyGroupResponse = response.familyGroup();
+
+            // then
+            assertAll(
+                    () -> assertThat(familyGroupResponse.groupName()).isEqualTo(관계그룹10.getRelationGroupName()),
+                    () -> assertThat(familyGroupResponse.babies()).containsExactly(
+                            new BabyResponse(
+                                    아기1.getId(),
+                                    관계그룹10.getGroupColor(),
+                                    아기1.getName()
+                            ),
+                            new BabyResponse(
+                                    아기2.getId(),
+                                    관계그룹20.getGroupColor(),
+                                    아기2.getName()
+                            )
+                    ),
+                    () -> assertThat(familyGroupResponse.members()).containsExactly(
+                            new GroupMemberResponse(
+                                    멤버1.getId(),
+                                    멤버1.getName(),
+                                    관계10.getRelationName(),
+                                    멤버1.getIconName(),
+                                    멤버1.getIconColor()
+                            ),
+                            new GroupMemberResponse(
+                                    멤버2.getId(),
+                                    멤버2.getName(),
+                                    관계11.getRelationName(),
+                                    멤버2.getIconName(),
+                                    멤버2.getIconColor()
+                            )
+                    ),
+                    () -> assertThat(response.myGroup()).isNull()
+            );
+        }
+
+
+        @Test
+        void 다른_사람의_아기를_조회했다면_가족_그룹의_아기들과_멤버들_그리고_자신의_소속_그룹의_멤버들을_조회할_수_있다() {
+            // given
+            given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버3));
+            given(babyRepository.findById(babyId)).willReturn(Optional.of(아기1));
+            given(relationRepository.findByMemberAndBaby(any(Member.class), any(Baby.class)))
+                    .willReturn(Optional.of(관계12));
+            given(relationGroupRepository.findByBabyAndFamily(any(Baby.class), eq(true)))
+                    .willReturn(Optional.of(관계그룹10));
+
+            given(relationRepository.findFirstByRelationGroup(any(RelationGroup.class))).willReturn(
+                    Optional.of(관계10));
+            given(relationRepository.findAllByMember(any(Member.class))).willReturn(List.of(관계10, 관계20));
+            given(relationRepository.findAllByRelationGroup(any(RelationGroup.class))).willReturn(
+                    List.of(관계10, 관계11), List.of(관계12));
+
+            // when
+            final BabyProfileResponse response = memberService.searchBabyGroups(memberId, babyId);
+            final FamilyGroupResponse familyGroupResponse = response.familyGroup();
+            final GroupResponse myGroupResponse = response.myGroup();
+
+            // then
+            assertAll(
+                    () -> assertThat(familyGroupResponse.groupName()).isEqualTo(관계그룹10.getRelationGroupName()),
+                    () -> assertThat(familyGroupResponse.babies()).containsExactly(
+                            new BabyResponse(
+                                    아기1.getId(),
+                                    관계그룹10.getGroupColor(),
+                                    아기1.getName()
+                            ),
+                            new BabyResponse(
+                                    아기2.getId(),
+                                    관계그룹20.getGroupColor(),
+                                    아기2.getName()
+                            )
+                    ),
+                    () -> assertThat(familyGroupResponse.members()).containsExactly(
+                            new GroupMemberResponse(
+                                    멤버1.getId(),
+                                    멤버1.getName(),
+                                    관계10.getRelationName(),
+                                    멤버1.getIconName(),
+                                    멤버1.getIconColor()
+                            ),
+                            new GroupMemberResponse(
+                                    멤버2.getId(),
+                                    멤버2.getName(),
+                                    관계11.getRelationName(),
+                                    멤버2.getIconName(),
+                                    멤버2.getIconColor()
+                            )
+                    ),
+                    () -> assertThat(myGroupResponse.groupName()).isEqualTo(관계그룹11.getRelationGroupName()),
+                    () -> assertThat(myGroupResponse.members()).containsExactly(
+                            new GroupMemberResponse(
+                                    멤버3.getId(),
+                                    멤버3.getName(),
+                                    관계12.getRelationName(),
+                                    멤버3.getIconName(),
+                                    멤버3.getIconColor()
+                            )
+                    )
+            );
+        }
     }
 }

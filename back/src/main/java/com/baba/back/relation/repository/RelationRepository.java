@@ -21,5 +21,9 @@ public interface RelationRepository extends JpaRepository<Relation, Long> {
 
     Optional<Relation> findFirstByMemberAndRelationGroupFamily(Member member, boolean isFamily);
 
+    Optional<Relation> findFirstByRelationGroup(RelationGroup relationGroup);
+
+    List<Relation> findAllByRelationGroup(RelationGroup relationGroup);
+
     List<Relation> findAllByRelationGroupIn(List<RelationGroup> relationGroups);
 }
