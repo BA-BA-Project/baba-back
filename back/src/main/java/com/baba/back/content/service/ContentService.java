@@ -274,7 +274,7 @@ public class ContentService {
         );
     }
 
-    public String findTagMemberName(Comment comment) {
+    private String findTagMemberName(Comment comment) {
         final Optional<Tag> tag = tagRepository.findByComment(comment);
         if (tag.isPresent()) {
             return tag.get().getTagMember().getName();
