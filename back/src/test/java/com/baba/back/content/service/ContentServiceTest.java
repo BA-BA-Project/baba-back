@@ -17,9 +17,6 @@ import static com.baba.back.fixture.DomainFixture.멤버3;
 import static com.baba.back.fixture.DomainFixture.아기1;
 import static com.baba.back.fixture.DomainFixture.아기2;
 import static com.baba.back.fixture.DomainFixture.좋아요10;
-import static com.baba.back.fixture.DomainFixture.좋아요20;
-import static com.baba.back.fixture.DomainFixture.좋아요21;
-import static com.baba.back.fixture.DomainFixture.좋아요22;
 import static com.baba.back.fixture.DomainFixture.컨텐츠10;
 import static com.baba.back.fixture.DomainFixture.컨텐츠11;
 import static com.baba.back.fixture.DomainFixture.컨텐츠20;
@@ -232,6 +229,19 @@ class ContentServiceTest {
         // when & then
         assertThatThrownBy(() -> contentService.likeContent(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId()))
                 .isInstanceOf(ContentNotFountException.class);
+    }
+
+    @Test
+    void 좋아요_추가_시_아기와_콘텐츠가_관련이_없으면_예외를_던진다() {
+        // given
+        given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
+        given(babyRepository.findById(아기1.getId())).willReturn(Optional.of(아기1));
+        given(relationRepository.findByMemberAndBaby(멤버1, 아기1)).willReturn(Optional.of(관계10));
+        given(contentRepository.findById(컨텐츠20.getId())).willReturn(Optional.of(컨텐츠20));
+
+        // when & then
+        assertThatThrownBy(() -> contentService.likeContent(멤버1.getId(), 아기1.getId(), 컨텐츠20.getId()))
+                .isInstanceOf(ContentBadRequestException.class);
     }
 
     @Test
@@ -506,12 +516,12 @@ class ContentServiceTest {
     }
 
     @Test
-    void 성장앨범_댓글_요창_시_존재하지_않는_멤버가_요청하면_예외를_던진다() {
+    void 성장앨범_댓글_요청_시_존재하지_않는_멤버가_요청하면_예외를_던진다() {
         // given
         given(memberRepository.findById(멤버1.getId())).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> contentService.getComments(멤버1.getId(), 컨텐츠10.getId()))
+        assertThatThrownBy(() -> contentService.getComments(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId()))
                 .isInstanceOf(MemberNotFoundException.class);
     }
 
@@ -522,7 +532,7 @@ class ContentServiceTest {
         given(contentRepository.findById(컨텐츠10.getId())).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> contentService.getComments(멤버1.getId(), 컨텐츠10.getId()))
+        assertThatThrownBy(() -> contentService.getComments(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId()))
                 .isInstanceOf(ContentNotFountException.class);
     }
 
@@ -531,10 +541,11 @@ class ContentServiceTest {
         // given
         given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
         given(contentRepository.findById(컨텐츠10.getId())).willReturn(Optional.of(컨텐츠10));
+        given(babyRepository.findById(아기1.getId())).willReturn(Optional.of(아기1));
         given(relationRepository.findByMemberAndBaby(멤버1, 아기1)).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> contentService.getComments(멤버1.getId(), 컨텐츠10.getId()))
+        assertThatThrownBy(() -> contentService.getComments(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId()))
                 .isInstanceOf(RelationNotFoundException.class);
     }
 
@@ -543,12 +554,13 @@ class ContentServiceTest {
         // given
         given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
         given(contentRepository.findById(컨텐츠10.getId())).willReturn(Optional.of(컨텐츠10));
+        given(babyRepository.findById(아기1.getId())).willReturn(Optional.of(아기1));
         given(relationRepository.findByMemberAndBaby(멤버1, 아기1)).willReturn(Optional.of(관계10));
         given(commentRepository.findAllByContent(컨텐츠10)).willReturn(List.of(댓글10));
         given(tagRepository.findByComment(댓글10)).willReturn(Optional.empty());
 
         // when & then
-        assertThat(contentService.getComments(멤버1.getId(), 컨텐츠10.getId()))
+        assertThat(contentService.getComments(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId()))
                 .isEqualTo(new CommentsResponse(
                         List.of(new CommentResponse(
                                         댓글10.getId(),
@@ -570,12 +582,13 @@ class ContentServiceTest {
         // given
         given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
         given(contentRepository.findById(컨텐츠10.getId())).willReturn(Optional.of(컨텐츠10));
+        given(babyRepository.findById(아기1.getId())).willReturn(Optional.of(아기1));
         given(relationRepository.findByMemberAndBaby(멤버1, 아기1)).willReturn(Optional.of(관계10));
         given(commentRepository.findAllByContent(컨텐츠10)).willReturn(List.of(댓글10));
         given(tagRepository.findByComment(댓글10)).willReturn(Optional.of(태그10));
 
         // when & then
-        assertThat(contentService.getComments(멤버1.getId(), 컨텐츠10.getId()))
+        assertThat(contentService.getComments(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId()))
                 .isEqualTo(new CommentsResponse(
                         List.of(new CommentResponse(
                                         댓글10.getId(),
@@ -597,6 +610,7 @@ class ContentServiceTest {
         // given
         given(memberRepository.findById(멤버2.getId())).willReturn(Optional.of(멤버2));
         given(contentRepository.findById(컨텐츠20.getId())).willReturn(Optional.of(컨텐츠20));
+        given(babyRepository.findById(아기2.getId())).willReturn(Optional.of(아기2));
         given(relationRepository.findByMemberAndBaby(멤버1, 아기2)).willReturn(Optional.of(관계20));
         given(relationRepository.findByMemberAndBaby(멤버2, 아기2)).willReturn(Optional.of(관계21));
         given(relationRepository.findByMemberAndBaby(멤버3, 아기2)).willReturn(Optional.of(관계22));
@@ -606,7 +620,7 @@ class ContentServiceTest {
         given(tagRepository.findByComment(댓글23)).willReturn(Optional.of(태그20));
 
         // when & then
-        assertThat(contentService.getComments(멤버2.getId(), 컨텐츠20.getId()))
+        assertThat(contentService.getComments(멤버2.getId(), 아기2.getId(), 컨텐츠20.getId()))
                 .isEqualTo(new CommentsResponse(
                                 List.of(new CommentResponse(
                                                 댓글20.getId(),

@@ -18,7 +18,6 @@ import com.baba.back.oauth.service.SignTokenProvider;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.UUID;
@@ -33,11 +32,11 @@ import org.springframework.test.context.jdbc.Sql;
 @Sql("/truncate.sql")
 public class AcceptanceTest {
 
-    private static final String BASE_PATH = "/api";
-    private static final String MEMBER_BASE_PATH = BASE_PATH + "/members";
-    private static final String AUTH_BASE_PATH = BASE_PATH + "/auth";
-    private static final String BABY_BASE_PATH = BASE_PATH + "/baby";
-    private static final String CONTENT_BASE_PATH = BASE_PATH + "/album";
+    private static final String BASE_PATH = "api";
+    private static final String MEMBER_BASE_PATH = "members";
+    private static final String AUTH_BASE_PATH = "auth";
+    private static final String BABY_BASE_PATH = "baby";
+    private static final String CONTENT_BASE_PATH = "album";
 
     @Autowired
     protected SignTokenProvider signTokenProvider;
@@ -58,47 +57,51 @@ public class AcceptanceTest {
 
     protected ExtractableResponse<Response> 아기_등록_회원가입_요청(String memberId, MemberSignUpRequest request) {
         final String signToken = signTokenProvider.createToken(memberId);
-        return post(MEMBER_BASE_PATH + "/baby", Map.of("Authorization", "Bearer " + signToken), request);
+        return post(String.format("/%s/%s/%s", BASE_PATH, MEMBER_BASE_PATH, BABY_BASE_PATH),
+                Map.of("Authorization", "Bearer " + signToken), request);
     }
 
     protected ExtractableResponse<Response> 초대코드로_회원가입_요청(String memberId, String code) {
         final String signToken = signTokenProvider.createToken(memberId);
-        return post(MEMBER_BASE_PATH + "/baby/invite-code",
+        return post(String.format("/%s/%s/%s/invite-code", BASE_PATH, MEMBER_BASE_PATH, BABY_BASE_PATH),
                 Map.of("Authorization", "Bearer " + signToken),
                 new SignUpWithCodeRequest(code, "박재희", "PROFILE_W_1"));
     }
 
     protected ExtractableResponse<Response> 그룹_추가_요청(String accessToken) {
-        return post(MEMBER_BASE_PATH + "/groups", Map.of("Authorization", "Bearer " + accessToken),
+        return post(String.format("/%s/%s/groups", BASE_PATH, MEMBER_BASE_PATH),
+                Map.of("Authorization", "Bearer " + accessToken),
                 그룹_추가_요청_데이터);
     }
 
     protected ExtractableResponse<Response> 초대장_조회_요청(String code) {
-        return get(BABY_BASE_PATH + "/invitation" + "?code=" + code);
+        return get(String.format("/%s/%s/invitation?code=%s", BASE_PATH, BABY_BASE_PATH, code));
     }
 
     protected ExtractableResponse<Response> 사용자_정보_요청(String accessToken) {
-        return get(MEMBER_BASE_PATH, Map.of("Authorization", "Bearer " + accessToken));
+        return get(String.format("/%s/%s", BASE_PATH, MEMBER_BASE_PATH),
+                Map.of("Authorization", "Bearer " + accessToken));
     }
 
     protected ExtractableResponse<Response> 소셜_로그인_요청() {
-        return post(AUTH_BASE_PATH + "/login", 소셜_토큰_요청_데이터);
+        return post(String.format("/%s/%s/login", BASE_PATH, AUTH_BASE_PATH), 소셜_토큰_요청_데이터);
     }
 
     protected ExtractableResponse<Response> 약관_조회_요청() {
-        return post(AUTH_BASE_PATH + "/terms", 소셜_토큰_요청_데이터);
+        return post(String.format("/%s/%s/terms", BASE_PATH, AUTH_BASE_PATH), 소셜_토큰_요청_데이터);
     }
 
     protected ExtractableResponse<Response> 약관_동의_요청() {
-        return post(AUTH_BASE_PATH + "/login/terms", 약관_동의_요청_데이터);
+        return post(String.format("/%s/%s/login/terms", BASE_PATH, AUTH_BASE_PATH), 약관_동의_요청_데이터);
     }
 
     protected ExtractableResponse<Response> 토큰_재발급_요청(TokenRefreshRequest request) {
-        return post(AUTH_BASE_PATH + "/refresh", request);
+        return post(String.format("/%s/%s/refresh", BASE_PATH, AUTH_BASE_PATH), request);
     }
 
     protected ExtractableResponse<Response> 아기_리스트_조회_요청(String accessToken) {
-        return get(BABY_BASE_PATH, Map.of("Authorization", "Bearer " + accessToken));
+        return get(String.format("/%s/%s", BASE_PATH, BABY_BASE_PATH),
+                Map.of("Authorization", "Bearer " + accessToken));
     }
 
     protected ExtractableResponse<Response> 성장앨범_생성_요청(String accessToken, String babyId, LocalDate now) {
@@ -110,13 +113,13 @@ public class AcceptanceTest {
                         .multiPart("title", "title")
                         .multiPart("cardStyle", "CARD_BASIC_1")
                         .when()
-                        .post(CONTENT_BASE_PATH + "/" + babyId)
+                        .post(String.format("/%s/%s/%s/%s", BASE_PATH, BABY_BASE_PATH, babyId, CONTENT_BASE_PATH))
         );
     }
 
     protected ExtractableResponse<Response> 좋아요_요청(String accessToken, String babyId, Long contentId) {
-        return post(
-                Paths.get(CONTENT_BASE_PATH, babyId, contentId.toString(), "like").toString(),
+        return post(String.format("/%s/%s/%s/%s/%s/like",
+                        BASE_PATH, BABY_BASE_PATH, babyId, CONTENT_BASE_PATH, contentId.toString()),
                 Map.of("Authorization", "Bearer " + accessToken)
         );
     }
@@ -124,15 +127,16 @@ public class AcceptanceTest {
     protected ExtractableResponse<Response> 댓글_생성_요청(String accessToken, String babyId, Long contentId,
                                                      CreateCommentRequest request) {
         return post(
-                Paths.get(CONTENT_BASE_PATH, babyId, contentId.toString(), "comment").toString(),
+                String.format("/%s/%s/%s/%s/%s/comment", BASE_PATH, BABY_BASE_PATH, babyId, CONTENT_BASE_PATH,
+                        contentId.toString()),
                 Map.of("Authorization", "Bearer " + accessToken),
                 request
         );
     }
 
     protected ExtractableResponse<Response> 성장_앨범_메인_요청(String accessToken, String babyId, int year, int month) {
-        return get(
-                CONTENT_BASE_PATH + "/" + babyId + "?year=" + year + "&month=" + month,
+        return get(String.format("/%s/%s/%s/%s?year=%d&month=%d",
+                        BASE_PATH, BABY_BASE_PATH, babyId, CONTENT_BASE_PATH, year, month),
                 Map.of("Authorization", "Bearer " + accessToken)
         );
     }
@@ -142,20 +146,24 @@ public class AcceptanceTest {
     }
 
     private ExtractableResponse<Response> 초대_코드_생성_요청(String accessToken, CreateInviteCodeRequest request) {
-        return post(BABY_BASE_PATH + "/invite-code", Map.of("Authorization", "Bearer " + accessToken), request);
+        return post(String.format("/%s/%s/invite-code", BASE_PATH, BABY_BASE_PATH),
+                Map.of("Authorization", "Bearer " + accessToken), request);
     }
 
-    protected ExtractableResponse<Response> 성장앨범_댓글_보기_요청(String accessToken, Long contentId) {
-        return get(CONTENT_BASE_PATH + "/" + contentId + "/comments", Map.of("Authorization", "Bearer " + accessToken));
+    protected ExtractableResponse<Response> 성장앨범_댓글_보기_요청(String accessToken, String babyId, Long contentId) {
+        return get(String.format("/%s/%s/%s/%s/%s/comments",
+                        BASE_PATH, BABY_BASE_PATH, babyId, CONTENT_BASE_PATH, contentId),
+                Map.of("Authorization", "Bearer " + accessToken));
     }
 
     protected ExtractableResponse<Response> 마이_그룹별_조회_요청(String accessToken) {
-        return get(MEMBER_BASE_PATH + "/my-page", Map.of("Authorization", "Bearer " + accessToken));
+        return get(String.format("/%s/%s/my-page", BASE_PATH, MEMBER_BASE_PATH),
+                Map.of("Authorization", "Bearer " + accessToken));
     }
 
     protected Long getContentId(ExtractableResponse<Response> response) {
         final String location = getLocation(response);
-        final String id = location.split("/")[3];
+        final String id = location.split("/")[4];
         return Long.parseLong(id);
     }
 

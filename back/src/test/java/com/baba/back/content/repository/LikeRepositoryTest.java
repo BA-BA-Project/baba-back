@@ -2,7 +2,6 @@ package com.baba.back.content.repository;
 
 import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.DomainFixture.아기1;
-import static com.baba.back.fixture.DomainFixture.좋아요10;
 import static com.baba.back.fixture.DomainFixture.컨텐츠10;
 import static org.assertj.core.api.Assertions.assertThat;
 

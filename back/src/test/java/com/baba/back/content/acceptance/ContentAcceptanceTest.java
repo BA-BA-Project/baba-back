@@ -44,7 +44,7 @@ public class ContentAcceptanceTest extends AcceptanceTest {
     private AmazonS3 amazonS3;
 
     @Test
-    void 요청_body에_null값이_있으면_400을_던진다() {
+    void 성장앨범_생성_요청_body에_null값이_있으면_400을_던진다() {
         // given
         final String accessToken = toObject(아기_등록_회원가입_요청(), MemberSignUpResponse.class).accessToken();
 
@@ -56,7 +56,7 @@ public class ContentAcceptanceTest extends AcceptanceTest {
                         .multiPart("date", LocalDate.now())
                         .multiPart("cardStyle", "card_basic_1")
                         .when()
-                        .post("/api/album/" + 아기1.getId())
+                        .post("/api/baby/" + 아기1.getId() + "/album")
         );
 
         // then
@@ -254,7 +254,7 @@ public class ContentAcceptanceTest extends AcceptanceTest {
         댓글_생성_요청(accessToken, babyId, contentId, new CreateCommentRequest("", "짜기싫다"));
 
         // when
-        final ExtractableResponse<Response> httpResponse = 성장앨범_댓글_보기_요청(accessToken, contentId);
+        final ExtractableResponse<Response> httpResponse = 성장앨범_댓글_보기_요청(accessToken, babyId, contentId);
 
         // then
         final CommentsResponse response = toObject(httpResponse, CommentsResponse.class);
