@@ -56,7 +56,7 @@ public class ContentAcceptanceTest extends AcceptanceTest {
                         .multiPart("date", LocalDate.now())
                         .multiPart("cardStyle", "card_basic_1")
                         .when()
-                        .post("/api/baby/" + "/" + 아기1.getId() + "/album")
+                        .post("/api/baby/" + 아기1.getId() + "/album")
         );
 
         // then
