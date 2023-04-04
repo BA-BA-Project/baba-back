@@ -15,7 +15,9 @@ import com.baba.back.content.dto.ContentResponse;
 import com.baba.back.content.dto.ContentsResponse;
 import com.baba.back.content.dto.CreateCommentRequest;
 import com.baba.back.content.dto.CreateContentRequest;
+import com.baba.back.content.dto.IconResponse;
 import com.baba.back.content.dto.LikeContentResponse;
+import com.baba.back.content.dto.LikesResponse;
 import com.baba.back.content.exception.ContentAuthorizationException;
 import com.baba.back.content.exception.ContentBadRequestException;
 import com.baba.back.content.exception.ContentNotFountException;
@@ -25,6 +27,7 @@ import com.baba.back.content.repository.ContentRepository;
 import com.baba.back.content.repository.LikeRepository;
 import com.baba.back.content.repository.TagRepository;
 import com.baba.back.oauth.domain.member.Member;
+import com.baba.back.oauth.dto.MemberResponse;
 import com.baba.back.oauth.exception.MemberNotFoundException;
 import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.relation.domain.Relation;
@@ -280,5 +283,35 @@ public class ContentService {
             return tag.get().getTagMember().getName();
         }
         return "";
+    }
+
+    public LikesResponse getLikes(String memberId, String babyId, Long contentId) {
+        final Member member = findMember(memberId);
+        final Content content = findContent(contentId);
+        final Baby baby = findBaby(babyId);
+        validateContentBaby(baby, content);
+        findRelation(member, baby);
+
+        final List<Like> likes = likeRepository.findAllByContent(content);
+
+        final List<MemberResponse> memberResponses = likes.stream()
+                .sorted()
+                .map(like -> {
+                    final Member likeMember = like.getMember();
+                    return new MemberResponse(
+                            likeMember.getId(),
+                            likeMember.getName(),
+                            likeMember.getIntroduction(),
+                            likeMember.getIconName(),
+                            likeMember.getIconColor());
+                })
+                .toList();
+
+        final List<IconResponse> iconResponses = memberResponses.stream()
+                .map(memberResponse -> new IconResponse(memberResponse.iconColor(), memberResponse.iconName()))
+                .limit(3)
+                .toList();
+
+        return new LikesResponse(iconResponses, memberResponses);
     }
 }

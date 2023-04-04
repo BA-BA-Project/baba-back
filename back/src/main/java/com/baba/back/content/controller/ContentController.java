@@ -5,6 +5,7 @@ import com.baba.back.content.dto.ContentsResponse;
 import com.baba.back.content.dto.CreateCommentRequest;
 import com.baba.back.content.dto.CreateContentRequest;
 import com.baba.back.content.dto.LikeContentResponse;
+import com.baba.back.content.dto.LikesResponse;
 import com.baba.back.content.service.ContentService;
 import com.baba.back.oauth.support.Login;
 import com.baba.back.swagger.BadRequestResponse;
@@ -84,12 +85,23 @@ public class ContentController {
     @NotFoundResponse
     @IntervalServerErrorResponse
     @GetMapping("/baby/{babyId}/album/{contentId}/comments")
-    public ResponseEntity<CommentsResponse> getContent(@Login String memberId,
+    public ResponseEntity<CommentsResponse> getComments(@Login String memberId,
                                                        @PathVariable("babyId") String babyId,
                                                        @PathVariable("contentId") Long contentId) {
         return ResponseEntity.ok(contentService.getComments(memberId, babyId, contentId));
     }
 
+    @Operation(summary = "성장 앨범 좋아요 보기 조회 요청")
+    @OkResponse
+    @UnAuthorizedResponse
+    @NotFoundResponse
+    @IntervalServerErrorResponse
+    @GetMapping("/baby/{babyId}/album/{contentId}/likes")
+    public ResponseEntity<LikesResponse> getlikes(@Login String memberId,
+                                                  @PathVariable("babyId") String babyId,
+                                                  @PathVariable("contentId") Long contentId) {
+        return ResponseEntity.ok(contentService.getLikes(memberId, babyId, contentId));
+    }
 
     @Operation(summary = "성장 앨범 댓글 추가 요청")
     @CreatedResponse
