@@ -25,7 +25,7 @@ public class Icon {
     }
 
     public String getIconColor() {
-        return this.iconColor.name();
+        return this.iconColor.getValue();
     }
 
     public String getIconName() {
