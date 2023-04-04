@@ -54,6 +54,13 @@ public class DomainFixture {
             .iconName(IconName.PROFILE_G_1.toString())
             .iconColor(Color.COLOR_1)
             .build();
+    public static final Member 멤버4 = Member.builder()
+            .id("member4")
+            .name("멤버4")
+            .introduction("안녕하세요")
+            .iconName(IconName.PROFILE_G_1.toString())
+            .iconColor(Color.COLOR_1)
+            .build();;
     public static final Token 토큰1 = Token.builder()
             .member(멤버1)
             .value("토큰1")
@@ -89,6 +96,22 @@ public class DomainFixture {
             .member(멤버1)
             .content(컨텐츠10)
             .build();
+
+    public static final Like 좋아요11 = Like.builder()
+            .member(멤버2)
+            .content(컨텐츠10)
+            .build();
+
+    public static final Like 좋아요12 = Like.builder()
+            .member(멤버3)
+            .content(컨텐츠10)
+            .build();
+
+    public static final Like 좋아요13 = Like.builder()
+            .member(멤버4)
+            .content(컨텐츠10)
+            .build();
+
     public static final Comment 댓글10 = Comment.builder()
             .owner(멤버1)
             .content(컨텐츠10)

@@ -14,9 +14,13 @@ import static com.baba.back.fixture.DomainFixture.댓글23;
 import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.DomainFixture.멤버2;
 import static com.baba.back.fixture.DomainFixture.멤버3;
+import static com.baba.back.fixture.DomainFixture.멤버4;
 import static com.baba.back.fixture.DomainFixture.아기1;
 import static com.baba.back.fixture.DomainFixture.아기2;
 import static com.baba.back.fixture.DomainFixture.좋아요10;
+import static com.baba.back.fixture.DomainFixture.좋아요11;
+import static com.baba.back.fixture.DomainFixture.좋아요12;
+import static com.baba.back.fixture.DomainFixture.좋아요13;
 import static com.baba.back.fixture.DomainFixture.컨텐츠10;
 import static com.baba.back.fixture.DomainFixture.컨텐츠11;
 import static com.baba.back.fixture.DomainFixture.컨텐츠20;
@@ -46,6 +50,7 @@ import com.baba.back.content.dto.CommentsResponse;
 import com.baba.back.content.dto.ContentResponse;
 import com.baba.back.content.dto.ContentsResponse;
 import com.baba.back.content.dto.LikeContentResponse;
+import com.baba.back.content.dto.LikesResponse;
 import com.baba.back.content.exception.ContentAuthorizationException;
 import com.baba.back.content.exception.ContentBadRequestException;
 import com.baba.back.content.exception.ContentNotFountException;
@@ -54,6 +59,7 @@ import com.baba.back.content.repository.CommentRepository;
 import com.baba.back.content.repository.ContentRepository;
 import com.baba.back.content.repository.LikeRepository;
 import com.baba.back.content.repository.TagRepository;
+import com.baba.back.oauth.dto.MemberResponse;
 import com.baba.back.oauth.exception.MemberNotFoundException;
 import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.relation.exception.RelationNotFoundException;
@@ -647,5 +653,46 @@ class ContentServiceTest {
                                 )
                         )
                 );
+    }
+
+    @Test
+    void 좋아요_보기_요청_시_게시물에_등록된_모든_좋아요를_조회한다() {
+        // given
+        given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
+        given(contentRepository.findById(컨텐츠10.getId())).willReturn(Optional.of(컨텐츠10));
+        given(babyRepository.findById(아기1.getId())).willReturn(Optional.of(아기1));
+        given(relationRepository.findByMemberAndBaby(멤버1, 아기1)).willReturn(Optional.of(관계10));
+        given(likeRepository.findAllByContent(컨텐츠10)).willReturn(List.of(좋아요10, 좋아요11, 좋아요12, 좋아요13));
+
+        // when
+        final LikesResponse response = contentService.getLikes(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId());
+
+        // then
+        assertAll(
+                () -> assertThat(response.likeUsersPreview()).hasSize(3),
+                () -> assertThat(response.likeUsers()).containsExactly(
+                        new MemberResponse(멤버1.getId(), 멤버1.getName(), 멤버1.getIntroduction(), 멤버1.getIconName(), 멤버1.getIconColor()),
+                        new MemberResponse(멤버2.getId(), 멤버2.getName(), 멤버2.getIntroduction(), 멤버2.getIconName(), 멤버2.getIconColor()),
+                        new MemberResponse(멤버3.getId(), 멤버3.getName(), 멤버3.getIntroduction(), 멤버3.getIconName(), 멤버3.getIconColor()),
+                        new MemberResponse(멤버4.getId(), 멤버4.getName(), 멤버4.getIntroduction(), 멤버4.getIconName(), 멤버4.getIconColor())
+                ));
+    }
+
+    @Test
+    void 좋아요_보기_요청_시_게시물에_좋아요가_등록되지_않았다면_빈_리스트를_반환한다() {
+        // given
+        given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
+        given(contentRepository.findById(컨텐츠10.getId())).willReturn(Optional.of(컨텐츠10));
+        given(babyRepository.findById(아기1.getId())).willReturn(Optional.of(아기1));
+        given(relationRepository.findByMemberAndBaby(멤버1, 아기1)).willReturn(Optional.of(관계10));
+        given(likeRepository.findAllByContent(컨텐츠10)).willReturn(List.of());
+
+        // when
+        final LikesResponse response = contentService.getLikes(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId());
+
+        // then
+        assertAll(
+                () -> assertThat(response.likeUsersPreview()).hasSize(0),
+                () -> assertThat(response.likeUsers()).hasSize(0));
     }
 }
