@@ -191,11 +191,6 @@ public class ContentAcceptanceTest extends AcceptanceTest {
         );
     }
 
-    // TODO: 2023/03/12 초대 로직 생성 후 테스트 작성
-    @Test
-    void 원하는_년_월의_내가_올린_성장_앨범과_다른_사람이_올린_성장_앨범을_조회한다() {
-    }
-
     @Test
     void 태그를_하지않고_댓글을_추가할_수_있다() throws MalformedURLException {
         // given
@@ -214,11 +209,6 @@ public class ContentAcceptanceTest extends AcceptanceTest {
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
                 () -> assertThat(getCommentId(response)).isPositive()
         );
-    }
-
-    // TODO: 2023/03/21 멤버 초대 API 구현 후 작성
-    @Test
-    void 태그를_하고_댓글을_추가할_수_있다() {
     }
 
     @Test
@@ -266,7 +256,7 @@ public class ContentAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    void 성장_앨범의_모든_좋아요를_볼_수_있다() throws MalformedURLException {
+    void 성장_앨범의_좋아요를_볼_수_있다() throws MalformedURLException {
         // given
         final ExtractableResponse<Response> signUpResponse1 = 아기_등록_회원가입_요청();
         final String accessToken = toObject(signUpResponse1, MemberSignUpResponse.class).accessToken();
@@ -287,7 +277,38 @@ public class ContentAcceptanceTest extends AcceptanceTest {
         );
     }
 
+    @Test
+    void 성장_앨범의_좋아요가_존재하지않으면_빈_리스트를_반환한다() throws MalformedURLException {
+        // given
+        final ExtractableResponse<Response> signUpResponse1 = 아기_등록_회원가입_요청();
+        final String accessToken = toObject(signUpResponse1, MemberSignUpResponse.class).accessToken();
+        final String babyId = getBabyId(signUpResponse1);
+        given(amazonS3.getUrl(any(String.class), any(String.class))).willReturn(new URL(VALID_URL));
+        final Long contentId = getContentId(성장앨범_생성_요청(accessToken, babyId, nowDate));
+        좋아요_요청(accessToken, babyId, contentId);
+        좋아요_요청(accessToken, babyId, contentId);
+
+        // when
+        final ExtractableResponse<Response> httpResponse = 성장_앨범_좋아요_보기_요청(accessToken, babyId, contentId);
+
+        // then
+        final LikesResponse response = toObject(httpResponse, LikesResponse.class);
+        assertAll(
+                () -> assertThat(httpResponse.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(response.likeUsersPreview()).hasSize(0),
+                () -> assertThat(response.likeUsers()).hasSize(0)
+        );
+    }
+
     // TODO: 2023/03/26 멤버 초대 API 구현되면 테스트 작성
+    @Test
+    void 원하는_년_월의_내가_올린_성장_앨범과_다른_사람이_올린_성장_앨범을_조회한다() {
+    }
+
+    @Test
+    void 태그를_하고_댓글을_추가할_수_있다() {
+    }
+
     @Test
     void 성장_앨범_댓글_보기_요청_시_가족_멤버가_요청하면_모든_좋아요_댓글을_확인할_수_있다() {
     }
@@ -297,6 +318,6 @@ public class ContentAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    void 성장_앨범_댓글_보기_요청_시_소속_그룹에_상관없이_모든_좋아요를_확인할_수_있다() {
+    void 성장_앨범_댓글_보기_요청_시_소속_그룹에_상관없이_모든_좋아요조를_확인할_수_있다() {
     }
 }
