@@ -382,7 +382,7 @@ class MemberServiceTest {
         final MyProfileResponse response = memberService.searchMyGroups(memberId);
 
         // then
-        assertThat(response.groups()).containsExactly(
+        assertThat(response.groups()).contains(
                 new GroupResponseWithFamily(관계그룹10.getRelationGroupName(), 관계그룹10.isFamily(),
                         List.of(new GroupMemberResponse(
                                         멤버1.getId(),

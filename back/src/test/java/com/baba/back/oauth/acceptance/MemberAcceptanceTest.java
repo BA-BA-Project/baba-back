@@ -118,7 +118,7 @@ class MemberAcceptanceTest extends AcceptanceTest {
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(toObject(response, MemberResponse.class)).extracting("name", "introduction",
                                 "iconName", "iconColor")
-                        .containsExactly(멤버_가입_요청_데이터.getName(), "", 멤버_가입_요청_데이터.getIconName(), Color.COLOR_1.name())
+                        .containsExactly(멤버_가입_요청_데이터.getName(), "", 멤버_가입_요청_데이터.getIconName(), Color.COLOR_1.getValue())
         );
     }
 

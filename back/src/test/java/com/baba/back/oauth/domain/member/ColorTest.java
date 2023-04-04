@@ -34,7 +34,7 @@ class ColorTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"FFAEBA", "FF8698", "FFE3C8"})
+    @ValueSource(strings = {"#FFAEBA", "#FF8698", "#FFE3C8"})
     void 유효한_아이콘_색을_선택한다(String color) {
         assertThatCode(() -> Color.from(color))
                 .doesNotThrowAnyException();
