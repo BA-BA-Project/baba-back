@@ -318,6 +318,6 @@ public class ContentAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    void 성장_앨범_댓글_보기_요청_시_소속_그룹에_상관없이_모든_좋아요조를_확인할_수_있다() {
+    void 성장_앨범_댓글_보기_요청_시_소속_그룹에_상관없이_모든_좋아요를_확인할_수_있다() {
     }
 }
