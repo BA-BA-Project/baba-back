@@ -17,6 +17,7 @@ import com.baba.back.content.dto.ContentResponse;
 import com.baba.back.content.dto.ContentsResponse;
 import com.baba.back.content.dto.CreateCommentRequest;
 import com.baba.back.content.dto.LikeContentResponse;
+import com.baba.back.content.dto.LikesResponse;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
 import com.baba.back.oauth.service.AccessTokenProvider;
 import io.restassured.RestAssured;
@@ -264,12 +265,38 @@ public class ContentAcceptanceTest extends AcceptanceTest {
         );
     }
 
+    @Test
+    void 성장_앨범의_모든_좋아요를_볼_수_있다() throws MalformedURLException {
+        // given
+        final ExtractableResponse<Response> signUpResponse1 = 아기_등록_회원가입_요청();
+        final String accessToken = toObject(signUpResponse1, MemberSignUpResponse.class).accessToken();
+        final String babyId = getBabyId(signUpResponse1);
+        given(amazonS3.getUrl(any(String.class), any(String.class))).willReturn(new URL(VALID_URL));
+        final Long contentId = getContentId(성장앨범_생성_요청(accessToken, babyId, nowDate));
+        좋아요_요청(accessToken, babyId, contentId);
+
+        // when
+        final ExtractableResponse<Response> httpResponse = 성장_앨범_좋아요_보기_요청(accessToken, babyId, contentId);
+
+        // then
+        final LikesResponse response = toObject(httpResponse, LikesResponse.class);
+        assertAll(
+                () -> assertThat(httpResponse.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(response.likeUsersPreview()).hasSize(1),
+                () -> assertThat(response.likeUsers()).hasSize(1)
+        );
+    }
+
     // TODO: 2023/03/26 멤버 초대 API 구현되면 테스트 작성
     @Test
-    void 성장_앨범_자세히_보기_요청_시_가족_멤버가_요청하면_모든_좋아요_댓글을_확인할_수_있다() {
+    void 성장_앨범_댓글_보기_요청_시_가족_멤버가_요청하면_모든_좋아요_댓글을_확인할_수_있다() {
     }
 
     @Test
-    void 성장_앨범_자세히_보기_요청_시_가족이_아닌_멤버가_요청하면_가족_및_소속_그룹의_좋아요_댓글만_확인할_수_있다() {
+    void 성장_앨범_댓글_보기_요청_시_가족이_아닌_멤버가_요청하면_가족_및_소속_그룹의_좋아요_댓글만_확인할_수_있다() {
+    }
+
+    @Test
+    void 성장_앨범_댓글_보기_요청_시_소속_그룹에_상관없이_모든_좋아요를_확인할_수_있다() {
     }
 }
