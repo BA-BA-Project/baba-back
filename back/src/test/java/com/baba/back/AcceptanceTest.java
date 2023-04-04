@@ -70,8 +70,8 @@ public class AcceptanceTest {
     }
 
     protected ExtractableResponse<Response> 그룹_추가_요청(String accessToken) {
-        return post(MEMBER_BASE_PATH + "/groups", Map.of("Authorization", "Bearer " + accessToken),
-                그룹_추가_요청_데이터1);
+        return post(String.format("/%s/%s/groups", BASE_PATH, MEMBER_BASE_PATH),
+                Map.of("Authorization", "Bearer " + accessToken), 그룹_추가_요청_데이터1);
     }
 
     protected ExtractableResponse<Response> 초대장_조회_요청(String code) {
@@ -166,7 +166,8 @@ public class AcceptanceTest {
     }
 
     protected ExtractableResponse<Response> 다른_아기_프로필_조회_요청(String accessToken, String babyId) {
-        return get(MEMBER_BASE_PATH + "/baby-page/" + babyId, Map.of("Authorization", "Bearer " + accessToken));
+        return get(String.format("/%s/%s/baby-page/%s", BASE_PATH, MEMBER_BASE_PATH, babyId),
+                Map.of("Authorization", "Bearer " + accessToken));
     }
 
     protected Long getContentId(ExtractableResponse<Response> response) {
