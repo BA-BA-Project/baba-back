@@ -3,10 +3,11 @@ package com.baba.back;
 import static com.baba.back.SimpleRestAssured.get;
 import static com.baba.back.SimpleRestAssured.post;
 import static com.baba.back.SimpleRestAssured.thenExtract;
-import static com.baba.back.fixture.RequestFixture.그룹_추가_요청_데이터;
+import static com.baba.back.fixture.RequestFixture.그룹_추가_요청_데이터1;
 import static com.baba.back.fixture.RequestFixture.멤버_가입_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.소셜_토큰_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.약관_동의_요청_데이터;
+import static com.baba.back.fixture.RequestFixture.초대코드_생성_요청_데이터1;
 import static com.baba.back.fixture.RequestFixture.초대코드_생성_요청_데이터2;
 
 import com.baba.back.baby.dto.CreateInviteCodeRequest;
@@ -69,9 +70,8 @@ public class AcceptanceTest {
     }
 
     protected ExtractableResponse<Response> 그룹_추가_요청(String accessToken) {
-        return post(String.format("/%s/%s/groups", BASE_PATH, MEMBER_BASE_PATH),
-                Map.of("Authorization", "Bearer " + accessToken),
-                그룹_추가_요청_데이터);
+        return post(MEMBER_BASE_PATH + "/groups", Map.of("Authorization", "Bearer " + accessToken),
+                그룹_추가_요청_데이터1);
     }
 
     protected ExtractableResponse<Response> 초대장_조회_요청(String code) {
@@ -145,6 +145,10 @@ public class AcceptanceTest {
         return 초대_코드_생성_요청(accessToken, 초대코드_생성_요청_데이터2);
     }
 
+    protected ExtractableResponse<Response> 외가_초대_코드_생성_요청(String accessToken) {
+        return 초대_코드_생성_요청(accessToken, 초대코드_생성_요청_데이터1);
+    }
+
     private ExtractableResponse<Response> 초대_코드_생성_요청(String accessToken, CreateInviteCodeRequest request) {
         return post(String.format("/%s/%s/invite-code", BASE_PATH, BABY_BASE_PATH),
                 Map.of("Authorization", "Bearer " + accessToken), request);
@@ -159,6 +163,10 @@ public class AcceptanceTest {
     protected ExtractableResponse<Response> 마이_그룹별_조회_요청(String accessToken) {
         return get(String.format("/%s/%s/my-page", BASE_PATH, MEMBER_BASE_PATH),
                 Map.of("Authorization", "Bearer " + accessToken));
+    }
+
+    protected ExtractableResponse<Response> 다른_아기_프로필_조회_요청(String accessToken, String babyId) {
+        return get(MEMBER_BASE_PATH + "/baby-page/" + babyId, Map.of("Authorization", "Bearer " + accessToken));
     }
 
     protected Long getContentId(ExtractableResponse<Response> response) {

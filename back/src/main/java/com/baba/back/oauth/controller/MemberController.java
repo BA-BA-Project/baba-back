@@ -1,5 +1,6 @@
 package com.baba.back.oauth.controller;
 
+import com.baba.back.oauth.dto.BabyProfileResponse;
 import com.baba.back.oauth.dto.CreateGroupRequest;
 import com.baba.back.oauth.dto.MemberResponse;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -94,5 +96,15 @@ public class MemberController {
     @GetMapping("/members/my-page")
     public ResponseEntity<MyProfileResponse> searchMyProfile(@Login String memberId) {
         return ResponseEntity.ok(memberService.searchMyGroups(memberId));
+    }
+
+    @Operation(summary = "다른 아기 프로필 조회 요청")
+    @OkResponse
+    @UnAuthorizedResponse
+    @NotFoundResponse
+    @IntervalServerErrorResponse
+    @GetMapping("/members/baby-page/{babyId}")
+    public ResponseEntity<BabyProfileResponse> searchBabyProfile(@Login String memberId, @PathVariable String babyId) {
+        return ResponseEntity.ok(memberService.searchBabyGroups(memberId, babyId));
     }
 }

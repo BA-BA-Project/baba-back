@@ -6,18 +6,24 @@ import com.baba.back.baby.domain.IdConstructor;
 import com.baba.back.baby.domain.invitation.Invitation;
 import com.baba.back.baby.domain.invitation.InvitationCode;
 import com.baba.back.baby.domain.invitation.Invitations;
+import com.baba.back.baby.dto.BabyResponse;
+import com.baba.back.baby.exception.BabyNotFoundException;
+import com.baba.back.baby.exception.RelationGroupNotFoundException;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.baby.repository.InvitationRepository;
 import com.baba.back.oauth.domain.Picker;
 import com.baba.back.oauth.domain.member.Color;
 import com.baba.back.oauth.domain.member.Member;
 import com.baba.back.oauth.domain.token.Token;
+import com.baba.back.oauth.dto.BabyProfileResponse;
 import com.baba.back.oauth.dto.CreateGroupRequest;
+import com.baba.back.oauth.dto.FamilyGroupResponse;
+import com.baba.back.oauth.dto.GroupMemberResponse;
+import com.baba.back.oauth.dto.GroupResponse;
+import com.baba.back.oauth.dto.GroupResponseWithFamily;
 import com.baba.back.oauth.dto.MemberResponse;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
-import com.baba.back.oauth.dto.MyGroupMemberResponse;
-import com.baba.back.oauth.dto.MyGroupResponse;
 import com.baba.back.oauth.dto.MyProfileResponse;
 import com.baba.back.oauth.dto.SignUpWithBabyResponse;
 import com.baba.back.oauth.dto.SignUpWithCodeRequest;
@@ -130,7 +136,7 @@ public class MemberService {
     }
 
     public MemberResponse findMember(String memberId) {
-        final Member member = getMember(memberId);
+        final Member member = getFirstMember(memberId);
 
         return new MemberResponse(
                 memberId,
@@ -141,7 +147,7 @@ public class MemberService {
         );
     }
 
-    private Member getMember(String memberId) {
+    private Member getFirstMember(String memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(memberId + "에 해당하는 멤버가 존재하지 않습니다."));
     }
@@ -184,7 +190,7 @@ public class MemberService {
     }
 
     public void createGroup(String memberId, CreateGroupRequest request) {
-        final Member member = getMember(memberId);
+        final Member member = getFirstMember(memberId);
         final List<Baby> myBabies = getMyBabies(member);
         final List<RelationGroup> relationGroups = getRelationGroupsByBabies(myBabies);
 
@@ -231,12 +237,12 @@ public class MemberService {
     }
 
     public MyProfileResponse searchMyGroups(String memberId) {
-        final Member member = getMember(memberId);
+        final Member member = getFirstMember(memberId);
         final Baby firstBaby = findFirstBaby(member);
 
         final List<RelationGroup> relationGroups = getRelationGroupsByBaby(firstBaby);
         final List<Relation> relations = getRelationsByRelationGroups(relationGroups);
-        final List<MyGroupResponse> groups = getMyGroups(relations);
+        final List<GroupResponseWithFamily> groups = getMyGroups(relations);
 
         return new MyProfileResponse(groups);
     }
@@ -257,7 +263,7 @@ public class MemberService {
         return relationRepository.findAllByRelationGroupIn(relationGroups);
     }
 
-    private List<MyGroupResponse> getMyGroups(List<Relation> relations) {
+    private List<GroupResponseWithFamily> getMyGroups(List<Relation> relations) {
         return relations.stream()
                 .collect(Collectors.groupingBy(Relation::getRelationGroup))
                 .entrySet()
@@ -266,22 +272,94 @@ public class MemberService {
                     final RelationGroup relationGroup = entry.getKey();
                     final List<Relation> relationsByGroup = entry.getValue();
 
-                    return new MyGroupResponse(relationGroup.getRelationGroupName(), relationGroup.isFamily(),
+                    return new GroupResponseWithFamily(relationGroup.getRelationGroupName(), relationGroup.isFamily(),
                             getGroupMembers(relationsByGroup));
                 })
                 .toList();
     }
 
-    private List<MyGroupMemberResponse> getGroupMembers(List<Relation> relations) {
+    private List<GroupMemberResponse> getGroupMembers(List<Relation> relations) {
         return relations.stream()
                 .map(relation -> {
                     final Member member = relation.getMember();
-                    return new MyGroupMemberResponse(
+                    return new GroupMemberResponse(
                             member.getId(),
                             member.getName(),
                             relation.getRelationName(),
                             member.getIconName(),
                             member.getIconColor());
                 }).toList();
+    }
+
+    public BabyProfileResponse searchBabyGroups(String memberId, String babyId) {
+        final Member member = getFirstMember(memberId);
+        final Baby baby = getBaby(babyId);
+
+        final RelationGroup memberRelationGroup = getMemberRelationGroup(member, baby);
+        final RelationGroup familyRelationGroup = getFamilyRelationGroup(baby);
+
+        final FamilyGroupResponse familyGroupResponse = getFamilyGroup(familyRelationGroup);
+
+        if (memberRelationGroup.isFamily()) {
+            return new BabyProfileResponse(familyGroupResponse, null);
+        }
+
+        final GroupResponse groupResponse = getGroupResponse(memberRelationGroup);
+
+        return new BabyProfileResponse(familyGroupResponse, groupResponse);
+    }
+
+    private Baby getBaby(String babyId) {
+        return babyRepository.findById(babyId)
+                .orElseThrow(() -> new BabyNotFoundException(babyId + "에 해당하는 아기가 존재하지 않습니다."));
+    }
+
+    private RelationGroup getMemberRelationGroup(Member member, Baby baby) {
+        return relationRepository.findByMemberAndBaby(member, baby)
+                .orElseThrow(() -> new RelationNotFoundException("멤버와 아기의 관계가 존재하지 않습니다."))
+                .getRelationGroup();
+    }
+
+    private RelationGroup getFamilyRelationGroup(Baby baby) {
+        return relationGroupRepository.findByBabyAndFamily(baby, true)
+                .orElseThrow(() -> new RelationGroupNotFoundException("아기의 가족 그룹이 존재하지 않습니다."));
+    }
+
+    private FamilyGroupResponse getFamilyGroup(RelationGroup relationGroup) {
+        final List<BabyResponse> babyResponses = getBabies(relationGroup);
+
+        final List<GroupMemberResponse> groupMembers = getGroupMembersByRelationGroup(relationGroup);
+
+        return new FamilyGroupResponse(relationGroup.getRelationGroupName(), babyResponses, groupMembers);
+    }
+
+    private List<GroupMemberResponse> getGroupMembersByRelationGroup(RelationGroup relationGroup) {
+        final List<Relation> relations = relationRepository.findAllByRelationGroup(relationGroup);
+        return getGroupMembers(relations);
+    }
+
+    private List<BabyResponse> getBabies(RelationGroup relationGroup) {
+        final Member familyMember = getFirstMember(relationGroup);
+        final List<Relation> relations = relationRepository.findAllByMember(familyMember);
+
+        return relations.stream()
+                .map(relation -> {
+                    final RelationGroup group = relation.getRelationGroup();
+
+                    return new BabyResponse(group.getBabyId(), group.getGroupColor(), group.getBabyName());
+                })
+                .toList();
+    }
+
+    private Member getFirstMember(RelationGroup relationGroup) {
+        return relationRepository.findFirstByRelationGroup(relationGroup)
+                .orElseThrow(() -> new RelationNotFoundException("아기와의 관계가 존재하지 않습니다."))
+                .getMember();
+    }
+
+    private GroupResponse getGroupResponse(RelationGroup relationGroup) {
+        final List<GroupMemberResponse> groupMembers = getGroupMembersByRelationGroup(relationGroup);
+
+        return new GroupResponse(relationGroup.getRelationGroupName(), groupMembers);
     }
 }
