@@ -4,11 +4,9 @@ import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.DomainFixture.아기1;
 import static com.baba.back.fixture.DomainFixture.컨텐츠10;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.content.domain.comment.Comment;
-import com.baba.back.content.domain.comment.Tag;
 import com.baba.back.content.domain.content.Content;
 import com.baba.back.oauth.domain.member.Member;
 import com.baba.back.oauth.repository.MemberRepository;

@@ -89,4 +89,8 @@ public class Content extends BaseEntity {
     public String getCardStyle() {
         return this.cardStyle.name();
     }
+
+    public boolean hasEqualBaby(Baby baby) {
+        return this.baby.equals(baby);
+    }
 }

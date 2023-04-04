@@ -113,11 +113,19 @@ public class ContentService {
         final Baby baby = findBaby(babyId);
         findRelation(member, baby);
         final Content content = findContent(contentId);
+        validateContentBaby(baby, content);
+
         final Like like = findAndUpdateLike(member, content);
 
         likeRepository.save(like);
 
         return new LikeContentResponse(!like.isDeleted());
+    }
+
+    private void validateContentBaby(Baby baby, Content content) {
+        if (!content.hasEqualBaby(baby)) {
+            throw new ContentBadRequestException(content.getId() + "콘텐츠는 " + baby.getId() + "와 관련이 없습니다.");
+        }
     }
 
     private Content findContent(Long contentId) {
@@ -165,8 +173,9 @@ public class ContentService {
         final Member owner = findMember(memberId);
         final Baby baby = findBaby(babyId);
         final Relation ownerRelation = findRelation(owner, baby);
-
         final Content content = findContent(contentId);
+        validateContentBaby(baby, content);
+
         final Comment comment = Comment.builder()
                 .content(content)
                 .owner(owner)
@@ -206,10 +215,11 @@ public class ContentService {
         }
     }
 
-    public CommentsResponse getComments(String memberId, Long contentId) {
+    public CommentsResponse getComments(String memberId, String babyId, Long contentId) {
         final Member member = findMember(memberId);
         final Content content = findContent(contentId);
-        final Baby baby = content.getBaby();
+        final Baby baby = findBaby(babyId);
+        validateContentBaby(baby, content);
 
         final Relation relation = findRelation(member, baby);
         final RelationGroup relationGroup = relation.getRelationGroup();
@@ -264,7 +274,7 @@ public class ContentService {
         );
     }
 
-    public String findTagMemberName(Comment comment) {
+    private String findTagMemberName(Comment comment) {
         final Optional<Tag> tag = tagRepository.findByComment(comment);
         if (tag.isPresent()) {
             return tag.get().getTagMember().getName();
