@@ -33,7 +33,8 @@ public class RequestFixture {
     public static final MemberSignUpRequest 멤버_가입_요청_데이터 = new MemberSignUpRequest(
             "박재희", "PROFILE_W_1", "엄마", List.of(아기_생성_요청_데이터_1, 아기_생성_요청_데이터_2)
     );
-    public static final CreateGroupRequest 그룹_추가_요청_데이터 = new CreateGroupRequest("친가", "FFAEBA");
+    public static final CreateGroupRequest 그룹_추가_요청_데이터1 = new CreateGroupRequest("외가", "FFAEBA");
+    public static final CreateGroupRequest 그룹_추가_요청_데이터2 = new CreateGroupRequest("친가", "FFAEBA");
     public static final SignUpWithCodeRequest 초대코드로_멤버_가입_요청_데이터 = new SignUpWithCodeRequest(
             "AAAAAA", "박재희", "PROFILE_W_1"
     );
