@@ -30,9 +30,16 @@ public class Like extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Content content;
 
+    private boolean deleted;
+
+    public void updateDeleted() {
+        this.deleted = !this.deleted;
+    }
+
     @Builder
     public Like(Member member, Content content) {
         this.member = member;
         this.content = content;
+        this.deleted = false;
     }
 }
