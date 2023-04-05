@@ -34,6 +34,12 @@ public class Member extends BaseEntity {
         this.icon = Icon.of(iconColor, iconName);
     }
 
+    public void update(String name, String introduction, Color iconColor, String iconName) {
+        this.name = new Name(name);
+        this.introduction = new Introduction(introduction);
+        this.icon = Icon.of(iconColor, iconName);
+    }
+
     public String getName() {
         return this.name.getValue();
     }
