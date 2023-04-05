@@ -20,12 +20,6 @@ public abstract class BaseEntity implements Comparable<BaseEntity> {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    private boolean deleted = false;
-
-    public void updateDeleted() {
-        this.deleted = !this.deleted;
-    }
-
     @Override
     public int compareTo(BaseEntity o) {
         return this.createdAt.compareTo(o.createdAt);
