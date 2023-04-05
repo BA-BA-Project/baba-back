@@ -2,6 +2,7 @@ package com.baba.back.oauth.acceptance;
 
 import static com.baba.back.SimpleRestAssured.post;
 import static com.baba.back.SimpleRestAssured.toObject;
+import static com.baba.back.fixture.RequestFixture.마이_프로필_변경_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.멤버_가입_요청_데이터;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -118,7 +119,8 @@ class MemberAcceptanceTest extends AcceptanceTest {
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(toObject(response, MemberResponse.class)).extracting("name", "introduction",
                                 "iconName", "iconColor")
-                        .containsExactly(멤버_가입_요청_데이터.getName(), "", 멤버_가입_요청_데이터.getIconName(), Color.COLOR_1.getValue())
+                        .containsExactly(멤버_가입_요청_데이터.getName(), "", 멤버_가입_요청_데이터.getIconName(),
+                                Color.COLOR_1.getValue())
         );
     }
 
@@ -132,6 +134,25 @@ class MemberAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+    }
+
+    @Test
+    void 마이_프로필_변경_요청_시_멤버_정보를_변경한다() {
+        // given
+        final ExtractableResponse<Response> 아기_등록_회원가입_응답 = 아기_등록_회원가입_요청(멤버_가입_요청_데이터);
+        final String accessToken = toObject(아기_등록_회원가입_응답, MemberSignUpResponse.class).accessToken();
+
+        // when
+        final ExtractableResponse<Response> updateResponse = 마이_프로필_변경_요청(accessToken);
+
+        // then
+        final MemberResponse response = toObject(사용자_정보_요청(accessToken), MemberResponse.class);
+        assertAll(
+                () -> assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(response).extracting("name", "introduction", "iconName", "iconColor")
+                        .containsExactly(마이_프로필_변경_요청_데이터.getName(), 마이_프로필_변경_요청_데이터.getIntroduction(), 마이_프로필_변경_요청_데이터.getIconName(),
+                                마이_프로필_변경_요청_데이터.getIconColor())
+        );
     }
 
     @Test

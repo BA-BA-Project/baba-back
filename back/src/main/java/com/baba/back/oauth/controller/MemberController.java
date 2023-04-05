@@ -5,6 +5,7 @@ import com.baba.back.oauth.dto.CreateGroupRequest;
 import com.baba.back.oauth.dto.MemberResponse;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
+import com.baba.back.oauth.dto.MemberUpdateRequest;
 import com.baba.back.oauth.dto.MyProfileResponse;
 import com.baba.back.oauth.dto.SignUpWithBabyResponse;
 import com.baba.back.oauth.dto.SignUpWithCodeRequest;
@@ -27,6 +28,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -59,6 +61,18 @@ public class MemberController {
     @GetMapping("/members")
     public ResponseEntity<MemberResponse> findMember(@Login String memberId) {
         return ResponseEntity.ok(memberService.findMember(memberId));
+    }
+
+    @Operation(summary = "마이 프로필 변경 요청")
+    @OkResponse
+    @UnAuthorizedResponse
+    @NotFoundResponse
+    @IntervalServerErrorResponse
+    @PutMapping("/members")
+    public ResponseEntity<Void> updateMember(@Login String memberId,
+                                             @RequestBody @Valid MemberUpdateRequest request) {
+        memberService.updateMember(memberId, request);
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "초대코드로 멤버 생성 요청")

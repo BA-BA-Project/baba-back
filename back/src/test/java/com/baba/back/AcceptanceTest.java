@@ -2,8 +2,10 @@ package com.baba.back;
 
 import static com.baba.back.SimpleRestAssured.get;
 import static com.baba.back.SimpleRestAssured.post;
+import static com.baba.back.SimpleRestAssured.put;
 import static com.baba.back.SimpleRestAssured.thenExtract;
 import static com.baba.back.fixture.RequestFixture.그룹_추가_요청_데이터1;
+import static com.baba.back.fixture.RequestFixture.마이_프로필_변경_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.멤버_가입_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.소셜_토큰_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.약관_동의_요청_데이터;
@@ -81,6 +83,11 @@ public class AcceptanceTest {
     protected ExtractableResponse<Response> 사용자_정보_요청(String accessToken) {
         return get(String.format("/%s/%s", BASE_PATH, MEMBER_BASE_PATH),
                 Map.of("Authorization", "Bearer " + accessToken));
+    }
+
+    protected ExtractableResponse<Response> 마이_프로필_변경_요청(String accessToken) {
+        return put(String.format("/%s/%s", BASE_PATH, MEMBER_BASE_PATH),
+                Map.of("Authorization", "Bearer " + accessToken), 마이_프로필_변경_요청_데이터);
     }
 
     protected ExtractableResponse<Response> 소셜_로그인_요청() {

@@ -4,7 +4,6 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-import java.util.List;
 import java.util.Map;
 import org.springframework.http.MediaType;
 
@@ -35,6 +34,15 @@ public class SimpleRestAssured {
         return thenExtract(given.contentType(MediaType.APPLICATION_JSON_VALUE).when().post(path));
     }
 
+    public static ExtractableResponse<Response> put(String path, Map<String, String> headers, Object request) {
+        final RequestSpecification given = givenWithHeaders(headers);
+        if (request != null) {
+            given.body(request);
+        }
+
+        return thenExtract(given.contentType(MediaType.APPLICATION_JSON_VALUE).when().put(path));
+    }
+
     private static RequestSpecification givenWithHeaders(Map<String, String> headers) {
         final RequestSpecification given = given();
         if (headers != null) {
@@ -53,9 +61,5 @@ public class SimpleRestAssured {
 
     public static <T> T toObject(ExtractableResponse<Response> response, Class<T> clazz) {
         return response.as(clazz);
-    }
-
-    public static <T> List<T> toObjectList(ExtractableResponse<Response> response, Class<T> clazz) {
-        return response.body().jsonPath().getList(".", clazz);
     }
 }

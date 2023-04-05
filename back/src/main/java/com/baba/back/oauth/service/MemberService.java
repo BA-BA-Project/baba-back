@@ -24,6 +24,7 @@ import com.baba.back.oauth.dto.GroupResponseWithFamily;
 import com.baba.back.oauth.dto.MemberResponse;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
+import com.baba.back.oauth.dto.MemberUpdateRequest;
 import com.baba.back.oauth.dto.MyProfileResponse;
 import com.baba.back.oauth.dto.SignUpWithBabyResponse;
 import com.baba.back.oauth.dto.SignUpWithCodeRequest;
@@ -150,6 +151,14 @@ public class MemberService {
     private Member getFirstMember(String memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(memberId + "에 해당하는 멤버가 존재하지 않습니다."));
+    }
+
+    public void updateMember(String memberId, MemberUpdateRequest request) {
+        final Member member = getFirstMember(memberId);
+        member.update(request.getName(), request.getIntroduction(), Color.from(request.getIconColor()),
+                request.getIconName());
+
+        memberRepository.save(member);
     }
 
     public SignUpWithBabyResponse signUpWithCode(SignUpWithCodeRequest request, String memberId) {
