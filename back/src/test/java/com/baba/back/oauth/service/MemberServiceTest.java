@@ -20,6 +20,7 @@ import static com.baba.back.fixture.DomainFixture.초대10;
 import static com.baba.back.fixture.DomainFixture.초대20;
 import static com.baba.back.fixture.RequestFixture.그룹_추가_요청_데이터1;
 import static com.baba.back.fixture.RequestFixture.그룹_추가_요청_데이터2;
+import static com.baba.back.fixture.RequestFixture.마이_프로필_변경_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.멤버_가입_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.초대코드로_멤버_가입_요청_데이터;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -411,6 +412,22 @@ class MemberServiceTest {
                         )
                 )
         );
+    }
+
+    @Nested
+    class 마이_프로필_변경_시_ {
+        
+        @Test
+        void 멤버의_정보를_변경한다() {
+            // given
+            given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
+            
+            // when
+            memberService.updateMember(멤버1.getId(), 마이_프로필_변경_요청_데이터);
+            
+            // then
+            then(memberRepository).should().save(any(Member.class));
+        }
     }
 
     @Nested

@@ -12,6 +12,7 @@ import com.baba.back.oauth.domain.Terms;
 import com.baba.back.oauth.dto.AgreeTermsRequest;
 import com.baba.back.oauth.dto.CreateGroupRequest;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
+import com.baba.back.oauth.dto.MemberUpdateRequest;
 import com.baba.back.oauth.dto.SignUpWithCodeRequest;
 import com.baba.back.oauth.dto.SocialTokenRequest;
 import com.baba.back.oauth.dto.TermsRequest;
@@ -54,4 +55,8 @@ public class RequestFixture {
 
     public static final CreateInviteCodeRequest 초대코드_생성_요청_데이터2 = new CreateInviteCodeRequest(
             "가족", "아빠");
+
+    public static final MemberUpdateRequest 마이_프로필_변경_요청_데이터 = new MemberUpdateRequest(
+            "박재희2", "안녕하세요!", "PROFILE_W_2", "#81E0D5"
+    );
 }
