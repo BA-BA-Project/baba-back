@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Embeddable
 @NoArgsConstructor
 public class Name {
-    public static final int NAME_MAX_LENGTH = 6;
+    public static final int NAME_MAX_LENGTH = 10;
 
     @Column(name = "name")
     private String value;

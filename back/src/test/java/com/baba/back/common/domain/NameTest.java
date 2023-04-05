@@ -10,9 +10,9 @@ import org.junit.jupiter.params.provider.ValueSource;
 class NameTest {
 
     @ParameterizedTest
-    @ValueSource(strings = {"박재희박재희박", "abcdefg"})
+    @ValueSource(strings = {"박재희박재희박재희박재", "abcdefghijk"})
     @NullAndEmptySource
-    void 이름이_1자미만_6자초과이면_예외를_던진다(String name) {
+    void 이름이_1자미만_10자초과이면_예외를_던진다(String name) {
         assertThatThrownBy(() -> new Name(name))
                 .isInstanceOf(NameLengthBadRequestException.class);
     }
