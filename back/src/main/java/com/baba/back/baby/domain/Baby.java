@@ -40,4 +40,8 @@ public class Baby extends BaseEntity {
     public String getName() {
         return this.name.getValue();
     }
+
+    public void updateName(String name) {
+        this.name = new Name(name);
+    }
 }
