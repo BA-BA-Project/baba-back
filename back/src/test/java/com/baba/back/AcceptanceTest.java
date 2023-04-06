@@ -196,7 +196,7 @@ public class AcceptanceTest {
 
     protected Long getCommentId(ExtractableResponse<Response> response) {
         final String location = getLocation(response);
-        final String id = location.split("/")[5];
+        final String id = location.split("/")[6];
         return Long.parseLong(id);
     }
 
