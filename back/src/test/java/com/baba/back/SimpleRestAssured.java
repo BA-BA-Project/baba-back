@@ -43,6 +43,15 @@ public class SimpleRestAssured {
         return thenExtract(given.contentType(MediaType.APPLICATION_JSON_VALUE).when().put(path));
     }
 
+    public static ExtractableResponse<Response> patch(String path, Map<String, String> headers, Object request) {
+        final RequestSpecification given = givenWithHeaders(headers);
+        if (request != null) {
+            given.body(request);
+        }
+
+        return thenExtract(given.contentType(MediaType.APPLICATION_JSON_VALUE).when().patch(path));
+    }
+
     private static RequestSpecification givenWithHeaders(Map<String, String> headers) {
         final RequestSpecification given = given();
         if (headers != null) {

@@ -19,6 +19,7 @@ import static com.baba.back.fixture.DomainFixture.아기4;
 import static com.baba.back.fixture.DomainFixture.초대10;
 import static com.baba.back.fixture.DomainFixture.초대20;
 import static com.baba.back.fixture.DomainFixture.초대코드정보1;
+import static com.baba.back.fixture.RequestFixture.아기_이름_변경_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.초대코드_생성_요청_데이터1;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -131,7 +132,7 @@ class BabyServiceTest {
     class 아기_이름_변경_요청_시_ {
         final String memberId = 멤버1.getId();
         final String babyId = 아기1.getId();
-        final String babyName = "앙쥬";
+        final String babyName = 아기_이름_변경_요청_데이터.getName();
 
         @Test
         void 아기가_없으면_예외를_던진다() {

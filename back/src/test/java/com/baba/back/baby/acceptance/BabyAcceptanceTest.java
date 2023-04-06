@@ -52,6 +52,20 @@ class BabyAcceptanceTest extends AcceptanceTest {
                         )
         );
     }
+    
+    @Test
+    void 아기_이름_변경_요청_시_아기_이름이_변경된다() {
+        // given
+        final ExtractableResponse<Response> 아기_등록_회원가입_응답 = 아기_등록_회원가입_요청();
+        final String accessToken = toObject(아기_등록_회원가입_응답, MemberSignUpResponse.class).accessToken();
+        final String babyId = getBabyId(아기_등록_회원가입_응답);
+
+        // when
+        final ExtractableResponse<Response> response = 아기_이름_변경_요청(accessToken, babyId);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
 
     @Test
     void 초대_코드_생성_요청_시_초대_코드를_생성한다() {
