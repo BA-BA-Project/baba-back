@@ -1,6 +1,7 @@
 package com.baba.back.baby.service;
 
 import static com.baba.back.fixture.DomainFixture.관계10;
+import static com.baba.back.fixture.DomainFixture.관계12;
 import static com.baba.back.fixture.DomainFixture.관계20;
 import static com.baba.back.fixture.DomainFixture.관계30;
 import static com.baba.back.fixture.DomainFixture.관계40;
@@ -27,6 +28,8 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.times;
 
 import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.domain.invitation.Code;
@@ -37,10 +40,14 @@ import com.baba.back.baby.dto.BabyResponse;
 import com.baba.back.baby.dto.CreateInviteCodeResponse;
 import com.baba.back.baby.dto.InviteCodeBabyResponse;
 import com.baba.back.baby.dto.SearchInviteCodeResponse;
+import com.baba.back.baby.exception.BabyNotFoundException;
 import com.baba.back.baby.exception.InvitationCodeBadRequestException;
 import com.baba.back.baby.exception.InvitationsBadRequestException;
 import com.baba.back.baby.exception.RelationGroupNotFoundException;
+import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.baby.repository.InvitationRepository;
+import com.baba.back.oauth.domain.member.Member;
+import com.baba.back.oauth.exception.MemberAuthorizationException;
 import com.baba.back.oauth.exception.MemberNotFoundException;
 import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.relation.domain.RelationGroup;
@@ -52,8 +59,10 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -66,6 +75,9 @@ class BabyServiceTest {
 
     @Mock
     private MemberRepository memberRepository;
+
+    @Mock
+    private BabyRepository babyRepository;
 
     @Mock
     private RelationRepository relationRepository;
@@ -113,6 +125,65 @@ class BabyServiceTest {
                         new BabyResponse(아기4.getId(), 관계그룹40.getGroupColor(), 아기4.getName())
                 )
         );
+    }
+
+    @Nested
+    class 아기_이름_변경_요청_시_ {
+        final String memberId = 멤버1.getId();
+        final String babyId = 아기1.getId();
+        final String babyName = "앙쥬";
+
+        @Test
+        void 아기가_없으면_예외를_던진다() {
+            // given
+            given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
+            given(babyRepository.findById(babyId)).willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> babyService.updateBabyName(memberId, babyId, babyName))
+                    .isInstanceOf(BabyNotFoundException.class);
+        }
+
+        @Test
+        void 아기와의_관계가_없으면_예외를_던진다() {
+            // given
+            given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
+            given(babyRepository.findById(babyId)).willReturn(Optional.of(아기1));
+            given(relationRepository.findByMemberAndBaby(any(Member.class), any(Baby.class)))
+                    .willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> babyService.updateBabyName(memberId, babyId, babyName))
+                    .isInstanceOf(RelationNotFoundException.class);
+        }
+
+        @Test
+        void 아기와_가족_관계가_아니면_예외를_던진다() {
+            // given
+            given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
+            given(babyRepository.findById(babyId)).willReturn(Optional.of(아기1));
+            given(relationRepository.findByMemberAndBaby(any(Member.class), any(Baby.class)))
+                    .willReturn(Optional.of(관계12));
+
+            // when & then
+            assertThatThrownBy(() -> babyService.updateBabyName(memberId, babyId, babyName))
+                    .isInstanceOf(MemberAuthorizationException.class);
+        }
+
+        @Test
+        void 아기의_이름을_변경한다() {
+            // given
+            given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
+            given(babyRepository.findById(babyId)).willReturn(Optional.of(아기1));
+            given(relationRepository.findByMemberAndBaby(any(Member.class), any(Baby.class)))
+                    .willReturn(Optional.of(관계10));
+
+            // when
+            babyService.updateBabyName(memberId, babyId, babyName);
+
+            // then
+            then(babyRepository).should(times(1)).save(any(Baby.class));
+        }
     }
 
     @Test
