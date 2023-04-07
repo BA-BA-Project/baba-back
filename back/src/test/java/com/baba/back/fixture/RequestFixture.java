@@ -4,6 +4,7 @@ import static com.baba.back.content.domain.content.CardStyle.CARD_BASIC_1;
 import static com.baba.back.fixture.DomainFixture.멤버2;
 import static com.baba.back.fixture.DomainFixture.멤버3;
 
+import com.baba.back.baby.dto.BabyNameRequest;
 import com.baba.back.baby.dto.BabyRequest;
 import com.baba.back.baby.dto.CreateInviteCodeRequest;
 import com.baba.back.content.dto.CreateCommentRequest;
@@ -59,4 +60,6 @@ public class RequestFixture {
     public static final MemberUpdateRequest 마이_프로필_변경_요청_데이터 = new MemberUpdateRequest(
             "박재희2", "안녕하세요!", "PROFILE_W_2", "#81E0D5"
     );
+
+    public static final BabyNameRequest 아기_이름_변경_요청_데이터 = new BabyNameRequest("아기11");
 }

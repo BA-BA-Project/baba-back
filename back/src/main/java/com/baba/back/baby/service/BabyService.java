@@ -11,9 +11,12 @@ import com.baba.back.baby.dto.CreateInviteCodeRequest;
 import com.baba.back.baby.dto.CreateInviteCodeResponse;
 import com.baba.back.baby.dto.InviteCodeBabyResponse;
 import com.baba.back.baby.dto.SearchInviteCodeResponse;
+import com.baba.back.baby.exception.BabyNotFoundException;
 import com.baba.back.baby.exception.RelationGroupNotFoundException;
+import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.baby.repository.InvitationRepository;
 import com.baba.back.oauth.domain.member.Member;
+import com.baba.back.oauth.exception.MemberAuthorizationException;
 import com.baba.back.oauth.exception.MemberNotFoundException;
 import com.baba.back.oauth.repository.MemberRepository;
 import com.baba.back.relation.domain.Relation;
@@ -36,6 +39,7 @@ import org.springframework.stereotype.Service;
 public class BabyService {
 
     private final MemberRepository memberRepository;
+    private final BabyRepository babyRepository;
     private final RelationRepository relationRepository;
     private final RelationGroupRepository relationGroupRepository;
     private final InvitationRepository invitationRepository;
@@ -66,6 +70,33 @@ public class BabyService {
                 .map(group -> new BabyResponse(group.getBabyId(), group.getGroupColor(), group.getBabyName()))
                 .sorted()
                 .toList();
+    }
+
+    public void updateBabyName(String memberId, String babyId, String babyName) {
+        final Member member = findMember(memberId);
+        final Baby baby = findBaby(babyId);
+        final Relation relation = findRelation(member, baby);
+        checkAuthorization(relation);
+
+        baby.updateName(babyName);
+        babyRepository.save(baby);
+    }
+
+    private Baby findBaby(String babyId) {
+        return babyRepository.findById(babyId)
+                .orElseThrow(() -> new BabyNotFoundException(babyId + "에 해당하는 아기가 존재하지 않습니다."));
+    }
+
+    private Relation findRelation(Member member, Baby baby) {
+        return relationRepository.findByMemberAndBaby(member, baby)
+                .orElseThrow(() -> new RelationNotFoundException(
+                        member.getId() + "와 " + baby.getId() + " 사이의 관계가 존재하지 않습니다."));
+    }
+
+    private void checkAuthorization(Relation relation) {
+        if (!relation.isFamily()) {
+            throw new MemberAuthorizationException(relation.getId() + " 관계는 가족 관계가 아닙니다.");
+        }
     }
 
     public CreateInviteCodeResponse createInviteCode(CreateInviteCodeRequest request, String memberId) {

@@ -1,6 +1,7 @@
 package com.baba.back.baby.controller;
 
 import com.baba.back.baby.dto.BabiesResponse;
+import com.baba.back.baby.dto.BabyNameRequest;
 import com.baba.back.baby.dto.CreateInviteCodeRequest;
 import com.baba.back.baby.dto.CreateInviteCodeResponse;
 import com.baba.back.baby.dto.SearchInviteCodeResponse;
@@ -19,6 +20,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,8 +40,21 @@ public class BabyController {
     @NotFoundResponse
     @IntervalServerErrorResponse
     @GetMapping("/baby")
-    public BabiesResponse findBabies(@Login String memberId) {
-        return babyService.findBabies(memberId);
+    public ResponseEntity<BabiesResponse> findBabies(@Login String memberId) {
+        return ResponseEntity.ok().body(babyService.findBabies(memberId));
+    }
+
+    @Operation(summary = "아기 이름 변경 요청")
+    @OkResponse
+    @UnAuthorizedResponse
+    @NotFoundResponse
+    @IntervalServerErrorResponse
+    @PatchMapping("/baby/{babyId}")
+    public ResponseEntity<Void> updateBabyName(@Login String memberId,
+                                               @PathVariable String babyId,
+                                               @RequestBody @NotNull BabyNameRequest request) {
+        babyService.updateBabyName(memberId, babyId, request.getName());
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "초대 코드 생성 요청")
