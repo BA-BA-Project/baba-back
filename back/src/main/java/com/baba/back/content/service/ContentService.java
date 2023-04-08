@@ -4,7 +4,7 @@ import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.exception.BabyNotFoundException;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.common.FileHandler;
-import com.baba.back.content.controller.UpdateTitleAndCardStyleRequest;
+import com.baba.back.content.controller.ContentUpdateTitleAndCardStyleRequest;
 import com.baba.back.content.domain.Like;
 import com.baba.back.content.domain.comment.Comment;
 import com.baba.back.content.domain.comment.Tag;
@@ -316,7 +316,7 @@ public class ContentService {
         return new LikesResponse(iconResponses, memberResponses);
     }
 
-    public void updateTitleAndCard(String memberId, String babyId, Long contentId, UpdateTitleAndCardStyleRequest request) {
+    public void updateTitleAndCard(String memberId, String babyId, Long contentId, ContentUpdateTitleAndCardStyleRequest request) {
         final Member member = findMember(memberId);
         final Content content = findContent(contentId);
         final Baby baby = findBaby(babyId);

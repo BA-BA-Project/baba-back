@@ -132,7 +132,7 @@ public class ContentController {
     public ResponseEntity<Void> updateTitleAndCard(@Login String memberId,
                                               @PathVariable("babyId") String babyId,
                                               @PathVariable("contentId") Long contentId,
-                                              @RequestBody @Valid UpdateTitleAndCardStyleRequest request) {
+                                              @RequestBody @Valid ContentUpdateTitleAndCardStyleRequest request) {
 
         contentService.updateTitleAndCard(memberId, babyId, contentId, request);
         return ResponseEntity

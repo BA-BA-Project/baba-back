@@ -15,6 +15,7 @@ import static com.baba.back.fixture.DomainFixture.멤버1;
 import static com.baba.back.fixture.DomainFixture.멤버2;
 import static com.baba.back.fixture.DomainFixture.멤버3;
 import static com.baba.back.fixture.DomainFixture.멤버4;
+import static com.baba.back.fixture.DomainFixture.수정용_컨텐츠10;
 import static com.baba.back.fixture.DomainFixture.아기1;
 import static com.baba.back.fixture.DomainFixture.아기2;
 import static com.baba.back.fixture.DomainFixture.좋아요10;
@@ -28,6 +29,7 @@ import static com.baba.back.fixture.DomainFixture.태그10;
 import static com.baba.back.fixture.DomainFixture.태그20;
 import static com.baba.back.fixture.RequestFixture.댓글_생성_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.컨텐츠_생성_요청_데이터;
+import static com.baba.back.fixture.RequestFixture.콘텐츠_제목_카드스타일_수정_데이터;
 import static com.baba.back.fixture.RequestFixture.태그_댓글_생성_요청_데이터1;
 import static com.baba.back.fixture.RequestFixture.태그_댓글_생성_요청_데이터2;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -671,10 +673,14 @@ class ContentServiceTest {
         assertAll(
                 () -> assertThat(response.likeUsersPreview()).hasSize(3),
                 () -> assertThat(response.likeUsers()).containsExactly(
-                        new MemberResponse(멤버1.getId(), 멤버1.getName(), 멤버1.getIntroduction(), 멤버1.getIconName(), 멤버1.getIconColor()),
-                        new MemberResponse(멤버2.getId(), 멤버2.getName(), 멤버2.getIntroduction(), 멤버2.getIconName(), 멤버2.getIconColor()),
-                        new MemberResponse(멤버3.getId(), 멤버3.getName(), 멤버3.getIntroduction(), 멤버3.getIconName(), 멤버3.getIconColor()),
-                        new MemberResponse(멤버4.getId(), 멤버4.getName(), 멤버4.getIntroduction(), 멤버4.getIconName(), 멤버4.getIconColor())
+                        new MemberResponse(멤버1.getId(), 멤버1.getName(), 멤버1.getIntroduction(), 멤버1.getIconName(),
+                                멤버1.getIconColor()),
+                        new MemberResponse(멤버2.getId(), 멤버2.getName(), 멤버2.getIntroduction(), 멤버2.getIconName(),
+                                멤버2.getIconColor()),
+                        new MemberResponse(멤버3.getId(), 멤버3.getName(), 멤버3.getIntroduction(), 멤버3.getIconName(),
+                                멤버3.getIconColor()),
+                        new MemberResponse(멤버4.getId(), 멤버4.getName(), 멤버4.getIntroduction(), 멤버4.getIconName(),
+                                멤버4.getIconColor())
                 ));
     }
 
@@ -694,5 +700,22 @@ class ContentServiceTest {
         assertAll(
                 () -> assertThat(response.likeUsersPreview()).hasSize(0),
                 () -> assertThat(response.likeUsers()).hasSize(0));
+    }
+
+    @Test
+    void 성장_앨범_제목과_카드_수정을_진행한다() {
+        // given
+        given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
+        given(contentRepository.findById(수정용_컨텐츠10.getId())).willReturn(Optional.of(수정용_컨텐츠10));
+        given(babyRepository.findById(아기1.getId())).willReturn(Optional.of(아기1));
+        given(relationRepository.findByMemberAndBaby(멤버1, 아기1)).willReturn(Optional.of(관계10));
+
+        // when
+        contentService.updateTitleAndCard(멤버1.getId(), 아기1.getId(), 수정용_컨텐츠10.getId(), 콘텐츠_제목_카드스타일_수정_데이터);
+
+        // then
+        assertAll(
+                () -> assertThat(수정용_컨텐츠10.getTitle()).isEqualTo(콘텐츠_제목_카드스타일_수정_데이터.title()),
+                () -> assertThat(수정용_컨텐츠10.getCardStyle()).isEqualTo(콘텐츠_제목_카드스타일_수정_데이터.cardStyle()));
     }
 }

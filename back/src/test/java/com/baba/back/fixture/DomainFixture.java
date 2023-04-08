@@ -301,4 +301,14 @@ public class DomainFixture {
             .relationName("외삼촌")
             .relationGroup(관계그룹40)
             .build();
+
+    public static final Content 수정용_컨텐츠10 = Content.builder()
+            .title("제목1")
+            .contentDate(nowDate)
+            .now(nowDate)
+            .cardStyle(CardStyle.CARD_BASIC_1.toString())
+            .baby(아기1)
+            .owner(멤버1)
+            .relation(관계10.getRelationName())
+            .build();
 }
