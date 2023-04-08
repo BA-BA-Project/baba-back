@@ -29,7 +29,7 @@ import static com.baba.back.fixture.DomainFixture.태그10;
 import static com.baba.back.fixture.DomainFixture.태그20;
 import static com.baba.back.fixture.RequestFixture.댓글_생성_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.컨텐츠_생성_요청_데이터;
-import static com.baba.back.fixture.RequestFixture.콘텐츠_제목_카드스타일_수정_데이터;
+import static com.baba.back.fixture.RequestFixture.콘텐츠_제목_카드스타일_변경_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.태그_댓글_생성_요청_데이터1;
 import static com.baba.back.fixture.RequestFixture.태그_댓글_생성_요청_데이터2;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -711,11 +711,11 @@ class ContentServiceTest {
         given(relationRepository.findByMemberAndBaby(멤버1, 아기1)).willReturn(Optional.of(관계10));
 
         // when
-        contentService.updateTitleAndCard(멤버1.getId(), 아기1.getId(), 수정용_컨텐츠10.getId(), 콘텐츠_제목_카드스타일_수정_데이터);
+        contentService.updateTitleAndCard(멤버1.getId(), 아기1.getId(), 수정용_컨텐츠10.getId(), 콘텐츠_제목_카드스타일_변경_요청_데이터);
 
         // then
         assertAll(
-                () -> assertThat(수정용_컨텐츠10.getTitle()).isEqualTo(콘텐츠_제목_카드스타일_수정_데이터.title()),
-                () -> assertThat(수정용_컨텐츠10.getCardStyle()).isEqualTo(콘텐츠_제목_카드스타일_수정_데이터.cardStyle()));
+                () -> assertThat(수정용_컨텐츠10.getTitle()).isEqualTo(콘텐츠_제목_카드스타일_변경_요청_데이터.title()),
+                () -> assertThat(수정용_컨텐츠10.getCardStyle()).isEqualTo(콘텐츠_제목_카드스타일_변경_요청_데이터.cardStyle()));
     }
 }

@@ -65,5 +65,6 @@ public class RequestFixture {
 
     public static final BabyNameRequest 아기_이름_변경_요청_데이터 = new BabyNameRequest("아기11");
 
-    public static final ContentUpdateTitleAndCardStyleRequest 콘텐츠_제목_카드스타일_수정_데이터 = new ContentUpdateTitleAndCardStyleRequest("제목 수정", CARD_CHECK_1.name());
+    public static final ContentUpdateTitleAndCardStyleRequest 콘텐츠_제목_카드스타일_변경_요청_데이터 = new ContentUpdateTitleAndCardStyleRequest(
+            "제목 수정", CARD_CHECK_1.name());
 }

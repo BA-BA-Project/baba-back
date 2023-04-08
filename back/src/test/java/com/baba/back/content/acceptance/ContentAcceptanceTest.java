@@ -4,6 +4,7 @@ import static com.baba.back.SimpleRestAssured.thenExtract;
 import static com.baba.back.SimpleRestAssured.toObject;
 import static com.baba.back.fixture.DomainFixture.nowDate;
 import static com.baba.back.fixture.DomainFixture.아기1;
+import static com.baba.back.fixture.RequestFixture.콘텐츠_제목_카드스타일_변경_요청_데이터;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
@@ -298,6 +299,23 @@ public class ContentAcceptanceTest extends AcceptanceTest {
                 () -> assertThat(response.likeUsersPreview()).hasSize(0),
                 () -> assertThat(response.likeUsers()).hasSize(0)
         );
+    }
+
+    @Test
+    void 성장_앨범_카드_좋아요를_요청할_수_있다() throws MalformedURLException {
+        // given
+        final ExtractableResponse<Response> signUpResponse1 = 아기_등록_회원가입_요청();
+        final String accessToken = toObject(signUpResponse1, MemberSignUpResponse.class).accessToken();
+        final String babyId = getBabyId(signUpResponse1);
+        given(amazonS3.getUrl(any(String.class), any(String.class))).willReturn(new URL(VALID_URL));
+        final Long contentId = getContentId(성장앨범_생성_요청(accessToken, babyId, nowDate));
+
+        // when
+        final ExtractableResponse<Response> response = 성장_앨범_제목_카드_수정_요청(accessToken, babyId, contentId,
+                콘텐츠_제목_카드스타일_변경_요청_데이터);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     // TODO: 2023/03/26 멤버 초대 API 구현되면 테스트 작성
