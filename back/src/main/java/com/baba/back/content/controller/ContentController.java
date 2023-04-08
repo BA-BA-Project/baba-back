@@ -46,11 +46,11 @@ public class ContentController {
     @NotFoundResponse
     @IntervalServerErrorResponse
     @PostMapping(value = "/baby/{babyId}/album", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> createContent(@ModelAttribute @Valid CreateContentRequest request,
+    public ResponseEntity<String> createContent(@ModelAttribute @Valid CreateContentRequest request,
                                               @Login String memberId,
                                               @PathVariable("babyId") String babyId) {
         final Long contentId = contentService.createContent(request, memberId, babyId);
-        return ResponseEntity.created(URI.create("/baby/" + babyId + "/album/" + contentId)).build();
+        return ResponseEntity.created(URI.create("/baby/" + babyId + "/album/" + contentId)).body("API 호출 성공");
     }
 
     @Operation(summary = "좋아요 추가 요청")
@@ -116,8 +116,6 @@ public class ContentController {
                                               @RequestBody @Valid CreateCommentRequest request) {
 
         Long commentId = contentService.createComment(memberId, babyId, contentId, request);
-        return ResponseEntity
-                .created(URI.create("/album/" + babyId + "/" + contentId + "/comment/" + commentId))
-                .build();
+        return ResponseEntity.created(URI.create("/baby/" + babyId + "/album/" + contentId + "/comment/" + commentId)).build();
     }
 }
