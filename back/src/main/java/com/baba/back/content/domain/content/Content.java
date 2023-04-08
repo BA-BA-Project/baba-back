@@ -93,4 +93,9 @@ public class Content extends BaseEntity {
     public boolean hasEqualBaby(Baby baby) {
         return this.baby.equals(baby);
     }
+
+    public void updateTitleAndCardStyle(String title, String cardStyle) {
+        this.title = new Title(title);
+        this.cardStyle = CardStyle.from(cardStyle);
+    }
 }
