@@ -4,6 +4,7 @@ import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.exception.BabyNotFoundException;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.common.FileHandler;
+import com.baba.back.content.controller.ContentUpdateTitleAndCardStyleRequest;
 import com.baba.back.content.domain.Like;
 import com.baba.back.content.domain.comment.Comment;
 import com.baba.back.content.domain.comment.Tag;
@@ -313,5 +314,22 @@ public class ContentService {
                 .toList();
 
         return new LikesResponse(iconResponses, memberResponses);
+    }
+
+    public void updateTitleAndCard(String memberId, String babyId, Long contentId, ContentUpdateTitleAndCardStyleRequest request) {
+        final Member member = findMember(memberId);
+        final Content content = findContent(contentId);
+        final Baby baby = findBaby(babyId);
+        validateContentBaby(baby, content);
+        findRelation(member, baby);
+        validateContentOwner(content, member);
+
+        content.updateTitleAndCardStyle(request.title(), request.cardStyle());
+    }
+
+    private void validateContentOwner(Content content, Member member) {
+        if (!content.isOwner(member)) {
+            throw new ContentBadRequestException(member.getId() + "는 성장 앨범 " + content.getId() + "의 생성자가 아닙니다.");
+        }
     }
 }

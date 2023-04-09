@@ -9,13 +9,13 @@ import static com.baba.back.fixture.RequestFixture.그룹_추가_요청_데이�
 import static com.baba.back.fixture.RequestFixture.마이_프로필_변경_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.멤버_가입_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.소셜_토큰_요청_데이터;
-import static com.baba.back.fixture.RequestFixture.아기_생성_요청_데이터_1;
 import static com.baba.back.fixture.RequestFixture.아기_이름_변경_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.약관_동의_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.초대코드_생성_요청_데이터1;
 import static com.baba.back.fixture.RequestFixture.초대코드_생성_요청_데이터2;
 
 import com.baba.back.baby.dto.CreateInviteCodeRequest;
+import com.baba.back.content.controller.ContentUpdateTitleAndCardStyleRequest;
 import com.baba.back.content.dto.CreateCommentRequest;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
 import com.baba.back.oauth.dto.SignUpWithCodeRequest;
@@ -190,6 +190,15 @@ public class AcceptanceTest {
         return get(String.format("/%s/%s/baby-page/%s", BASE_PATH, MEMBER_BASE_PATH, babyId),
                 Map.of("Authorization", "Bearer " + accessToken));
     }
+
+    protected ExtractableResponse<Response> 성장_앨범_제목_카드_수정_요청(String accessToken, String babyId, Long contentId,
+                                                              ContentUpdateTitleAndCardStyleRequest request) {
+        return patch(String.format("/%s/%s/%s/%s/%s/title-card",
+                        BASE_PATH, BABY_BASE_PATH, babyId, CONTENT_BASE_PATH, contentId),
+                Map.of("Authorization", "Bearer " + accessToken),
+                request);
+    }
+
 
     protected Long getContentId(ExtractableResponse<Response> response) {
         final String location = getLocation(response);

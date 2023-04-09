@@ -25,6 +25,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -117,5 +118,23 @@ public class ContentController {
 
         Long commentId = contentService.createComment(memberId, babyId, contentId, request);
         return ResponseEntity.created(URI.create("/baby/" + babyId + "/album/" + contentId + "/comment/" + commentId)).build();
+    }
+
+    @Operation(summary = "성장 앨범 댓글 추가 요청")
+    @OkResponse
+    @BadRequestResponse
+    @UnAuthorizedResponse
+    @NotFoundResponse
+    @IntervalServerErrorResponse
+    @PatchMapping("/baby/{babyId}/album/{contentId}/title-card")
+    public ResponseEntity<Void> updateTitleAndCard(@Login String memberId,
+                                              @PathVariable("babyId") String babyId,
+                                              @PathVariable("contentId") Long contentId,
+                                              @RequestBody @Valid ContentUpdateTitleAndCardStyleRequest request) {
+
+        contentService.updateTitleAndCard(memberId, babyId, contentId, request);
+        return ResponseEntity
+                .ok()
+                .build();
     }
 }
