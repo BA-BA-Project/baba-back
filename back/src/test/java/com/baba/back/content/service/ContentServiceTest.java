@@ -718,4 +718,18 @@ class ContentServiceTest {
                 () -> assertThat(수정용_컨텐츠10.getTitle()).isEqualTo(콘텐츠_제목_카드스타일_변경_요청_데이터.title()),
                 () -> assertThat(수정용_컨텐츠10.getCardStyle()).isEqualTo(콘텐츠_제목_카드스타일_변경_요청_데이터.cardStyle()));
     }
+
+    @Test
+    void 성장_앨범_제목과_카드_수정_시_생성자가_아니라면_예외를_던진다() {
+        // given
+        given(memberRepository.findById(멤버2.getId())).willReturn(Optional.of(멤버2));
+        given(contentRepository.findById(수정용_컨텐츠10.getId())).willReturn(Optional.of(수정용_컨텐츠10));
+        given(babyRepository.findById(아기1.getId())).willReturn(Optional.of(아기1));
+        given(relationRepository.findByMemberAndBaby(멤버2, 아기1)).willReturn(Optional.of(관계11));
+
+        // when
+        assertThatThrownBy(() -> contentService.updateTitleAndCard(멤버2.getId(), 아기1.getId(), 수정용_컨텐츠10.getId(),
+                콘텐츠_제목_카드스타일_변경_요청_데이터))
+                .isInstanceOf(ContentBadRequestException.class);
+    }
 }

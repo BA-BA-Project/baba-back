@@ -322,7 +322,14 @@ public class ContentService {
         final Baby baby = findBaby(babyId);
         validateContentBaby(baby, content);
         findRelation(member, baby);
+        validateContentOwner(content, member);
 
         content.updateTitleAndCardStyle(request.title(), request.cardStyle());
+    }
+
+    private void validateContentOwner(Content content, Member member) {
+        if (!content.isOwner(member)) {
+            throw new ContentBadRequestException(member.getId() + "는 성장 앨범 " + content.getId() + "의 생성자가 아닙니다.");
+        }
     }
 }

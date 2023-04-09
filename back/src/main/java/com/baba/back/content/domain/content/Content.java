@@ -94,6 +94,10 @@ public class Content extends BaseEntity {
         return this.baby.equals(baby);
     }
 
+    public boolean isOwner(Member member) {
+        return this.owner.equals(member);
+    }
+
     public void updateTitleAndCardStyle(String title, String cardStyle) {
         this.title = new Title(title);
         this.cardStyle = CardStyle.from(cardStyle);
