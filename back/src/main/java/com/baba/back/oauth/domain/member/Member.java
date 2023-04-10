@@ -1,5 +1,6 @@
 package com.baba.back.oauth.domain.member;
 
+import com.baba.back.common.Generated;
 import com.baba.back.common.domain.BaseEntity;
 import com.baba.back.common.domain.Name;
 import jakarta.persistence.Embedded;
@@ -58,6 +59,7 @@ public class Member extends BaseEntity {
     }
 
     @Override
+    @Generated
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -72,6 +74,7 @@ public class Member extends BaseEntity {
     }
 
     @Override
+    @Generated
     public int hashCode() {
         return Objects.hash(id, name, introduction, icon);
     }
