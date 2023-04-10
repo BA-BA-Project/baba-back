@@ -19,6 +19,8 @@ import com.baba.back.content.dto.CreateContentRequest;
 import com.baba.back.content.dto.IconResponse;
 import com.baba.back.content.dto.LikeContentResponse;
 import com.baba.back.content.dto.LikesResponse;
+import com.baba.back.content.exception.CommentBadRequestException;
+import com.baba.back.content.exception.CommentNotFoundException;
 import com.baba.back.content.exception.ContentAuthorizationException;
 import com.baba.back.content.exception.ContentBadRequestException;
 import com.baba.back.content.exception.ContentNotFountException;
@@ -330,6 +332,32 @@ public class ContentService {
     private void validateContentOwner(Content content, Member member) {
         if (!content.isOwner(member)) {
             throw new ContentBadRequestException(member.getId() + "는 성장 앨범 " + content.getId() + "의 생성자가 아닙니다.");
+        }
+    }
+
+    public void deleteComment(String memberId, String babyId, Long contentId, Long commentId) {
+        final Content content = findContent(contentId);
+        final Baby baby = findBaby(babyId);
+        validateContentBaby(baby, content);
+
+        final Member member = findMember(memberId);
+        findRelation(member, baby);
+
+        final Comment comment = findComment(commentId);
+        validateCommentOwner(comment, member);
+
+        commentRepository.delete(comment);
+        tagRepository.deleteByComment(comment);
+    }
+
+    private Comment findComment(Long commentId) {
+        return commentRepository.findById(commentId)
+                .orElseThrow(() -> new CommentNotFoundException(commentId + "에 해당하는 댓글이 존재하지 않습니다."));
+    }
+
+    private void validateCommentOwner(Comment comment, Member member) {
+        if (!comment.isOwner(member)) {
+            throw new CommentBadRequestException(member.getId() + "는 댓글 " + comment.getId() + "의 생성자가 아닙니다.");
         }
     }
 }

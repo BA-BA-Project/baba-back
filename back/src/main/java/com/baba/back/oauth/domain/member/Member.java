@@ -5,6 +5,7 @@ import com.baba.back.common.domain.Name;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import java.util.Objects;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -54,5 +55,24 @@ public class Member extends BaseEntity {
 
     public String getIconName() {
         return this.icon.getIconName();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null) {
+            return false;
+        }
+        Member member = (Member) o;
+        return Objects.equals(id, member.getId()) && Objects.equals(name, member.getName())
+                && Objects.equals(introduction, member.getIntroduction()) && Objects.equals(icon,
+                member.getIcon());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, introduction, icon);
     }
 }

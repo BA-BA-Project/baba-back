@@ -137,4 +137,22 @@ public class ContentController {
                 .ok()
                 .build();
     }
+
+    @Operation(summary = "성장 앨범 댓글 삭제 요청")
+    @OkResponse
+    @BadRequestResponse
+    @UnAuthorizedResponse
+    @NotFoundResponse
+    @IntervalServerErrorResponse
+    @PatchMapping("/baby/{babyId}/album/{contentId}/comment/{commentId}")
+    public ResponseEntity<Void> deleteComment(@Login String memberId,
+                                                   @PathVariable("babyId") String babyId,
+                                                   @PathVariable("contentId") Long contentId,
+                                                   @PathVariable("commentId") Long commentId) {
+
+        contentService.deleteComment(memberId, babyId, contentId, commentId);
+        return ResponseEntity
+                .ok()
+                .build();
+    }
 }

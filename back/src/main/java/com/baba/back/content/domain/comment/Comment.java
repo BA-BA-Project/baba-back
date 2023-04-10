@@ -43,4 +43,8 @@ public class Comment extends BaseEntity {
     public String getText() {
         return text.getValue();
     }
+
+    public boolean isOwner(Member member) {
+        return this.owner.equals(member);
+    }
 }
