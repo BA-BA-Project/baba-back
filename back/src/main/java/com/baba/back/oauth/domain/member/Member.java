@@ -68,8 +68,8 @@ public class Member extends BaseEntity {
             return false;
         }
         Member member = (Member) o;
-        return Objects.equals(id, member.getId()) && Objects.equals(name, member.getName())
-                && Objects.equals(introduction, member.getIntroduction()) && Objects.equals(icon,
+        return Objects.equals(this.getId(), member.getId()) && Objects.equals(this.getName(), member.getName())
+                && Objects.equals(this.getIntroduction(), member.getIntroduction()) && Objects.equals(this.getIcon(),
                 member.getIcon());
     }
 

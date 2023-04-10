@@ -1,5 +1,6 @@
 package com.baba.back;
 
+import static com.baba.back.SimpleRestAssured.delete;
 import static com.baba.back.SimpleRestAssured.get;
 import static com.baba.back.SimpleRestAssured.patch;
 import static com.baba.back.SimpleRestAssured.post;
@@ -199,6 +200,11 @@ public class AcceptanceTest {
                 request);
     }
 
+    protected ExtractableResponse<Response> 댓글_삭제_요청(String accessToken, String babyId, Long contentId, Long commentId) {
+        return delete(String.format("/%s/%s/%s/%s/%s/comment/%s",
+                        BASE_PATH, BABY_BASE_PATH, babyId, CONTENT_BASE_PATH, contentId, commentId),
+                Map.of("Authorization", "Bearer " + accessToken));
+    }
 
     protected Long getContentId(ExtractableResponse<Response> response) {
         final String location = getLocation(response);

@@ -4,6 +4,7 @@ import static com.baba.back.SimpleRestAssured.thenExtract;
 import static com.baba.back.SimpleRestAssured.toObject;
 import static com.baba.back.fixture.DomainFixture.nowDate;
 import static com.baba.back.fixture.DomainFixture.아기1;
+import static com.baba.back.fixture.RequestFixture.댓글_생성_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.콘텐츠_제목_카드스타일_변경_요청_데이터;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -13,6 +14,7 @@ import static org.mockito.BDDMockito.given;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.baba.back.AcceptanceTest;
+import com.baba.back.content.dto.CommentResponse;
 import com.baba.back.content.dto.CommentsResponse;
 import com.baba.back.content.dto.ContentResponse;
 import com.baba.back.content.dto.ContentsResponse;
@@ -316,6 +318,31 @@ public class ContentAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    @Test
+    void 댓글을_삭제할_수_있다() throws MalformedURLException {
+        // given
+        final ExtractableResponse<Response> signUpResponse1 = 아기_등록_회원가입_요청();
+        final String accessToken = toObject(signUpResponse1, MemberSignUpResponse.class).accessToken();
+        final String babyId = getBabyId(signUpResponse1);
+        given(amazonS3.getUrl(any(String.class), any(String.class))).willReturn(new URL(VALID_URL));
+        final Long contentId = getContentId(성장앨범_생성_요청(accessToken, babyId, nowDate));
+        댓글_생성_요청(accessToken, babyId, contentId, 댓글_생성_요청_데이터);
+        final List<CommentResponse> comments = toObject(성장앨범_댓글_보기_요청(accessToken, babyId, contentId),
+                CommentsResponse.class).comments();
+        assertThat(comments).hasSize(1);
+
+        // when
+        final ExtractableResponse<Response> response = 댓글_삭제_요청(accessToken, babyId, contentId,
+                comments.get(0).commentId());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        // then
+        final List<CommentResponse> result = toObject(성장앨범_댓글_보기_요청(accessToken, babyId, contentId),
+                CommentsResponse.class).comments();
+        assertThat(result).hasSize(0);
+
     }
 
     // TODO: 2023/03/26 멤버 초대 API 구현되면 테스트 작성

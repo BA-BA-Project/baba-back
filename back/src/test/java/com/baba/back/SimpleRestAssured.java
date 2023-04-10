@@ -52,6 +52,12 @@ public class SimpleRestAssured {
         return thenExtract(given.contentType(MediaType.APPLICATION_JSON_VALUE).when().patch(path));
     }
 
+    public static ExtractableResponse<Response> delete(String path, Map<String, String> headers) {
+        final RequestSpecification given = givenWithHeaders(headers);
+
+        return thenExtract(given.contentType(MediaType.APPLICATION_JSON_VALUE).when().delete(path));
+    }
+
     private static RequestSpecification givenWithHeaders(Map<String, String> headers) {
         final RequestSpecification given = given();
         if (headers != null) {

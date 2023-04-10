@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -142,7 +143,7 @@ public class ContentController {
     @UnAuthorizedResponse
     @NotFoundResponse
     @IntervalServerErrorResponse
-    @PatchMapping("/baby/{babyId}/album/{contentId}/comment/{commentId}")
+    @DeleteMapping("/baby/{babyId}/album/{contentId}/comment/{commentId}")
     public ResponseEntity<Void> deleteComment(@Login String memberId,
                                                    @PathVariable("babyId") String babyId,
                                                    @PathVariable("contentId") Long contentId,
