@@ -33,12 +33,14 @@ import static com.baba.back.fixture.RequestFixture.콘텐츠_제목_카드스타
 import static com.baba.back.fixture.RequestFixture.태그_댓글_생성_요청_데이터1;
 import static com.baba.back.fixture.RequestFixture.태그_댓글_생성_요청_데이터2;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import com.baba.back.baby.exception.BabyNotFoundException;
 import com.baba.back.baby.repository.BabyRepository;
@@ -53,6 +55,8 @@ import com.baba.back.content.dto.ContentResponse;
 import com.baba.back.content.dto.ContentsResponse;
 import com.baba.back.content.dto.LikeContentResponse;
 import com.baba.back.content.dto.LikesResponse;
+import com.baba.back.content.exception.CommentBadRequestException;
+import com.baba.back.content.exception.CommentNotFoundException;
 import com.baba.back.content.exception.ContentAuthorizationException;
 import com.baba.back.content.exception.ContentBadRequestException;
 import com.baba.back.content.exception.ContentNotFountException;
@@ -731,5 +735,52 @@ class ContentServiceTest {
         assertThatThrownBy(() -> contentService.updateTitleAndCard(멤버2.getId(), 아기1.getId(), 수정용_컨텐츠10.getId(),
                 콘텐츠_제목_카드스타일_변경_요청_데이터))
                 .isInstanceOf(ContentBadRequestException.class);
+    }
+
+    @Test
+    void 성장_앨범_댓글_삭제_시_댓글의_작성자가_아니면_예외를_던진다() {
+        // given
+        given(memberRepository.findById(멤버2.getId())).willReturn(Optional.of(멤버2));
+        given(contentRepository.findById(컨텐츠10.getId())).willReturn(Optional.of(컨텐츠10));
+        given(babyRepository.findById(아기1.getId())).willReturn(Optional.of(아기1));
+        given(relationRepository.findByMemberAndBaby(멤버2, 아기1)).willReturn(Optional.of(관계11));
+        given(commentRepository.findById(댓글10.getId())).willReturn(Optional.of(댓글10));
+
+        // when & then
+        assertThatThrownBy(() -> contentService.deleteComment(멤버2.getId(), 아기1.getId(), 컨텐츠10.getId(), 댓글10.getId()))
+                .isInstanceOf(CommentBadRequestException.class);
+    }
+
+    @Test
+    void 성장_앨범_댓글을_삭제할_수_있다() {
+        // given
+        given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
+        given(contentRepository.findById(컨텐츠10.getId())).willReturn(Optional.of(컨텐츠10));
+        given(babyRepository.findById(아기1.getId())).willReturn(Optional.of(아기1));
+        given(relationRepository.findByMemberAndBaby(멤버1, 아기1)).willReturn(Optional.of(관계11));
+        given(commentRepository.findById(댓글10.getId())).willReturn(Optional.of(댓글10));
+
+        // when & then
+        assertAll(
+                () -> assertThatCode(
+                        () -> contentService.deleteComment(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId(), 댓글10.getId()))
+                        .doesNotThrowAnyException(),
+                () -> verify(commentRepository).delete(댓글10),
+                () -> verify(tagRepository).deleteByComment(댓글10)
+        );
+    }
+
+    @Test
+    void 성장_앨범_댓글을_삭제_시_댓글이_존재하지_않으면_예외를_던진다() {
+        // given
+        given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
+        given(contentRepository.findById(컨텐츠10.getId())).willReturn(Optional.of(컨텐츠10));
+        given(babyRepository.findById(아기1.getId())).willReturn(Optional.of(아기1));
+        given(relationRepository.findByMemberAndBaby(멤버1, 아기1)).willReturn(Optional.of(관계11));
+        given(commentRepository.findById(댓글10.getId())).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> contentService.deleteComment(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId(), 댓글10.getId()))
+                .isInstanceOf(CommentNotFoundException.class);
     }
 }
