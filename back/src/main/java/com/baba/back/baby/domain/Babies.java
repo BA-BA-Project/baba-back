@@ -23,4 +23,8 @@ public class Babies {
     public String getFirstBabyId() {
         return this.values.get(0).getId();
     }
+
+    public Baby getFirstBaby() {
+        return this.values.get(0);
+    }
 }

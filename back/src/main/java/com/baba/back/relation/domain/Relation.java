@@ -1,5 +1,6 @@
 package com.baba.back.relation.domain;
 
+import com.baba.back.baby.domain.Baby;
 import com.baba.back.common.domain.BaseEntity;
 import com.baba.back.common.domain.Name;
 import com.baba.back.oauth.domain.member.Member;
@@ -44,6 +45,14 @@ public class Relation extends BaseEntity {
 
     public String getRelationName() {
         return this.relationName.getValue();
+    }
+
+    public String getRelationGroupName() {
+        return this.relationGroup.getRelationGroupName();
+    }
+
+    public Baby getBaby() {
+        return this.relationGroup.getBaby();
     }
 
     public boolean isFamily() {

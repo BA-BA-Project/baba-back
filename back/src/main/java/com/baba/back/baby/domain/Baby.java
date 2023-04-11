@@ -44,4 +44,8 @@ public class Baby extends BaseEntity {
     public void updateName(String name) {
         this.name = new Name(name);
     }
+
+    public boolean equalsByName(String name) {
+        return this.name.getValue().equals(name);
+    }
 }
