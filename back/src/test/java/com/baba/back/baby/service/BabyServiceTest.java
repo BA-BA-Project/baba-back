@@ -120,22 +120,22 @@ class BabyServiceTest {
         @Test
         void 자신의_아기가_없다면_아기를_추가한다() {
             // given
-            final String expectedBabyId = "babyId";
-
             given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
             given(relationRepository.findAllByMemberAndRelationGroupFamily(any(Member.class), eq(true)))
                     .willReturn(List.of());
+
             given(clock.instant()).willReturn(now.instant());
             given(clock.getZone()).willReturn(now.getZone());
 
-            given(idConstructor.createId()).willReturn(expectedBabyId);
+            given(idConstructor.createId()).willReturn(아기1.getId());
             given(picker.pick(anyList())).willReturn(Color.COLOR_1);
+            given(babyRepository.save(any(Baby.class))).willReturn(아기1);
 
             // when
             final String babyId = babyService.createBaby(memberId, 아기_추가_요청_데이터);
 
             // then
-            assertThat(babyId).isEqualTo(expectedBabyId);
+            assertThat(babyId).isEqualTo(아기1.getId());
 
             then(babyRepository).should(times(1)).save(any(Baby.class));
             then(relationGroupRepository).should(times(1)).save(any(RelationGroup.class));
@@ -148,8 +148,6 @@ class BabyServiceTest {
             given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
             given(relationRepository.findAllByMemberAndRelationGroupFamily(any(Member.class), eq(true)))
                     .willReturn(List.of(관계10, 관계20));
-            given(clock.instant()).willReturn(now.instant());
-            given(clock.getZone()).willReturn(now.getZone());
 
             final CreateBabyRequest request = new CreateBabyRequest("아기1", "아빠", LocalDate.now());
 
@@ -171,14 +169,15 @@ class BabyServiceTest {
 
             given(relationGroupRepository.findAllByBaby(any(Baby.class))).willReturn(List.of(관계그룹10, 관계그룹11));
             given(relationRepository.findAllByRelationGroupIn(anyList())).willReturn(List.of(관계10, 관계11, 관계12));
-            given(idConstructor.createId()).willReturn(expectedBabyId);
+            given(idConstructor.createId()).willReturn(아기1.getId());
             given(picker.pick(anyList())).willReturn(Color.COLOR_1);
+            given(babyRepository.save(any(Baby.class))).willReturn(아기1);
 
             // when
             final String babyId = babyService.createBaby(memberId, 아기_추가_요청_데이터);
 
             // then
-            assertThat(babyId).isEqualTo(expectedBabyId);
+            assertThat(babyId).isEqualTo(아기1.getId());
 
             then(babyRepository).should(times(1)).save(any(Baby.class));
             then(relationGroupRepository).should(times(3)).save(any(RelationGroup.class));

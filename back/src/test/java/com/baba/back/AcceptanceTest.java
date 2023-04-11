@@ -10,6 +10,7 @@ import static com.baba.back.fixture.RequestFixture.마이_프로필_변경_요�
 import static com.baba.back.fixture.RequestFixture.멤버_가입_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.소셜_토큰_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.아기_이름_변경_요청_데이터;
+import static com.baba.back.fixture.RequestFixture.아기_추가_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.약관_동의_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.초대코드_생성_요청_데이터1;
 import static com.baba.back.fixture.RequestFixture.초대코드_생성_요청_데이터2;
@@ -107,6 +108,11 @@ public class AcceptanceTest {
 
     protected ExtractableResponse<Response> 토큰_재발급_요청(TokenRefreshRequest request) {
         return post(String.format("/%s/%s/refresh", BASE_PATH, AUTH_BASE_PATH), request);
+    }
+
+    protected ExtractableResponse<Response> 아기_추가_요청(String accessToken) {
+        return post(String.format("/%s/%s", BASE_PATH, BABY_BASE_PATH),
+                Map.of("Authorization", "Bearer " + accessToken), 아기_추가_요청_데이터);
     }
 
     protected ExtractableResponse<Response> 아기_리스트_조회_요청(String accessToken) {
