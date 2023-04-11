@@ -11,6 +11,8 @@ import jakarta.persistence.OneToOne;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Getter
 @Entity
@@ -22,6 +24,7 @@ public class Tag extends BaseEntity {
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Comment comment;
 
     @OneToOne(fetch = FetchType.LAZY)

@@ -347,7 +347,6 @@ public class ContentService {
         validateCommentOwner(comment, member);
 
         commentRepository.delete(comment);
-        tagRepository.deleteByComment(comment);
     }
 
     private Comment findComment(Long commentId) {
