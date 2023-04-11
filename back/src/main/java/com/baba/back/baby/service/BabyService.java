@@ -1,20 +1,26 @@
 package com.baba.back.baby.service;
 
+import com.baba.back.baby.domain.Babies;
 import com.baba.back.baby.domain.Baby;
+import com.baba.back.baby.domain.IdConstructor;
 import com.baba.back.baby.domain.invitation.Code;
 import com.baba.back.baby.domain.invitation.Invitation;
 import com.baba.back.baby.domain.invitation.InvitationCode;
 import com.baba.back.baby.domain.invitation.Invitations;
 import com.baba.back.baby.dto.BabiesResponse;
 import com.baba.back.baby.dto.BabyResponse;
+import com.baba.back.baby.dto.CreateBabyRequest;
 import com.baba.back.baby.dto.CreateInviteCodeRequest;
 import com.baba.back.baby.dto.CreateInviteCodeResponse;
 import com.baba.back.baby.dto.InviteCodeBabyResponse;
 import com.baba.back.baby.dto.SearchInviteCodeResponse;
+import com.baba.back.baby.exception.BabyBadRequestException;
 import com.baba.back.baby.exception.BabyNotFoundException;
 import com.baba.back.baby.exception.RelationGroupNotFoundException;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.baby.repository.InvitationRepository;
+import com.baba.back.oauth.domain.Picker;
+import com.baba.back.oauth.domain.member.Color;
 import com.baba.back.oauth.domain.member.Member;
 import com.baba.back.oauth.exception.MemberAuthorizationException;
 import com.baba.back.oauth.exception.MemberNotFoundException;
@@ -27,6 +33,7 @@ import com.baba.back.relation.repository.RelationGroupRepository;
 import com.baba.back.relation.repository.RelationRepository;
 import jakarta.transaction.Transactional;
 import java.time.Clock;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -38,6 +45,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class BabyService {
 
+    private final IdConstructor idConstructor;
+    private final Picker<Color> picker;
     private final MemberRepository memberRepository;
     private final BabyRepository babyRepository;
     private final RelationRepository relationRepository;
@@ -45,6 +54,80 @@ public class BabyService {
     private final InvitationRepository invitationRepository;
     private final CodeGenerator randomCodeGenerator;
     private final Clock clock;
+
+    /**
+     * 아기를 생성한다.
+     * 자신의 아기가 없다면 아기를 생성하고 관계를 생성한 후 응답을 마무리한다.
+     * 자신의 아기가 있다면 동일한 이름의 아기가 있는지 확인한다
+     *
+     * @param memberId 멤버 아이디
+     * @param request  아기 생성 요청
+     * @return 아기 아이디
+     */
+    public String createBaby(String memberId, CreateBabyRequest request) {
+        final Member member = findMember(memberId);
+        final List<Relation> relations = relationRepository.findAllByMemberAndRelationGroupFamily(member, true);
+        final Baby baby = request.toEntity(idConstructor.createId(), LocalDate.now(clock));
+
+        if (relations.isEmpty()) {
+            babyRepository.save(baby);
+            final RelationGroup relationGroup = saveRelationGroup(baby, "가족");
+            saveRelation(member, request.getRelationName(), relationGroup);
+
+            return baby.getId();
+        }
+
+        final Babies babies = getMyBabies(request.getName(), relations);
+        babyRepository.save(baby);
+
+        final List<RelationGroup> relationGroups = getRelationGroupsByBaby(babies.getFirstBaby());
+        final List<Relation> relationsByBaby = getRelationsByRelationGroups(relationGroups);
+
+        relationsByBaby.forEach(relation -> {
+            final RelationGroup relationGroup = saveRelationGroup(baby, relation.getRelationGroupName());
+            saveRelation(relation.getMember(), relation.getRelationName(), relationGroup);
+        });
+
+        return baby.getId();
+    }
+
+    private RelationGroup saveRelationGroup(Baby baby, String relationGroupName) {
+        return relationGroupRepository.save(RelationGroup.builder()
+                .baby(baby)
+                .relationGroupName(relationGroupName)
+                .groupColor(Color.from(picker))
+                .family(true)
+                .build());
+    }
+
+    private void saveRelation(Member member, String relationName, RelationGroup relationGroup) {
+        relationRepository.save(Relation.builder()
+                .member(member)
+                .relationName(relationName)
+                .relationGroup(relationGroup)
+                .build());
+    }
+
+    private Babies getMyBabies(String babyName, List<Relation> relations) {
+        return new Babies(relations.stream()
+                .map(relation -> {
+                    final Baby baby = relation.getBaby();
+                    if (baby.equalsByName(babyName)) {
+                        throw new BabyBadRequestException("{" + babyName + "} 는 이미 존재하는 아기 이름입니다.");
+                    }
+
+                    return baby;
+                })
+                .toList());
+    }
+
+    private List<RelationGroup> getRelationGroupsByBaby(Baby firstBaby) {
+        return relationGroupRepository.findAllByBaby(firstBaby);
+    }
+
+    private List<Relation> getRelationsByRelationGroups(List<RelationGroup> relationGroups) {
+        return relationRepository.findAllByRelationGroupIn(relationGroups);
+    }
 
     public BabiesResponse findBabies(String memberId) {
         final Member member = findMember(memberId);

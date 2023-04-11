@@ -7,6 +7,7 @@ import static com.baba.back.fixture.DomainFixture.멤버3;
 
 import com.baba.back.baby.dto.BabyNameRequest;
 import com.baba.back.baby.dto.BabyRequest;
+import com.baba.back.baby.dto.CreateBabyRequest;
 import com.baba.back.baby.dto.CreateInviteCodeRequest;
 import com.baba.back.content.controller.ContentUpdateTitleAndCardStyleRequest;
 import com.baba.back.content.dto.CreateCommentRequest;
@@ -32,11 +33,13 @@ public class RequestFixture {
             "socialToken", List.of(약관_요청_데이터1, 약관_요청_데이터2, 약관_요청_데이터3)
     );
 
-    public static final BabyRequest 아기_생성_요청_데이터_1 = new BabyRequest("아기1", LocalDate.now());
-    public static final BabyRequest 아기_생성_요청_데이터_2 = new BabyRequest("아기2", LocalDate.now());
+    private static final BabyRequest 아기_생성_요청_데이터_1 = new BabyRequest("아기1", LocalDate.now());
+    private static final BabyRequest 아기_생성_요청_데이터_2 = new BabyRequest("아기2", LocalDate.now());
     public static final MemberSignUpRequest 멤버_가입_요청_데이터 = new MemberSignUpRequest(
             "박재희", "PROFILE_W_1", "엄마", List.of(아기_생성_요청_데이터_1, 아기_생성_요청_데이터_2)
     );
+    public static final CreateBabyRequest 아기_추가_요청_데이터 = new CreateBabyRequest("아기3", "아빠", LocalDate.now());
+
     public static final CreateGroupRequest 그룹_추가_요청_데이터1 = new CreateGroupRequest("외가", "#FFAEBA");
     public static final CreateGroupRequest 그룹_추가_요청_데이터2 = new CreateGroupRequest("친가", "#FFAEBA");
     public static final SignUpWithCodeRequest 초대코드로_멤버_가입_요청_데이터 = new SignUpWithCodeRequest(
