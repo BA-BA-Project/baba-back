@@ -73,7 +73,7 @@ public class RelationGroup extends BaseEntity {
         return isSameBaby && canShareGroup;
     }
 
-    public boolean hasEqualName(String relationGroupName) {
+    public boolean hasEqualGroupName(String relationGroupName) {
         return getRelationGroupName().equals(relationGroupName);
     }
 }
