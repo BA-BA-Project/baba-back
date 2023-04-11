@@ -765,8 +765,8 @@ class ContentServiceTest {
                 () -> assertThatCode(
                         () -> contentService.deleteComment(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId(), 댓글10.getId()))
                         .doesNotThrowAnyException(),
-                () -> verify(commentRepository).delete(댓글10),
-                () -> verify(tagRepository).deleteByComment(댓글10)
+                () -> then(commentRepository).should().delete(댓글10),
+                () -> then(tagRepository).should().deleteByComment(댓글10)
         );
     }
 
