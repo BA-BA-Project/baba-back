@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -133,8 +134,23 @@ public class ContentController {
                                               @RequestBody @Valid ContentUpdateTitleAndCardStyleRequest request) {
 
         contentService.updateTitleAndCard(memberId, babyId, contentId, request);
-        return ResponseEntity
-                .ok()
-                .build();
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "성장 앨범 댓글 삭제 요청")
+    @OkResponse
+    @BadRequestResponse
+    @UnAuthorizedResponse
+    @NotFoundResponse
+    @IntervalServerErrorResponse
+    @DeleteMapping("/baby/{babyId}/album/{contentId}/comment/{commentId}")
+    public ResponseEntity<Void> deleteComment(@Login String memberId,
+                                                   @PathVariable("babyId") String babyId,
+                                                   @PathVariable("contentId") Long contentId,
+                                                   @PathVariable("commentId") Long commentId) {
+
+        contentService.deleteComment(memberId, babyId, contentId, commentId);
+
+        return ResponseEntity.ok().build();
     }
 }
