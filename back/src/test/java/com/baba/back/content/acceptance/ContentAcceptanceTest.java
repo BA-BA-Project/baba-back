@@ -81,7 +81,7 @@ public class ContentAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    void 컨텐츠를_생성한다() throws MalformedURLException {
+    void 성장_앨범을_생성한다() throws MalformedURLException {
         // given
         final ExtractableResponse<Response> signUpResponse = 아기_등록_회원가입_요청();
         final String accessToken = toObject(signUpResponse, MemberSignUpResponse.class).accessToken();
