@@ -2,6 +2,7 @@ package com.baba.back.baby.controller;
 
 import com.baba.back.baby.dto.BabiesResponse;
 import com.baba.back.baby.dto.BabyNameRequest;
+import com.baba.back.baby.dto.CreateBabyRequest;
 import com.baba.back.baby.dto.CreateInviteCodeRequest;
 import com.baba.back.baby.dto.CreateInviteCodeResponse;
 import com.baba.back.baby.dto.SearchInviteCodeResponse;
@@ -16,6 +17,7 @@ import com.baba.back.swagger.UnAuthorizedResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
+import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +35,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class BabyController {
 
     private final BabyService babyService;
+
+    @Operation(summary = "아기 추가 요청")
+    @CreatedResponse
+    @UnAuthorizedResponse
+    @NotFoundResponse
+    @IntervalServerErrorResponse
+    @PostMapping("/baby")
+    public ResponseEntity<Void> createBaby(@Login String memberId, @RequestBody @NotNull CreateBabyRequest request) {
+        final String babyId = babyService.createBaby(memberId, request);
+
+        return ResponseEntity.created(URI.create("/baby/" + babyId)).build();
+    }
 
     @Operation(summary = "추가된 전체 아기 조회 요청")
     @OkResponse

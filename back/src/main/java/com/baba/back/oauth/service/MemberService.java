@@ -229,7 +229,7 @@ public class MemberService {
 
     private void validateRelationGroup(List<RelationGroup> relationGroups, String relationGroupName) {
         relationGroups.forEach(relationGroup -> {
-            if (relationGroup.hasEqualName(relationGroupName)) {
+            if (relationGroup.hasEqualGroupName(relationGroupName)) {
                 throw new RelationGroupBadRequestException("이미 존재하는 그룹 이름입니다.");
             }
         });

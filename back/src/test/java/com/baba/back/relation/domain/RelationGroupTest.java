@@ -110,7 +110,7 @@ class RelationGroupTest {
         final RelationGroup relationGroup = new RelationGroup(아기1, relationGroupName, Color.COLOR_1, true);
 
         // when
-        final boolean result = relationGroup.hasEqualName(relationGroupName);
+        final boolean result = relationGroup.hasEqualGroupName(relationGroupName);
 
         // then
         assertThat(result).isTrue();
@@ -124,7 +124,7 @@ class RelationGroupTest {
         final RelationGroup relationGroup = new RelationGroup(아기1, relationGroupName, Color.COLOR_1, true);
 
         // when
-        final boolean result = relationGroup.hasEqualName(anotherRelationGroupName);
+        final boolean result = relationGroup.hasEqualGroupName(anotherRelationGroupName);
 
         // then
         assertThat(result).isFalse();

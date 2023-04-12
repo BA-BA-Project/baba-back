@@ -1,6 +1,8 @@
 package com.baba.back.baby.service;
 
+import static com.baba.back.fixture.DomainFixture.nowDate;
 import static com.baba.back.fixture.DomainFixture.관계10;
+import static com.baba.back.fixture.DomainFixture.관계11;
 import static com.baba.back.fixture.DomainFixture.관계12;
 import static com.baba.back.fixture.DomainFixture.관계20;
 import static com.baba.back.fixture.DomainFixture.관계30;
@@ -20,12 +22,14 @@ import static com.baba.back.fixture.DomainFixture.초대10;
 import static com.baba.back.fixture.DomainFixture.초대20;
 import static com.baba.back.fixture.DomainFixture.초대코드정보1;
 import static com.baba.back.fixture.RequestFixture.아기_이름_변경_요청_데이터;
+import static com.baba.back.fixture.RequestFixture.아기_추가_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.초대코드_생성_요청_데이터1;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -33,29 +37,36 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
 import com.baba.back.baby.domain.Baby;
+import com.baba.back.baby.domain.IdConstructor;
 import com.baba.back.baby.domain.invitation.Code;
 import com.baba.back.baby.domain.invitation.Invitation;
 import com.baba.back.baby.domain.invitation.InvitationCode;
 import com.baba.back.baby.dto.BabiesResponse;
 import com.baba.back.baby.dto.BabyResponse;
+import com.baba.back.baby.dto.CreateBabyRequest;
 import com.baba.back.baby.dto.CreateInviteCodeResponse;
 import com.baba.back.baby.dto.InviteCodeBabyResponse;
 import com.baba.back.baby.dto.SearchInviteCodeResponse;
+import com.baba.back.baby.exception.BabyBadRequestException;
 import com.baba.back.baby.exception.BabyNotFoundException;
 import com.baba.back.baby.exception.InvitationCodeBadRequestException;
 import com.baba.back.baby.exception.InvitationsBadRequestException;
 import com.baba.back.baby.exception.RelationGroupNotFoundException;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.baby.repository.InvitationRepository;
+import com.baba.back.oauth.domain.Picker;
+import com.baba.back.oauth.domain.member.Color;
 import com.baba.back.oauth.domain.member.Member;
 import com.baba.back.oauth.exception.MemberAuthorizationException;
 import com.baba.back.oauth.exception.MemberNotFoundException;
 import com.baba.back.oauth.repository.MemberRepository;
+import com.baba.back.relation.domain.Relation;
 import com.baba.back.relation.domain.RelationGroup;
 import com.baba.back.relation.exception.RelationNotFoundException;
 import com.baba.back.relation.repository.RelationGroupRepository;
 import com.baba.back.relation.repository.RelationRepository;
 import java.time.Clock;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
@@ -63,7 +74,6 @@ import java.util.Optional;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -73,6 +83,12 @@ class BabyServiceTest {
 
     @InjectMocks
     private BabyService babyService;
+
+    @Mock
+    private IdConstructor idConstructor;
+
+    @Mock
+    private Picker<Color> picker;
 
     @Mock
     private MemberRepository memberRepository;
@@ -94,6 +110,84 @@ class BabyServiceTest {
 
     @Mock
     private Clock clock;
+
+    @Nested
+    class 아기_추가_요청_시_ {
+
+        final String memberId = 멤버1.getId();
+        final Clock now = Clock.systemDefaultZone();
+
+        @Test
+        void 자신의_아기가_없다면_아기를_추가한다() {
+            // given
+            given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
+            given(relationRepository.findAllByMemberAndRelationGroupFamily(any(Member.class), eq(true)))
+                    .willReturn(List.of());
+
+            given(clock.instant()).willReturn(now.instant());
+            given(clock.getZone()).willReturn(now.getZone());
+            given(idConstructor.createId()).willReturn(아기1.getId());
+            given(babyRepository.save(any(Baby.class))).willReturn(아기1);
+
+            given(picker.pick(anyList())).willReturn(Color.COLOR_1);
+
+            // when
+            final String babyId = babyService.createBaby(memberId, 아기_추가_요청_데이터);
+
+            // then
+            assertThat(babyId).isEqualTo(아기1.getId());
+
+            then(babyRepository).should(times(1)).save(any(Baby.class));
+            then(relationGroupRepository).should(times(1)).save(any(RelationGroup.class));
+            then(relationRepository).should(times(1)).save(any(Relation.class));
+        }
+
+        @Test
+        void 동일한_이름의_아기가_존재하면_예외를_던진다() {
+            // given
+            given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
+            given(clock.instant()).willReturn(now.instant());
+            given(clock.getZone()).willReturn(now.getZone());
+            given(clock.instant()).willReturn(now.instant());
+            given(clock.getZone()).willReturn(now.getZone());
+            given(idConstructor.createId()).willReturn(아기1.getId());
+            given(babyRepository.save(any(Baby.class))).willReturn(아기1);
+
+            given(relationRepository.findAllByMemberAndRelationGroupFamily(any(Member.class), eq(true)))
+                    .willReturn(List.of(관계10, 관계20));
+
+            final CreateBabyRequest request = new CreateBabyRequest("아기1", "아빠", LocalDate.now());
+
+            // when & then
+            assertThatThrownBy(() -> babyService.createBaby(memberId, request))
+                    .isInstanceOf(BabyBadRequestException.class);
+        }
+
+        @Test
+        void 자신의_아기가_있어도_아기를_추가할_수_있다() {
+            // given
+            given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
+            given(relationRepository.findAllByMemberAndRelationGroupFamily(any(Member.class), eq(true)))
+                    .willReturn(List.of(관계10, 관계20));
+            given(clock.instant()).willReturn(now.instant());
+            given(clock.getZone()).willReturn(now.getZone());
+            given(idConstructor.createId()).willReturn(아기1.getId());
+            given(babyRepository.save(any(Baby.class))).willReturn(아기1);
+
+            given(relationGroupRepository.findAllByBaby(any(Baby.class))).willReturn(List.of(관계그룹10, 관계그룹11));
+            given(relationRepository.findAllByRelationGroupIn(anyList())).willReturn(List.of(관계10, 관계11, 관계12));
+
+            // when
+            final String babyId = babyService.createBaby(memberId, 아기_추가_요청_데이터);
+
+            // then
+            assertThat(babyId).isEqualTo(아기1.getId());
+
+            then(babyRepository).should(times(1)).save(any(Baby.class));
+            then(relationGroupRepository).should(times(3)).save(any(RelationGroup.class));
+            then(relationRepository).should(times(3)).save(any(Relation.class));
+        }
+    }
 
     @Test
     void 존재하지_않는_멤버가_등록된_아기_리스트를_조회할_때_예외를_던진다() {
@@ -174,8 +268,15 @@ class BabyServiceTest {
         @Test
         void 아기의_이름을_변경한다() {
             // given
+            final Baby baby = Baby.builder()
+                    .id("baby1")
+                    .name("아기1")
+                    .birthday(nowDate)
+                    .now(nowDate)
+                    .build();
+
             given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
-            given(babyRepository.findById(babyId)).willReturn(Optional.of(아기1));
+            given(babyRepository.findById(babyId)).willReturn(Optional.of(baby));
             given(relationRepository.findByMemberAndBaby(any(Member.class), any(Baby.class)))
                     .willReturn(Optional.of(관계10));
 
