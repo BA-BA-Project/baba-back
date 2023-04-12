@@ -6,6 +6,7 @@ import com.baba.back.content.dto.CreateCommentRequest;
 import com.baba.back.content.dto.CreateContentRequest;
 import com.baba.back.content.dto.LikeContentResponse;
 import com.baba.back.content.dto.LikesResponse;
+import com.baba.back.content.dto.SuccessMessageResponse;
 import com.baba.back.content.service.ContentService;
 import com.baba.back.oauth.support.Login;
 import com.baba.back.swagger.BadRequestResponse;
@@ -48,11 +49,12 @@ public class ContentController {
     @NotFoundResponse
     @IntervalServerErrorResponse
     @PostMapping(value = "/baby/{babyId}/album", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> createContent(@ModelAttribute @Valid CreateContentRequest request,
+    public ResponseEntity<SuccessMessageResponse> createContent(@ModelAttribute @Valid CreateContentRequest request,
                                               @Login String memberId,
                                               @PathVariable("babyId") String babyId) {
         final Long contentId = contentService.createContent(request, memberId, babyId);
-        return ResponseEntity.created(URI.create("/baby/" + babyId + "/album/" + contentId)).body("API 호출 성공");
+        return ResponseEntity.created(URI.create("/baby/" + babyId + "/album/" + contentId))
+                .body(new SuccessMessageResponse("API 호출 성공"));
     }
 
     @Operation(summary = "좋아요 추가 요청")
