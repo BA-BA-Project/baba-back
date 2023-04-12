@@ -146,6 +146,13 @@ class BabyServiceTest {
         void 동일한_이름의_아기가_존재하면_예외를_던진다() {
             // given
             given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
+            given(clock.instant()).willReturn(now.instant());
+            given(clock.getZone()).willReturn(now.getZone());
+            given(clock.instant()).willReturn(now.instant());
+            given(clock.getZone()).willReturn(now.getZone());
+            given(idConstructor.createId()).willReturn(아기1.getId());
+            given(babyRepository.save(any(Baby.class))).willReturn(아기1);
+
             given(relationRepository.findAllByMemberAndRelationGroupFamily(any(Member.class), eq(true)))
                     .willReturn(List.of(관계10, 관계20));
 
@@ -159,19 +166,17 @@ class BabyServiceTest {
         @Test
         void 자신의_아기가_있어도_아기를_추가할_수_있다() {
             // given
-            final String expectedBabyId = "babyId";
-
             given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
             given(relationRepository.findAllByMemberAndRelationGroupFamily(any(Member.class), eq(true)))
                     .willReturn(List.of(관계10, 관계20));
             given(clock.instant()).willReturn(now.instant());
             given(clock.getZone()).willReturn(now.getZone());
+            given(idConstructor.createId()).willReturn(아기1.getId());
+            given(babyRepository.save(any(Baby.class))).willReturn(아기1);
 
             given(relationGroupRepository.findAllByBaby(any(Baby.class))).willReturn(List.of(관계그룹10, 관계그룹11));
             given(relationRepository.findAllByRelationGroupIn(anyList())).willReturn(List.of(관계10, 관계11, 관계12));
-            given(idConstructor.createId()).willReturn(아기1.getId());
             given(picker.pick(anyList())).willReturn(Color.COLOR_1);
-            given(babyRepository.save(any(Baby.class))).willReturn(아기1);
 
             // when
             final String babyId = babyService.createBaby(memberId, 아기_추가_요청_데이터);

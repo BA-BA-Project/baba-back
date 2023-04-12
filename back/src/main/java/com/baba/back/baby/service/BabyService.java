@@ -67,9 +67,9 @@ public class BabyService {
     public String createBaby(String memberId, CreateBabyRequest request) {
         final Member member = findMember(memberId);
         final List<Relation> relations = relationRepository.findAllByMemberAndRelationGroupFamily(member, true);
+        final Baby baby = saveBaby(request);
 
         if (relations.isEmpty()) {
-            final Baby baby = saveBaby(request);
             final RelationGroup relationGroup = saveRelationGroup(baby, "가족");
             saveRelation(member, request.getRelationName(), relationGroup);
 
@@ -77,7 +77,6 @@ public class BabyService {
         }
 
         final Babies babies = getMyBabies(request.getName(), relations);
-        final Baby baby = saveBaby(request);
 
         final List<RelationGroup> relationGroups = getRelationGroupsByBaby(babies.getFirstBaby());
         final List<Relation> relationsByBaby = getRelationsByRelationGroups(relationGroups);
