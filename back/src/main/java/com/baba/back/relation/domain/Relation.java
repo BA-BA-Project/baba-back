@@ -51,6 +51,10 @@ public class Relation extends BaseEntity {
         return this.relationGroup.getRelationGroupName();
     }
 
+    public String getRelationGroupColor() {
+        return this.relationGroup.getGroupColor();
+    }
+
     public Baby getBaby() {
         return this.relationGroup.getBaby();
     }

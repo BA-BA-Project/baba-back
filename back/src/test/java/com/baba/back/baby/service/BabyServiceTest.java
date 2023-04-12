@@ -126,10 +126,10 @@ class BabyServiceTest {
 
             given(clock.instant()).willReturn(now.instant());
             given(clock.getZone()).willReturn(now.getZone());
-
             given(idConstructor.createId()).willReturn(아기1.getId());
-            given(picker.pick(anyList())).willReturn(Color.COLOR_1);
             given(babyRepository.save(any(Baby.class))).willReturn(아기1);
+
+            given(picker.pick(anyList())).willReturn(Color.COLOR_1);
 
             // when
             final String babyId = babyService.createBaby(memberId, 아기_추가_요청_데이터);
@@ -176,7 +176,6 @@ class BabyServiceTest {
 
             given(relationGroupRepository.findAllByBaby(any(Baby.class))).willReturn(List.of(관계그룹10, 관계그룹11));
             given(relationRepository.findAllByRelationGroupIn(anyList())).willReturn(List.of(관계10, 관계11, 관계12));
-            given(picker.pick(anyList())).willReturn(Color.COLOR_1);
 
             // when
             final String babyId = babyService.createBaby(memberId, 아기_추가_요청_데이터);

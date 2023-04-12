@@ -56,9 +56,7 @@ public class BabyService {
     private final Clock clock;
 
     /**
-     * 아기를 생성한다.
-     * 자신의 아기가 없다면 아기를 생성하고 관계를 생성한 후 응답을 마무리한다.
-     * 자신의 아기가 있다면 동일한 이름의 아기가 있는지 확인한다
+     * 아기를 생성한다. 자신의 아기가 없다면 아기를 생성하고 관계를 생성한 후 응답을 마무리한다. 자신의 아기가 있다면 동일한 이름의 아기가 있는지 확인한다
      *
      * @param memberId 멤버 아이디
      * @param request  아기 생성 요청
@@ -70,7 +68,7 @@ public class BabyService {
         final Baby baby = saveBaby(request);
 
         if (relations.isEmpty()) {
-            final RelationGroup relationGroup = saveRelationGroup(baby, "가족");
+            final RelationGroup relationGroup = saveRelationGroup(baby, "가족", Color.from(picker));
             saveRelation(member, request.getRelationName(), relationGroup);
 
             return baby.getId();
@@ -82,7 +80,8 @@ public class BabyService {
         final List<Relation> relationsByBaby = getRelationsByRelationGroups(relationGroups);
 
         relationsByBaby.forEach(relation -> {
-            final RelationGroup relationGroup = saveRelationGroup(baby, relation.getRelationGroupName());
+            final RelationGroup relationGroup = saveRelationGroup(baby, relation.getRelationGroupName(),
+                    Color.from(relation.getRelationGroupColor()));
             saveRelation(relation.getMember(), relation.getRelationName(), relationGroup);
         });
 
@@ -93,11 +92,11 @@ public class BabyService {
         return babyRepository.save(request.toEntity(idConstructor.createId(), LocalDate.now(clock)));
     }
 
-    private RelationGroup saveRelationGroup(Baby baby, String relationGroupName) {
+    private RelationGroup saveRelationGroup(Baby baby, String relationGroupName, Color color) {
         return relationGroupRepository.save(RelationGroup.builder()
                 .baby(baby)
                 .relationGroupName(relationGroupName)
-                .groupColor(Color.from(picker))
+                .groupColor(color)
                 .family(true)
                 .build());
     }
