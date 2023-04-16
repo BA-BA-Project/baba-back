@@ -13,6 +13,7 @@ import com.baba.back.baby.dto.CreateBabyRequest;
 import com.baba.back.baby.dto.CreateInviteCodeRequest;
 import com.baba.back.baby.dto.CreateInviteCodeResponse;
 import com.baba.back.baby.dto.InviteCodeBabyResponse;
+import com.baba.back.baby.dto.InviteCodeRequest;
 import com.baba.back.baby.dto.SearchInviteCodeResponse;
 import com.baba.back.baby.exception.BabyBadRequestException;
 import com.baba.back.baby.exception.BabyNotFoundException;
@@ -251,5 +252,28 @@ public class BabyService {
                         })
                         .toList(),
                 invitationCode.getRelationName());
+    }
+
+    public void createBabyWithCode(InviteCodeRequest request, String memberId) {
+        final Member member = findMember(memberId);
+
+        final Invitations invitations = getInvitations(request.getInviteCode());
+        final InvitationCode invitationCode = invitations.getUnExpiredInvitationCode(LocalDateTime.now(clock));
+
+        saveRelations(invitations.values(), invitationCode.getRelationName(), member);
+    }
+
+    private Invitations getInvitations(String code) {
+        return new Invitations(invitationRepository.findAllByCode(code));
+    }
+
+    private void saveRelations(List<Invitation> invitations, String relationName, Member member) {
+        invitations.forEach(invitation ->
+                relationRepository.save(Relation.builder()
+                        .relationGroup(invitation.getRelationGroup())
+                        .relationName(relationName)
+                        .member(member)
+                        .build())
+        );
     }
 }
