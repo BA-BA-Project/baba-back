@@ -58,7 +58,6 @@ import com.baba.back.baby.repository.InvitationRepository;
 import com.baba.back.oauth.domain.Picker;
 import com.baba.back.oauth.domain.member.Color;
 import com.baba.back.oauth.domain.member.Member;
-import com.baba.back.oauth.dto.SignUpWithCodeRequest;
 import com.baba.back.oauth.exception.MemberAuthorizationException;
 import com.baba.back.oauth.exception.MemberNotFoundException;
 import com.baba.back.oauth.repository.MemberRepository;
@@ -463,7 +462,7 @@ class BabyServiceTest {
             given(invitationRepository.findAllByCode(inviteCode)).willReturn(List.of());
 
             // when & then
-            assertThatThrownBy(() -> babyService.createBabyWithCode(초대코드로_아기_추가_요청_데이터, memberId))
+            assertThatThrownBy(() -> babyService.addBabyWithCode(초대코드로_아기_추가_요청_데이터, memberId))
                     .isInstanceOf(InvitationsBadRequestException.class);
         }
 
@@ -497,7 +496,7 @@ class BabyServiceTest {
             given(clock.getZone()).willReturn(timeTravelClock.getZone());
 
             // when & then
-            assertThatThrownBy(() -> babyService.createBabyWithCode(초대코드로_아기_추가_요청_데이터, memberId))
+            assertThatThrownBy(() -> babyService.addBabyWithCode(초대코드로_아기_추가_요청_데이터, memberId))
                     .isInstanceOf(InvitationCodeBadRequestException.class);
         }
 
@@ -512,7 +511,7 @@ class BabyServiceTest {
             given(clock.getZone()).willReturn(now.getZone());
 
             // when
-            babyService.createBabyWithCode(초대코드로_아기_추가_요청_데이터, memberId);
+            babyService.addBabyWithCode(초대코드로_아기_추가_요청_데이터, memberId);
 
             // then
             then(relationRepository).should(times(2)).save(any(Relation.class));

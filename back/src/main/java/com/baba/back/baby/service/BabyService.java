@@ -254,7 +254,7 @@ public class BabyService {
                 invitationCode.getRelationName());
     }
 
-    public void createBabyWithCode(InviteCodeRequest request, String memberId) {
+    public void addBabyWithCode(InviteCodeRequest request, String memberId) {
         final Member member = findMember(memberId);
 
         final Invitations invitations = getInvitations(request.getInviteCode());
