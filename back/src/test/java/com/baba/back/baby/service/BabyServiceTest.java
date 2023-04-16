@@ -5,6 +5,8 @@ import static com.baba.back.fixture.DomainFixture.관계10;
 import static com.baba.back.fixture.DomainFixture.관계11;
 import static com.baba.back.fixture.DomainFixture.관계12;
 import static com.baba.back.fixture.DomainFixture.관계20;
+import static com.baba.back.fixture.DomainFixture.관계21;
+import static com.baba.back.fixture.DomainFixture.관계22;
 import static com.baba.back.fixture.DomainFixture.관계30;
 import static com.baba.back.fixture.DomainFixture.관계40;
 import static com.baba.back.fixture.DomainFixture.관계그룹10;
@@ -52,6 +54,7 @@ import com.baba.back.baby.exception.BabyBadRequestException;
 import com.baba.back.baby.exception.BabyNotFoundException;
 import com.baba.back.baby.exception.InvitationCodeBadRequestException;
 import com.baba.back.baby.exception.InvitationsBadRequestException;
+import com.baba.back.baby.exception.RelationBadRequestException;
 import com.baba.back.baby.exception.RelationGroupNotFoundException;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.baby.repository.InvitationRepository;
@@ -490,7 +493,7 @@ class BabyServiceTest {
                     .atZone(ZoneId.systemDefault()).toInstant(), ZoneId.systemDefault());
 
             given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
-            given(invitationRepository.findAllByCode(inviteCode)).willReturn(List.of(초대10, 초대20));
+            given(invitationRepository.findAllByCode(inviteCode)).willReturn(List.of(invitation));
 
             given(clock.instant()).willReturn(timeTravelClock.instant());
             given(clock.getZone()).willReturn(timeTravelClock.getZone());
@@ -498,6 +501,23 @@ class BabyServiceTest {
             // when & then
             assertThatThrownBy(() -> babyService.addBabyWithCode(초대코드로_아기_추가_요청_데이터, memberId))
                     .isInstanceOf(InvitationCodeBadRequestException.class);
+        }
+
+        @Test
+        void 아기와의_관계가_이미_존재하면_예외를_던진다() {
+            // given
+            given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
+            given(invitationRepository.findAllByCode(inviteCode)).willReturn(List.of(초대10, 초대20));
+
+            final Clock now = Clock.systemDefaultZone();
+            given(clock.instant()).willReturn(now.instant());
+            given(clock.getZone()).willReturn(now.getZone());
+
+            given(relationRepository.findAllByMember(any(Member.class))).willReturn(List.of(관계12, 관계21));
+
+            // when & then
+            assertThatThrownBy(() -> babyService.addBabyWithCode(초대코드로_아기_추가_요청_데이터, memberId))
+                    .isInstanceOf(RelationBadRequestException.class);
         }
 
         @Test
