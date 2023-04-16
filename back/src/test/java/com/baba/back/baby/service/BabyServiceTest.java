@@ -6,7 +6,6 @@ import static com.baba.back.fixture.DomainFixture.관계11;
 import static com.baba.back.fixture.DomainFixture.관계12;
 import static com.baba.back.fixture.DomainFixture.관계20;
 import static com.baba.back.fixture.DomainFixture.관계21;
-import static com.baba.back.fixture.DomainFixture.관계22;
 import static com.baba.back.fixture.DomainFixture.관계30;
 import static com.baba.back.fixture.DomainFixture.관계40;
 import static com.baba.back.fixture.DomainFixture.관계그룹10;
@@ -521,7 +520,7 @@ class BabyServiceTest {
         }
 
         @Test
-        void 관계를_생성한다(){
+        void 관계를_생성한다() {
             // given
             given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
             given(invitationRepository.findAllByCode(inviteCode)).willReturn(List.of(초대10, 초대20));
@@ -529,6 +528,8 @@ class BabyServiceTest {
             final Clock now = Clock.systemDefaultZone();
             given(clock.instant()).willReturn(now.instant());
             given(clock.getZone()).willReturn(now.getZone());
+
+            given(relationRepository.findAllByMember(any(Member.class))).willReturn(List.of());
 
             // when
             babyService.addBabyWithCode(초대코드로_아기_추가_요청_데이터, memberId);
