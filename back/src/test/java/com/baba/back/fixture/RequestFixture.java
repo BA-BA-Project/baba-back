@@ -9,7 +9,7 @@ import com.baba.back.baby.dto.BabyNameRequest;
 import com.baba.back.baby.dto.BabyRequest;
 import com.baba.back.baby.dto.CreateBabyRequest;
 import com.baba.back.baby.dto.CreateInviteCodeRequest;
-import com.baba.back.content.controller.ContentUpdateTitleAndCardStyleRequest;
+import com.baba.back.content.dto.ContentUpdateTitleAndCardStyleRequest;
 import com.baba.back.content.dto.CreateCommentRequest;
 import com.baba.back.content.dto.CreateContentRequest;
 import com.baba.back.oauth.domain.Terms;

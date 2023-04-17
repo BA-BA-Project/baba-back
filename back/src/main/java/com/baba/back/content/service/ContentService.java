@@ -4,7 +4,7 @@ import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.exception.BabyNotFoundException;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.common.FileHandler;
-import com.baba.back.content.controller.ContentUpdateTitleAndCardStyleRequest;
+import com.baba.back.content.dto.ContentUpdateTitleAndCardStyleRequest;
 import com.baba.back.content.domain.Like;
 import com.baba.back.content.domain.comment.Comment;
 import com.baba.back.content.domain.comment.Tag;
@@ -358,5 +358,20 @@ public class ContentService {
         if (!comment.isOwner(member)) {
             throw new CommentBadRequestException(member.getId() + "는 댓글 " + comment.getId() + "의 생성자가 아닙니다.");
         }
+    }
+
+    public void updatePhoto(String memberId, String babyId, Long contentId, CreateContentRequest request) {
+        final Content content = findContent(contentId);
+        final Baby baby = findBaby(babyId);
+        validateContentBaby(baby, content);
+
+        final Member member = findMember(memberId);
+        findRelation(member, baby);
+
+        validateContentOwner(content, member);
+
+        final ImageFile imageFile = new ImageFile(request.getPhoto());
+        final String imageSource = fileHandler.upload(imageFile);
+        content.updateURL(imageSource);
     }
 }

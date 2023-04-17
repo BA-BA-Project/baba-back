@@ -1,4 +1,4 @@
-package com.baba.back.content.controller;
+package com.baba.back.content.dto;
 
 import jakarta.validation.constraints.NotNull;
 

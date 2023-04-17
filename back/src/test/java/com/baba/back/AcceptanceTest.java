@@ -17,7 +17,7 @@ import static com.baba.back.fixture.RequestFixture.초대코드_생성_요청_�
 import static com.baba.back.fixture.RequestFixture.초대코드_생성_요청_데이터2;
 
 import com.baba.back.baby.dto.CreateInviteCodeRequest;
-import com.baba.back.content.controller.ContentUpdateTitleAndCardStyleRequest;
+import com.baba.back.content.dto.ContentUpdateTitleAndCardStyleRequest;
 import com.baba.back.content.dto.CreateCommentRequest;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
 import com.baba.back.oauth.dto.SignUpWithCodeRequest;
