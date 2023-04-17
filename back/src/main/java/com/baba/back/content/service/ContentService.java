@@ -19,6 +19,7 @@ import com.baba.back.content.dto.CreateContentRequest;
 import com.baba.back.content.dto.IconResponse;
 import com.baba.back.content.dto.LikeContentResponse;
 import com.baba.back.content.dto.LikesResponse;
+import com.baba.back.content.dto.UpdateContentPhotoRequest;
 import com.baba.back.content.exception.CommentBadRequestException;
 import com.baba.back.content.exception.CommentNotFoundException;
 import com.baba.back.content.exception.ContentAuthorizationException;
@@ -360,7 +361,7 @@ public class ContentService {
         }
     }
 
-    public void updatePhoto(String memberId, String babyId, Long contentId, CreateContentRequest request) {
+    public void updatePhoto(String memberId, String babyId, Long contentId, UpdateContentPhotoRequest request) {
         final Content content = findContent(contentId);
         final Baby baby = findBaby(babyId);
         validateContentBaby(baby, content);
@@ -370,7 +371,7 @@ public class ContentService {
 
         validateContentOwner(content, member);
 
-        final ImageFile imageFile = new ImageFile(request.getPhoto());
+        final ImageFile imageFile = new ImageFile(request.photo());
         final String imageSource = fileHandler.upload(imageFile);
         content.updateURL(imageSource);
     }

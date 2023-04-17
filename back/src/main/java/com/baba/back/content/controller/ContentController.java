@@ -8,6 +8,7 @@ import com.baba.back.content.dto.CreateContentRequest;
 import com.baba.back.content.dto.LikeContentResponse;
 import com.baba.back.content.dto.LikesResponse;
 import com.baba.back.content.dto.SuccessMessageResponse;
+import com.baba.back.content.dto.UpdateContentPhotoRequest;
 import com.baba.back.content.service.ContentService;
 import com.baba.back.oauth.support.Login;
 import com.baba.back.swagger.BadRequestResponse;
@@ -168,7 +169,7 @@ public class ContentController {
     public ResponseEntity<Void> updatePhoto(@Login String memberId,
                                             @PathVariable("babyId") String babyId,
                                             @PathVariable("contentId") Long contentId,
-                                            @ModelAttribute @Valid CreateContentRequest request
+                                            @ModelAttribute @Valid UpdateContentPhotoRequest request
     ) {
 
         contentService.updatePhoto(memberId, babyId, contentId, request);
