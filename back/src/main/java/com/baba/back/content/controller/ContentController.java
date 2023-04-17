@@ -165,7 +165,7 @@ public class ContentController {
     @UnAuthorizedResponse
     @NotFoundResponse
     @IntervalServerErrorResponse
-    @DeleteMapping("/baby/{babyId}/album/{contentId}/photo")
+    @PatchMapping("/baby/{babyId}/album/{contentId}/photo")
     public ResponseEntity<Void> updatePhoto(@Login String memberId,
                                             @PathVariable("babyId") String babyId,
                                             @PathVariable("contentId") Long contentId,

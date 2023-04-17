@@ -5,6 +5,7 @@ import static com.baba.back.SimpleRestAssured.toObject;
 import static com.baba.back.fixture.DomainFixture.nowDate;
 import static com.baba.back.fixture.DomainFixture.아기1;
 import static com.baba.back.fixture.RequestFixture.댓글_생성_요청_데이터;
+import static com.baba.back.fixture.RequestFixture.컨텐츠_사진_수정_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.콘텐츠_제목_카드스타일_변경_요청_데이터;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -26,6 +27,7 @@ import com.baba.back.oauth.service.AccessTokenProvider;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
@@ -342,6 +344,25 @@ public class ContentAcceptanceTest extends AcceptanceTest {
         final List<CommentResponse> result = toObject(성장앨범_댓글_보기_요청(accessToken, babyId, contentId),
                 CommentsResponse.class).comments();
         assertThat(result).hasSize(0);
+
+    }
+
+    @Test
+    void 성장_앨범을_사진을_수정한다() throws IOException {
+        // given
+        final ExtractableResponse<Response> signUpResponse = 아기_등록_회원가입_요청();
+        final String accessToken = toObject(signUpResponse, MemberSignUpResponse.class).accessToken();
+        final String babyId = getBabyId(signUpResponse);
+        given(amazonS3.getUrl(any(String.class), any(String.class))).willReturn(new URL(VALID_URL));
+        final ExtractableResponse<Response> createContentResponse = 성장앨범_생성_요청(accessToken, babyId, nowDate);
+        final Long contentId = getContentId(createContentResponse);
+
+        // when
+        final ExtractableResponse<Response> response = 성장_앨범_사진_수정_요청(accessToken, babyId, contentId,
+                컨텐츠_사진_수정_요청_데이터);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
     }
 

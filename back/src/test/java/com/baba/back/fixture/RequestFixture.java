@@ -57,7 +57,7 @@ public class RequestFixture {
     public static final ContentUpdateTitleAndCardStyleRequest 콘텐츠_제목_카드스타일_변경_요청_데이터 = new ContentUpdateTitleAndCardStyleRequest(
             "제목 수정", CARD_CHECK_1.name());
     public static final UpdateContentPhotoRequest 컨텐츠_사진_수정_요청_데이터 = new UpdateContentPhotoRequest(
-            new MockMultipartFile("photo", "file.png", "image/png", "Mock File".getBytes())
+            new MockMultipartFile("photo2", "file.png", "image/png", "Mock File".getBytes())
     );
     private static final BabyRequest 아기_생성_요청_데이터_1 = new BabyRequest("아기1", LocalDate.now());
     private static final BabyRequest 아기_생성_요청_데이터_2 = new BabyRequest("아기2", LocalDate.now());
