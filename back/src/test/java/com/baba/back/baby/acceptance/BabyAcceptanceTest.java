@@ -174,26 +174,49 @@ class BabyAcceptanceTest extends AcceptanceTest {
 
     }
 
-    @Test
-    void 초대코드로_아기_추가_요청_시_아기의_성장앨범을_조회할_수_있다() {
-        // given
-        final ExtractableResponse<Response> signUpResponse = 아기_등록_회원가입_요청();
-        final String accessToken = toObject(signUpResponse, MemberSignUpResponse.class).accessToken();
-        final String babyId = getBabyId(signUpResponse);
+    @Nested
+    class 초대코드로_아기_추가_요청_시_ {
 
-        그룹_추가_요청(accessToken);
-        final String inviteCode = toObject(외가_초대_코드_생성_요청(accessToken),
-                CreateInviteCodeResponse.class).inviteCode();
+        @Test
+        void 아기의_성장앨범을_조회할_수_있다() {
+            // given
+            final ExtractableResponse<Response> signUpResponse = 아기_등록_회원가입_요청();
+            final String accessToken = toObject(signUpResponse, MemberSignUpResponse.class).accessToken();
+            final String babyId = getBabyId(signUpResponse);
 
-        final String accessToken2 = toObject(아기_등록_회원가입_요청(), MemberSignUpResponse.class).accessToken();
-        초대코드로_아기_추가_요청(accessToken2, inviteCode);
+            그룹_추가_요청(accessToken);
+            final String inviteCode = toObject(외가_초대_코드_생성_요청(accessToken),
+                    CreateInviteCodeResponse.class).inviteCode();
 
-        // when
-        final ExtractableResponse<Response> response = 성장_앨범_메인_요청(accessToken2, babyId, nowDate.getYear(),
-                nowDate.getMonthValue());
+            final String accessToken2 = toObject(아기_등록_회원가입_요청(), MemberSignUpResponse.class).accessToken();
+            초대코드로_아기_추가_요청(accessToken2, inviteCode);
 
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+            // when
+            final ExtractableResponse<Response> response = 성장_앨범_메인_요청(accessToken2, babyId, nowDate.getYear(),
+                    nowDate.getMonthValue());
+
+            // then
+            assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        }
+
+        @Test
+        void 이미_관계가_존재하면_400을_던진다() {
+            // given
+            final String accessToken = toObject(아기_등록_회원가입_요청(), MemberSignUpResponse.class).accessToken();
+
+            그룹_추가_요청(accessToken);
+            final ExtractableResponse<Response> 외가_초대_코드_생성_응답 = 외가_초대_코드_생성_요청(accessToken);
+            final String inviteCode = toObject(외가_초대_코드_생성_응답, CreateInviteCodeResponse.class).inviteCode();
+
+            final String accessToken2 = toObject(아기_등록_회원가입_요청(), MemberSignUpResponse.class).accessToken();
+            초대코드로_아기_추가_요청(accessToken2, inviteCode);
+
+            // when
+            final ExtractableResponse<Response> response = 초대코드로_아기_추가_요청(accessToken2, inviteCode);
+
+            // then
+            assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        }
     }
 
     @TestConfiguration
