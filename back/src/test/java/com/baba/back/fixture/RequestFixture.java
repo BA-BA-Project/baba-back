@@ -9,6 +9,7 @@ import com.baba.back.baby.dto.BabyNameRequest;
 import com.baba.back.baby.dto.BabyRequest;
 import com.baba.back.baby.dto.CreateBabyRequest;
 import com.baba.back.baby.dto.CreateInviteCodeRequest;
+import com.baba.back.baby.dto.InviteCodeRequest;
 import com.baba.back.content.dto.ContentUpdateTitleAndCardStyleRequest;
 import com.baba.back.content.dto.CreateCommentRequest;
 import com.baba.back.content.dto.CreateContentRequest;
@@ -50,6 +51,7 @@ public class RequestFixture {
             "외가", "이모");
     public static final CreateInviteCodeRequest 초대코드_생성_요청_데이터2 = new CreateInviteCodeRequest(
             "가족", "아빠");
+    public static final InviteCodeRequest 초대코드로_아기_추가_요청_데이터 = new InviteCodeRequest("AAAAAA");
     public static final MemberUpdateRequest 마이_프로필_변경_요청_데이터 = new MemberUpdateRequest(
             "박재희2", "안녕하세요!", "PROFILE_W_2", "#81E0D5"
     );

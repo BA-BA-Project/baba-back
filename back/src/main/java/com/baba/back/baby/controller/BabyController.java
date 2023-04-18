@@ -5,6 +5,7 @@ import com.baba.back.baby.dto.BabyNameRequest;
 import com.baba.back.baby.dto.CreateBabyRequest;
 import com.baba.back.baby.dto.CreateInviteCodeRequest;
 import com.baba.back.baby.dto.CreateInviteCodeResponse;
+import com.baba.back.baby.dto.InviteCodeRequest;
 import com.baba.back.baby.dto.SearchInviteCodeResponse;
 import com.baba.back.baby.service.BabyService;
 import com.baba.back.oauth.support.Login;
@@ -93,5 +94,18 @@ public class BabyController {
     @GetMapping("/baby/invitation")
     public ResponseEntity<SearchInviteCodeResponse> searchInviteCodeByVisitor(@RequestParam String code) {
         return ResponseEntity.ok().body(babyService.searchInviteCode(code));
+    }
+
+    @Operation(summary = "초대코드로 아기 추가 요청")
+    @CreatedResponse
+    @BadRequestResponse
+    @UnAuthorizedResponse
+    @NotFoundResponse
+    @IntervalServerErrorResponse
+    @PostMapping("/baby/code")
+    public ResponseEntity<Void> addBabyWithCode(@RequestBody @NotNull InviteCodeRequest request,
+                                                @Login String memberId) {
+        babyService.addBabyWithCode(request, memberId);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

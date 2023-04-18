@@ -13,9 +13,11 @@ import com.baba.back.baby.dto.CreateBabyRequest;
 import com.baba.back.baby.dto.CreateInviteCodeRequest;
 import com.baba.back.baby.dto.CreateInviteCodeResponse;
 import com.baba.back.baby.dto.InviteCodeBabyResponse;
+import com.baba.back.baby.dto.InviteCodeRequest;
 import com.baba.back.baby.dto.SearchInviteCodeResponse;
 import com.baba.back.baby.exception.BabyBadRequestException;
 import com.baba.back.baby.exception.BabyNotFoundException;
+import com.baba.back.baby.exception.RelationBadRequestException;
 import com.baba.back.baby.exception.RelationGroupNotFoundException;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.baby.repository.InvitationRepository;
@@ -251,5 +253,41 @@ public class BabyService {
                         })
                         .toList(),
                 invitationCode.getRelationName());
+    }
+
+    public void addBabyWithCode(InviteCodeRequest request, String memberId) {
+        final Member member = findMember(memberId);
+
+        final Invitations invitations = getInvitations(request.getInviteCode());
+        final InvitationCode invitationCode = invitations.getUnExpiredInvitationCode(LocalDateTime.now(clock));
+
+        validateRelations(invitations.values(), member);
+        saveRelations(invitations.values(), invitationCode.getRelationName(), member);
+    }
+
+    private Invitations getInvitations(String code) {
+        return new Invitations(invitationRepository.findAllByCode(code));
+    }
+
+    private void validateRelations(List<Invitation> invitations, Member member) {
+        final List<Relation> relations = relationRepository.findAllByMember(member);
+        final List<RelationGroup> relationGroups = relations.stream()
+                .map(Relation::getRelationGroup)
+                .toList();
+
+        invitations.forEach(invitation -> {
+            if (relationGroups.contains(invitation.getRelationGroup())) {
+                throw new RelationBadRequestException("이미 존재하는 관계입니다.");
+            }
+        });
+    }
+
+    private void saveRelations(List<Invitation> invitations, String relationName, Member member) {
+        invitations.forEach(invitation -> relationRepository.save(Relation.builder()
+                .relationGroup(invitation.getRelationGroup())
+                .relationName(relationName)
+                .member(member)
+                .build())
+        );
     }
 }
