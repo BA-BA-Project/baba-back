@@ -1,6 +1,7 @@
 package com.baba.back.baby.acceptance;
 
 import static com.baba.back.SimpleRestAssured.toObject;
+import static com.baba.back.fixture.DomainFixture.nowDate;
 import static com.baba.back.fixture.DomainFixture.아기1;
 import static com.baba.back.fixture.DomainFixture.아기2;
 import static com.baba.back.fixture.RequestFixture.초대코드_생성_요청_데이터2;
@@ -171,6 +172,51 @@ class BabyAcceptanceTest extends AcceptanceTest {
     @Test
     void 초대_코드_조회_요청_시_가족_그룹_이외의_초대_코드도_조회할_수_있다() {
 
+    }
+
+    @Nested
+    class 초대코드로_아기_추가_요청_시_ {
+
+        @Test
+        void 아기의_성장앨범을_조회할_수_있다() {
+            // given
+            final ExtractableResponse<Response> signUpResponse = 아기_등록_회원가입_요청();
+            final String accessToken = toObject(signUpResponse, MemberSignUpResponse.class).accessToken();
+            final String babyId = getBabyId(signUpResponse);
+
+            그룹_추가_요청(accessToken);
+            final String inviteCode = toObject(외가_초대_코드_생성_요청(accessToken),
+                    CreateInviteCodeResponse.class).inviteCode();
+
+            final String accessToken2 = toObject(아기_등록_회원가입_요청(), MemberSignUpResponse.class).accessToken();
+            초대코드로_아기_추가_요청(accessToken2, inviteCode);
+
+            // when
+            final ExtractableResponse<Response> response = 성장_앨범_메인_요청(accessToken2, babyId, nowDate.getYear(),
+                    nowDate.getMonthValue());
+
+            // then
+            assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        }
+
+        @Test
+        void 이미_관계가_존재하면_400을_던진다() {
+            // given
+            final String accessToken = toObject(아기_등록_회원가입_요청(), MemberSignUpResponse.class).accessToken();
+
+            그룹_추가_요청(accessToken);
+            final ExtractableResponse<Response> 외가_초대_코드_생성_응답 = 외가_초대_코드_생성_요청(accessToken);
+            final String inviteCode = toObject(외가_초대_코드_생성_응답, CreateInviteCodeResponse.class).inviteCode();
+
+            final String accessToken2 = toObject(아기_등록_회원가입_요청(), MemberSignUpResponse.class).accessToken();
+            초대코드로_아기_추가_요청(accessToken2, inviteCode);
+
+            // when
+            final ExtractableResponse<Response> response = 초대코드로_아기_추가_요청(accessToken2, inviteCode);
+
+            // then
+            assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        }
     }
 
     @TestConfiguration
