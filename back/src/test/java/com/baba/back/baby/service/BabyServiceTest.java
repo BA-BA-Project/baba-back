@@ -114,84 +114,6 @@ class BabyServiceTest {
     @Mock
     private Clock clock;
 
-    @Nested
-    class 아기_추가_요청_시_ {
-
-        final String memberId = 멤버1.getId();
-        final Clock now = Clock.systemDefaultZone();
-
-        @Test
-        void 자신의_아기가_없다면_아기를_추가한다() {
-            // given
-            given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
-            given(relationRepository.findAllByMemberAndRelationGroupFamily(any(Member.class), eq(true)))
-                    .willReturn(List.of());
-
-            given(clock.instant()).willReturn(now.instant());
-            given(clock.getZone()).willReturn(now.getZone());
-            given(idConstructor.createId()).willReturn(아기1.getId());
-            given(babyRepository.save(any(Baby.class))).willReturn(아기1);
-
-            given(picker.pick(anyList())).willReturn(Color.COLOR_1);
-
-            // when
-            final String babyId = babyService.createBaby(memberId, 아기_추가_요청_데이터);
-
-            // then
-            assertThat(babyId).isEqualTo(아기1.getId());
-
-            then(babyRepository).should(times(1)).save(any(Baby.class));
-            then(relationGroupRepository).should(times(1)).save(any(RelationGroup.class));
-            then(relationRepository).should(times(1)).save(any(Relation.class));
-        }
-
-        @Test
-        void 동일한_이름의_아기가_존재하면_예외를_던진다() {
-            // given
-            given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
-            given(clock.instant()).willReturn(now.instant());
-            given(clock.getZone()).willReturn(now.getZone());
-            given(clock.instant()).willReturn(now.instant());
-            given(clock.getZone()).willReturn(now.getZone());
-            given(idConstructor.createId()).willReturn(아기1.getId());
-            given(babyRepository.save(any(Baby.class))).willReturn(아기1);
-
-            given(relationRepository.findAllByMemberAndRelationGroupFamily(any(Member.class), eq(true)))
-                    .willReturn(List.of(관계10, 관계20));
-
-            final CreateBabyRequest request = new CreateBabyRequest("아기1", "아빠", LocalDate.now());
-
-            // when & then
-            assertThatThrownBy(() -> babyService.createBaby(memberId, request))
-                    .isInstanceOf(BabyBadRequestException.class);
-        }
-
-        @Test
-        void 자신의_아기가_있어도_아기를_추가할_수_있다() {
-            // given
-            given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
-            given(relationRepository.findAllByMemberAndRelationGroupFamily(any(Member.class), eq(true)))
-                    .willReturn(List.of(관계10, 관계20));
-            given(clock.instant()).willReturn(now.instant());
-            given(clock.getZone()).willReturn(now.getZone());
-            given(idConstructor.createId()).willReturn(아기1.getId());
-            given(babyRepository.save(any(Baby.class))).willReturn(아기1);
-
-            given(relationGroupRepository.findAllByBaby(any(Baby.class))).willReturn(List.of(관계그룹10, 관계그룹11));
-            given(relationRepository.findAllByRelationGroupIn(anyList())).willReturn(List.of(관계10, 관계11, 관계12));
-
-            // when
-            final String babyId = babyService.createBaby(memberId, 아기_추가_요청_데이터);
-
-            // then
-            assertThat(babyId).isEqualTo(아기1.getId());
-
-            then(babyRepository).should(times(1)).save(any(Baby.class));
-            then(relationGroupRepository).should(times(3)).save(any(RelationGroup.class));
-            then(relationRepository).should(times(3)).save(any(Relation.class));
-        }
-    }
-
     @Test
     void 존재하지_않는_멤버가_등록된_아기_리스트를_조회할_때_예외를_던진다() {
         // given
@@ -223,72 +145,6 @@ class BabyServiceTest {
                         new BabyResponse(아기4.getId(), 관계그룹40.getGroupColor(), 아기4.getName())
                 )
         );
-    }
-
-    @Nested
-    class 아기_이름_변경_요청_시_ {
-        final String memberId = 멤버1.getId();
-        final String babyId = 아기1.getId();
-        final String babyName = 아기_이름_변경_요청_데이터.getName();
-
-        @Test
-        void 아기가_없으면_예외를_던진다() {
-            // given
-            given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
-            given(babyRepository.findById(babyId)).willReturn(Optional.empty());
-
-            // when & then
-            assertThatThrownBy(() -> babyService.updateBabyName(memberId, babyId, babyName))
-                    .isInstanceOf(BabyNotFoundException.class);
-        }
-
-        @Test
-        void 아기와의_관계가_없으면_예외를_던진다() {
-            // given
-            given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
-            given(babyRepository.findById(babyId)).willReturn(Optional.of(아기1));
-            given(relationRepository.findByMemberAndBaby(any(Member.class), any(Baby.class)))
-                    .willReturn(Optional.empty());
-
-            // when & then
-            assertThatThrownBy(() -> babyService.updateBabyName(memberId, babyId, babyName))
-                    .isInstanceOf(RelationNotFoundException.class);
-        }
-
-        @Test
-        void 아기와_가족_관계가_아니면_예외를_던진다() {
-            // given
-            given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
-            given(babyRepository.findById(babyId)).willReturn(Optional.of(아기1));
-            given(relationRepository.findByMemberAndBaby(any(Member.class), any(Baby.class)))
-                    .willReturn(Optional.of(관계12));
-
-            // when & then
-            assertThatThrownBy(() -> babyService.updateBabyName(memberId, babyId, babyName))
-                    .isInstanceOf(MemberAuthorizationException.class);
-        }
-
-        @Test
-        void 아기의_이름을_변경한다() {
-            // given
-            final Baby baby = Baby.builder()
-                    .id("baby1")
-                    .name("아기1")
-                    .birthday(nowDate)
-                    .now(nowDate)
-                    .build();
-
-            given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
-            given(babyRepository.findById(babyId)).willReturn(Optional.of(baby));
-            given(relationRepository.findByMemberAndBaby(any(Member.class), any(Baby.class)))
-                    .willReturn(Optional.of(관계10));
-
-            // when
-            babyService.updateBabyName(memberId, babyId, babyName);
-
-            // then
-            then(babyRepository).should(times(1)).save(any(Baby.class));
-        }
     }
 
     @Test
@@ -449,6 +305,150 @@ class BabyServiceTest {
                         new InviteCodeBabyResponse(아기1.getName()),
                         new InviteCodeBabyResponse(아기2.getName()))
         );
+    }
+
+    @Nested
+    class 아기_추가_요청_시_ {
+
+        final String memberId = 멤버1.getId();
+        final Clock now = Clock.systemDefaultZone();
+
+        @Test
+        void 자신의_아기가_없다면_아기를_추가한다() {
+            // given
+            given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
+            given(relationRepository.findAllByMemberAndRelationGroupFamily(any(Member.class), eq(true)))
+                    .willReturn(List.of());
+
+            given(clock.instant()).willReturn(now.instant());
+            given(clock.getZone()).willReturn(now.getZone());
+            given(idConstructor.createId()).willReturn(아기1.getId());
+            given(babyRepository.save(any(Baby.class))).willReturn(아기1);
+
+            given(picker.pick(anyList())).willReturn(Color.COLOR_1);
+
+            // when
+            final String babyId = babyService.createBaby(memberId, 아기_추가_요청_데이터);
+
+            // then
+            assertThat(babyId).isEqualTo(아기1.getId());
+
+            then(babyRepository).should(times(1)).save(any(Baby.class));
+            then(relationGroupRepository).should(times(1)).save(any(RelationGroup.class));
+            then(relationRepository).should(times(1)).save(any(Relation.class));
+        }
+
+        @Test
+        void 동일한_이름의_아기가_존재하면_예외를_던진다() {
+            // given
+            given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
+            given(clock.instant()).willReturn(now.instant());
+            given(clock.getZone()).willReturn(now.getZone());
+            given(clock.instant()).willReturn(now.instant());
+            given(clock.getZone()).willReturn(now.getZone());
+            given(idConstructor.createId()).willReturn(아기1.getId());
+            given(babyRepository.save(any(Baby.class))).willReturn(아기1);
+
+            given(relationRepository.findAllByMemberAndRelationGroupFamily(any(Member.class), eq(true)))
+                    .willReturn(List.of(관계10, 관계20));
+
+            final CreateBabyRequest request = new CreateBabyRequest("아기1", "아빠", LocalDate.now());
+
+            // when & then
+            assertThatThrownBy(() -> babyService.createBaby(memberId, request))
+                    .isInstanceOf(BabyBadRequestException.class);
+        }
+
+        @Test
+        void 자신의_아기가_있어도_아기를_추가할_수_있다() {
+            // given
+            given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
+            given(relationRepository.findAllByMemberAndRelationGroupFamily(any(Member.class), eq(true)))
+                    .willReturn(List.of(관계10, 관계20));
+            given(clock.instant()).willReturn(now.instant());
+            given(clock.getZone()).willReturn(now.getZone());
+            given(idConstructor.createId()).willReturn(아기1.getId());
+            given(babyRepository.save(any(Baby.class))).willReturn(아기1);
+
+            given(relationGroupRepository.findAllByBaby(any(Baby.class))).willReturn(List.of(관계그룹10, 관계그룹11));
+            given(relationRepository.findAllByRelationGroupIn(anyList())).willReturn(List.of(관계10, 관계11, 관계12));
+
+            // when
+            final String babyId = babyService.createBaby(memberId, 아기_추가_요청_데이터);
+
+            // then
+            assertThat(babyId).isEqualTo(아기1.getId());
+
+            then(babyRepository).should(times(1)).save(any(Baby.class));
+            then(relationGroupRepository).should(times(3)).save(any(RelationGroup.class));
+            then(relationRepository).should(times(3)).save(any(Relation.class));
+        }
+    }
+
+    @Nested
+    class 아기_이름_변경_요청_시_ {
+        final String memberId = 멤버1.getId();
+        final String babyId = 아기1.getId();
+        final String babyName = 아기_이름_변경_요청_데이터.getName();
+
+        @Test
+        void 아기가_없으면_예외를_던진다() {
+            // given
+            given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
+            given(babyRepository.findById(babyId)).willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> babyService.updateBabyName(memberId, babyId, babyName))
+                    .isInstanceOf(BabyNotFoundException.class);
+        }
+
+        @Test
+        void 아기와의_관계가_없으면_예외를_던진다() {
+            // given
+            given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
+            given(babyRepository.findById(babyId)).willReturn(Optional.of(아기1));
+            given(relationRepository.findByMemberAndBaby(any(Member.class), any(Baby.class)))
+                    .willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> babyService.updateBabyName(memberId, babyId, babyName))
+                    .isInstanceOf(RelationNotFoundException.class);
+        }
+
+        @Test
+        void 아기와_가족_관계가_아니면_예외를_던진다() {
+            // given
+            given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
+            given(babyRepository.findById(babyId)).willReturn(Optional.of(아기1));
+            given(relationRepository.findByMemberAndBaby(any(Member.class), any(Baby.class)))
+                    .willReturn(Optional.of(관계12));
+
+            // when & then
+            assertThatThrownBy(() -> babyService.updateBabyName(memberId, babyId, babyName))
+                    .isInstanceOf(MemberAuthorizationException.class);
+        }
+
+        @Test
+        void 아기의_이름을_변경한다() {
+            // given
+            final Baby baby = Baby.builder()
+                    .id("baby1")
+                    .name("아기1")
+                    .birthday(nowDate)
+                    .now(nowDate)
+                    .build();
+
+            given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
+            given(babyRepository.findById(babyId)).willReturn(Optional.of(baby));
+            given(relationRepository.findByMemberAndBaby(any(Member.class), any(Baby.class)))
+                    .willReturn(Optional.of(관계10));
+
+            // when
+            babyService.updateBabyName(memberId, babyId, babyName);
+
+            // then
+            then(babyRepository).should(times(1)).save(any(Baby.class));
+        }
     }
 
     @Nested

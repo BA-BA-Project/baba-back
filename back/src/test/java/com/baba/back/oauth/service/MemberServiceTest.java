@@ -25,7 +25,6 @@ import static com.baba.back.fixture.RequestFixture.마이_프로필_변경_요�
 import static com.baba.back.fixture.RequestFixture.멤버_가입_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.초대코드로_멤버_가입_요청_데이터;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
@@ -63,7 +62,6 @@ import com.baba.back.oauth.dto.MemberSignUpResponse;
 import com.baba.back.oauth.dto.MyProfileResponse;
 import com.baba.back.oauth.dto.SignUpWithBabyResponse;
 import com.baba.back.oauth.dto.SignUpWithCodeRequest;
-import com.baba.back.oauth.dto.UpdateGroupRequest;
 import com.baba.back.oauth.exception.MemberBadRequestException;
 import com.baba.back.oauth.exception.MemberNotFoundException;
 import com.baba.back.oauth.repository.MemberRepository;

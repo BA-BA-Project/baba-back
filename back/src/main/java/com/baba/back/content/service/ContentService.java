@@ -4,7 +4,6 @@ import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.exception.BabyNotFoundException;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.common.FileHandler;
-import com.baba.back.content.dto.ContentUpdateTitleAndCardStyleRequest;
 import com.baba.back.content.domain.Like;
 import com.baba.back.content.domain.comment.Comment;
 import com.baba.back.content.domain.comment.Tag;
@@ -13,6 +12,7 @@ import com.baba.back.content.domain.content.ImageFile;
 import com.baba.back.content.dto.CommentResponse;
 import com.baba.back.content.dto.CommentsResponse;
 import com.baba.back.content.dto.ContentResponse;
+import com.baba.back.content.dto.ContentUpdateTitleAndCardStyleRequest;
 import com.baba.back.content.dto.ContentsResponse;
 import com.baba.back.content.dto.CreateCommentRequest;
 import com.baba.back.content.dto.CreateContentRequest;
@@ -319,7 +319,8 @@ public class ContentService {
         return new LikesResponse(iconResponses, memberResponses);
     }
 
-    public void updateTitleAndCard(String memberId, String babyId, Long contentId, ContentUpdateTitleAndCardStyleRequest request) {
+    public void updateTitleAndCard(String memberId, String babyId, Long contentId,
+                                   ContentUpdateTitleAndCardStyleRequest request) {
         final Member member = findMember(memberId);
         final Content content = findContent(contentId);
         final Baby baby = findBaby(babyId);

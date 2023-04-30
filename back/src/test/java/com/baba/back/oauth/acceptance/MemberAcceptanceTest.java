@@ -150,7 +150,8 @@ class MemberAcceptanceTest extends AcceptanceTest {
         assertAll(
                 () -> assertThat(updateResponse.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(response).extracting("name", "introduction", "iconName", "iconColor")
-                        .containsExactly(마이_프로필_변경_요청_데이터.getName(), 마이_프로필_변경_요청_데이터.getIntroduction(), 마이_프로필_변경_요청_데이터.getIconName(),
+                        .containsExactly(마이_프로필_변경_요청_데이터.getName(), 마이_프로필_변경_요청_데이터.getIntroduction(),
+                                마이_프로필_변경_요청_데이터.getIconName(),
                                 마이_프로필_변경_요청_데이터.getIconColor())
         );
     }
@@ -315,6 +316,28 @@ class MemberAcceptanceTest extends AcceptanceTest {
         );
     }
 
+    @Test
+    void 그룹_정보_변경_요청_시_그룹명이_변경된다() {
+        // given
+        final ExtractableResponse<Response> 아기_등록_회원가입_응답 = 아기_등록_회원가입_요청(멤버_가입_요청_데이터);
+        final String accessToken = toObject(아기_등록_회원가입_응답, MemberSignUpResponse.class).accessToken();
+        외가_그룹_추가_요청(accessToken);
+
+        // when
+        final ExtractableResponse<Response> response = 그룹_정보_변경_요청(accessToken);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        public Picker<Color> picker() {
+            return colors -> Color.COLOR_1;
+        }
+    }
+
     @Nested
     class 다른_아기_프로필_조회_요청_시_ {
 
@@ -370,28 +393,6 @@ class MemberAcceptanceTest extends AcceptanceTest {
                     () -> assertThat(babyProfileResponse.familyGroup().babies()).hasSize(2),
                     () -> assertThat(babyProfileResponse.myGroup().members()).hasSize(1)
             );
-        }
-    }
-
-    @Test
-    void 그룹_정보_변경_요청_시_그룹명이_변경된다() {
-        // given
-        final ExtractableResponse<Response> 아기_등록_회원가입_응답 = 아기_등록_회원가입_요청(멤버_가입_요청_데이터);
-        final String accessToken = toObject(아기_등록_회원가입_응답, MemberSignUpResponse.class).accessToken();
-        외가_그룹_추가_요청(accessToken);
-
-        // when
-        final ExtractableResponse<Response> response = 그룹_정보_변경_요청(accessToken);
-
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-    }
-
-    @TestConfiguration
-    static class TestConfig {
-        @Bean
-        public Picker<Color> picker() {
-            return colors -> Color.COLOR_1;
         }
     }
 }
