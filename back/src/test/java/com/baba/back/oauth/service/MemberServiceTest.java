@@ -18,12 +18,14 @@ import static com.baba.back.fixture.DomainFixture.아기1;
 import static com.baba.back.fixture.DomainFixture.아기2;
 import static com.baba.back.fixture.DomainFixture.초대10;
 import static com.baba.back.fixture.DomainFixture.초대20;
+import static com.baba.back.fixture.RequestFixture.그룹_정보_변경_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.그룹_추가_요청_데이터1;
 import static com.baba.back.fixture.RequestFixture.그룹_추가_요청_데이터2;
 import static com.baba.back.fixture.RequestFixture.마이_프로필_변경_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.멤버_가입_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.초대코드로_멤버_가입_요청_데이터;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
@@ -416,15 +418,15 @@ class MemberServiceTest {
 
     @Nested
     class 마이_프로필_변경_시_ {
-        
+
         @Test
         void 멤버의_정보를_변경한다() {
             // given
             given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
-            
+
             // when
             memberService.updateMember(멤버1.getId(), 마이_프로필_변경_요청_데이터);
-            
+
             // then
             then(memberRepository).should().save(any(Member.class));
         }
@@ -619,6 +621,39 @@ class MemberServiceTest {
                             )
                     )
             );
+        }
+    }
+
+    @Nested
+    class 그룹_정보_변경_시_ {
+
+        final String memberId = 멤버1.getId();
+        final String groupName = "외가";
+
+        @Test
+        void 요청_받은_그룹명에_해당하는_그룹이_없으면_예외를_던진다() {
+            // given
+            given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
+            given(relationRepository.findFirstByMemberAndRelationGroupFamily(any(Member.class), eq(true)))
+                    .willReturn(Optional.of(관계10));
+            given(relationGroupRepository.findAllByBaby(any(Baby.class))).willReturn(List.of(관계그룹10));
+
+            // when & then
+            assertThatThrownBy(() -> memberService.updateGroup(memberId, groupName, 그룹_정보_변경_요청_데이터))
+                    .isInstanceOf(RelationGroupNotFoundException.class);
+        }
+
+        @Test
+        void 그룹명을_변경한다() {
+            // given
+            given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
+            given(relationRepository.findFirstByMemberAndRelationGroupFamily(any(Member.class), eq(true)))
+                    .willReturn(Optional.of(관계10));
+            given(relationGroupRepository.findAllByBaby(any(Baby.class))).willReturn(List.of(관계그룹10, 관계그룹11));
+
+            // when & then
+            assertThatCode(() -> memberService.updateGroup(memberId, groupName, 그룹_정보_변경_요청_데이터))
+                    .doesNotThrowAnyException();
         }
     }
 }

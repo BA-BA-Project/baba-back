@@ -22,6 +22,7 @@ import com.baba.back.oauth.dto.MemberUpdateRequest;
 import com.baba.back.oauth.dto.SignUpWithCodeRequest;
 import com.baba.back.oauth.dto.SocialTokenRequest;
 import com.baba.back.oauth.dto.TermsRequest;
+import com.baba.back.oauth.dto.UpdateGroupRequest;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.mock.web.MockMultipartFile;
@@ -37,6 +38,9 @@ public class RequestFixture {
     public static final CreateBabyRequest 아기_추가_요청_데이터 = new CreateBabyRequest("아기3", "아빠", LocalDate.now());
     public static final CreateGroupRequest 그룹_추가_요청_데이터1 = new CreateGroupRequest("외가", "#FFAEBA");
     public static final CreateGroupRequest 그룹_추가_요청_데이터2 = new CreateGroupRequest("친가", "#FFAEBA");
+
+    public static final UpdateGroupRequest 그룹_정보_변경_요청_데이터 = new UpdateGroupRequest("외가");
+
     public static final SignUpWithCodeRequest 초대코드로_멤버_가입_요청_데이터 = new SignUpWithCodeRequest(
             "AAAAAA", "박재희", "PROFILE_W_1"
     );

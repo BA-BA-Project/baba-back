@@ -65,6 +65,10 @@ public class RelationGroup extends BaseEntity {
         return this.relationGroupName.getValue();
     }
 
+    public void updateRelationGroupName(String relationGroupName) {
+        this.relationGroupName = new Name(relationGroupName);
+    }
+
     public boolean canShare(RelationGroup other) {
 
         final boolean isSameBaby = this.baby.equals(other.baby);
