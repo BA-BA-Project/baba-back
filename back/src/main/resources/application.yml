@@ -4,7 +4,7 @@ spring:
     active: local
   servlet:
     multipart:
-      maxFileSize: 10MB
+      maxFileSize: 1MB
 
 springdoc:
   swagger-ui:
