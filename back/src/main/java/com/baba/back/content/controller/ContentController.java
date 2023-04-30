@@ -1,12 +1,14 @@
 package com.baba.back.content.controller;
 
 import com.baba.back.content.dto.CommentsResponse;
+import com.baba.back.content.dto.ContentUpdateTitleAndCardStyleRequest;
 import com.baba.back.content.dto.ContentsResponse;
 import com.baba.back.content.dto.CreateCommentRequest;
 import com.baba.back.content.dto.CreateContentRequest;
 import com.baba.back.content.dto.LikeContentResponse;
 import com.baba.back.content.dto.LikesResponse;
 import com.baba.back.content.dto.SuccessMessageResponse;
+import com.baba.back.content.dto.UpdateContentPhotoRequest;
 import com.baba.back.content.service.ContentService;
 import com.baba.back.oauth.support.Login;
 import com.baba.back.swagger.BadRequestResponse;
@@ -90,8 +92,8 @@ public class ContentController {
     @IntervalServerErrorResponse
     @GetMapping("/baby/{babyId}/album/{contentId}/comments")
     public ResponseEntity<CommentsResponse> getComments(@Login String memberId,
-                                                       @PathVariable("babyId") String babyId,
-                                                       @PathVariable("contentId") Long contentId) {
+                                                        @PathVariable("babyId") String babyId,
+                                                        @PathVariable("contentId") Long contentId) {
         return ResponseEntity.ok(contentService.getComments(memberId, babyId, contentId));
     }
 
@@ -120,7 +122,8 @@ public class ContentController {
                                               @RequestBody @Valid CreateCommentRequest request) {
 
         Long commentId = contentService.createComment(memberId, babyId, contentId, request);
-        return ResponseEntity.created(URI.create("/baby/" + babyId + "/album/" + contentId + "/comment/" + commentId)).build();
+        return ResponseEntity.created(URI.create("/baby/" + babyId + "/album/" + contentId + "/comment/" + commentId))
+                .build();
     }
 
     @Operation(summary = "성장 앨범 댓글 추가 요청")
@@ -131,9 +134,9 @@ public class ContentController {
     @IntervalServerErrorResponse
     @PatchMapping("/baby/{babyId}/album/{contentId}/title-card")
     public ResponseEntity<Void> updateTitleAndCard(@Login String memberId,
-                                              @PathVariable("babyId") String babyId,
-                                              @PathVariable("contentId") Long contentId,
-                                              @RequestBody @Valid ContentUpdateTitleAndCardStyleRequest request) {
+                                                   @PathVariable("babyId") String babyId,
+                                                   @PathVariable("contentId") Long contentId,
+                                                   @RequestBody @Valid ContentUpdateTitleAndCardStyleRequest request) {
 
         contentService.updateTitleAndCard(memberId, babyId, contentId, request);
         return ResponseEntity.ok().build();
@@ -147,11 +150,29 @@ public class ContentController {
     @IntervalServerErrorResponse
     @DeleteMapping("/baby/{babyId}/album/{contentId}/comment/{commentId}")
     public ResponseEntity<Void> deleteComment(@Login String memberId,
-                                                   @PathVariable("babyId") String babyId,
-                                                   @PathVariable("contentId") Long contentId,
-                                                   @PathVariable("commentId") Long commentId) {
+                                              @PathVariable("babyId") String babyId,
+                                              @PathVariable("contentId") Long contentId,
+                                              @PathVariable("commentId") Long commentId) {
 
         contentService.deleteComment(memberId, babyId, contentId, commentId);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "성장 앨범 사진 수정 요청")
+    @OkResponse
+    @BadRequestResponse
+    @UnAuthorizedResponse
+    @NotFoundResponse
+    @IntervalServerErrorResponse
+    @PatchMapping("/baby/{babyId}/album/{contentId}/photo")
+    public ResponseEntity<Void> updatePhoto(@Login String memberId,
+                                            @PathVariable("babyId") String babyId,
+                                            @PathVariable("contentId") Long contentId,
+                                            @ModelAttribute @Valid UpdateContentPhotoRequest request
+    ) {
+
+        contentService.updatePhoto(memberId, babyId, contentId, request);
 
         return ResponseEntity.ok().build();
     }

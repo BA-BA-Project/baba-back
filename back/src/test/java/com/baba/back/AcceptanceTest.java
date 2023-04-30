@@ -19,8 +19,9 @@ import static com.baba.back.fixture.RequestFixture.초대코드_생성_요청_�
 
 import com.baba.back.baby.dto.CreateInviteCodeRequest;
 import com.baba.back.baby.dto.InviteCodeRequest;
-import com.baba.back.content.controller.ContentUpdateTitleAndCardStyleRequest;
+import com.baba.back.content.dto.ContentUpdateTitleAndCardStyleRequest;
 import com.baba.back.content.dto.CreateCommentRequest;
+import com.baba.back.content.dto.UpdateContentPhotoRequest;
 import com.baba.back.oauth.dto.MemberSignUpRequest;
 import com.baba.back.oauth.dto.SignUpWithCodeRequest;
 import com.baba.back.oauth.dto.TokenRefreshRequest;
@@ -28,6 +29,7 @@ import com.baba.back.oauth.service.SignTokenProvider;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.UUID;
@@ -37,6 +39,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.web.multipart.MultipartFile;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Sql("/truncate.sql")
@@ -140,7 +143,7 @@ public class AcceptanceTest {
 
     protected ExtractableResponse<Response> 성장앨범_생성_요청(String accessToken, String babyId, LocalDate now) {
         return thenExtract(
-                RestAssured.given()
+                SimpleRestAssured.given()
                         .headers(Map.of("Authorization", "Bearer " + accessToken))
                         .multiPart("photo", "test_file.jpg", "Something".getBytes(), MediaType.IMAGE_PNG_VALUE)
                         .multiPart("date", now.toString())
@@ -218,10 +221,25 @@ public class AcceptanceTest {
                 request);
     }
 
-    protected ExtractableResponse<Response> 댓글_삭제_요청(String accessToken, String babyId, Long contentId, Long commentId) {
+    protected ExtractableResponse<Response> 댓글_삭제_요청(String accessToken, String babyId, Long contentId,
+                                                     Long commentId) {
         return delete(String.format("/%s/%s/%s/%s/%s/comment/%s",
                         BASE_PATH, BABY_BASE_PATH, babyId, CONTENT_BASE_PATH, contentId, commentId),
                 Map.of("Authorization", "Bearer " + accessToken));
+    }
+
+    protected ExtractableResponse<Response> 성장_앨범_사진_수정_요청(String accessToken, String babyId, Long contentId,
+                                                           UpdateContentPhotoRequest request) throws IOException {
+        final MultipartFile photo = request.photo();
+        return thenExtract(
+                SimpleRestAssured.given()
+                        .headers(Map.of("Authorization", "Bearer " + accessToken))
+                        .multiPart("photo", photo.getOriginalFilename(), photo.getBytes(),
+                                photo.getContentType())
+                        .when()
+                        .patch(String.format("/%s/%s/%s/%s/%s/photo",
+                                BASE_PATH, BABY_BASE_PATH, babyId, CONTENT_BASE_PATH, contentId))
+        );
     }
 
     protected Long getContentId(ExtractableResponse<Response> response) {

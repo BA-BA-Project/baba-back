@@ -28,6 +28,7 @@ import static com.baba.back.fixture.DomainFixture.컨텐츠20;
 import static com.baba.back.fixture.DomainFixture.태그10;
 import static com.baba.back.fixture.DomainFixture.태그20;
 import static com.baba.back.fixture.RequestFixture.댓글_생성_요청_데이터;
+import static com.baba.back.fixture.RequestFixture.컨텐츠_사진_수정_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.컨텐츠_생성_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.콘텐츠_제목_카드스타일_변경_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.태그_댓글_생성_요청_데이터1;
@@ -40,7 +41,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 import com.baba.back.baby.exception.BabyNotFoundException;
 import com.baba.back.baby.repository.BabyRepository;
@@ -781,5 +781,32 @@ class ContentServiceTest {
         // when & then
         assertThatThrownBy(() -> contentService.deleteComment(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId(), 댓글10.getId()))
                 .isInstanceOf(CommentNotFoundException.class);
+    }
+
+    @Test
+    void 성장_앨범_사진_수정_시_성장_앨범의_생성자가_아니라면_예외를_던진다() {
+        // given
+        given(contentRepository.findById(컨텐츠10.getId())).willReturn(Optional.of(컨텐츠10));
+        given(babyRepository.findById(아기1.getId())).willReturn(Optional.of(아기1));
+        given(memberRepository.findById(멤버2.getId())).willReturn(Optional.of(멤버2));
+        given(relationRepository.findByMemberAndBaby(멤버2, 아기1)).willReturn(Optional.of(관계11));
+
+        // when & then
+        assertThatThrownBy(() -> contentService.updatePhoto(멤버2.getId(), 아기1.getId(), 컨텐츠10.getId(), 컨텐츠_사진_수정_요청_데이터))
+                .isInstanceOf(ContentBadRequestException.class);
+    }
+
+    @Test
+    void 성장_앨범_사진을_수정할_수_있다() {
+        // given
+        given(contentRepository.findById(컨텐츠10.getId())).willReturn(Optional.of(컨텐츠10));
+        given(babyRepository.findById(아기1.getId())).willReturn(Optional.of(아기1));
+        given(memberRepository.findById(멤버1.getId())).willReturn(Optional.of(멤버1));
+        given(relationRepository.findByMemberAndBaby(멤버1, 아기1)).willReturn(Optional.of(관계10));
+        given(fileHandler.upload(any(ImageFile.class))).willReturn("VALID_IMAGE_SOURCE");
+
+        // when & then
+        assertThatCode(() -> contentService.updatePhoto(멤버1.getId(), 아기1.getId(), 컨텐츠10.getId(), 컨텐츠_사진_수정_요청_데이터))
+                .doesNotThrowAnyException();
     }
 }
