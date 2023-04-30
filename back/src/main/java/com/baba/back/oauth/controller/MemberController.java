@@ -9,6 +9,7 @@ import com.baba.back.oauth.dto.MemberUpdateRequest;
 import com.baba.back.oauth.dto.MyProfileResponse;
 import com.baba.back.oauth.dto.SignUpWithBabyResponse;
 import com.baba.back.oauth.dto.SignUpWithCodeRequest;
+import com.baba.back.oauth.dto.UpdateGroupRequest;
 import com.baba.back.oauth.service.MemberService;
 import com.baba.back.oauth.support.Login;
 import com.baba.back.oauth.support.SignUp;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "멤버 관련 API")
@@ -120,5 +122,18 @@ public class MemberController {
     @GetMapping("/members/baby-page/{babyId}")
     public ResponseEntity<BabyProfileResponse> searchBabyProfile(@Login String memberId, @PathVariable String babyId) {
         return ResponseEntity.ok(memberService.searchBabyGroups(memberId, babyId));
+    }
+
+    @Operation(summary = "그룹 정보 변경 요청")
+    @OkResponse
+    @UnAuthorizedResponse
+    @NotFoundResponse
+    @IntervalServerErrorResponse
+    @PutMapping("/members/groups")
+    public ResponseEntity<Void> updateGroup(@Login String memberId,
+                                            @RequestParam("groupName") String groupName,
+                                            @RequestBody @Valid UpdateGroupRequest request) {
+        memberService.updateGroup(memberId, groupName, request);
+        return ResponseEntity.ok().build();
     }
 }

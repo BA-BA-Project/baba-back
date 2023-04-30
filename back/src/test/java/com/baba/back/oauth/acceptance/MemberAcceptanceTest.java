@@ -373,6 +373,20 @@ class MemberAcceptanceTest extends AcceptanceTest {
         }
     }
 
+    @Test
+    void 그룹_정보_변경_요청_시_그룹명이_변경된다() {
+        // given
+        final ExtractableResponse<Response> 아기_등록_회원가입_응답 = 아기_등록_회원가입_요청(멤버_가입_요청_데이터);
+        final String accessToken = toObject(아기_등록_회원가입_응답, MemberSignUpResponse.class).accessToken();
+        외가_그룹_추가_요청(accessToken);
+
+        // when
+        final ExtractableResponse<Response> response = 그룹_정보_변경_요청(accessToken);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
     @TestConfiguration
     static class TestConfig {
         @Bean
