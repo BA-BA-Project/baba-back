@@ -63,6 +63,7 @@ import com.baba.back.oauth.dto.MemberSignUpResponse;
 import com.baba.back.oauth.dto.MyProfileResponse;
 import com.baba.back.oauth.dto.SignUpWithBabyResponse;
 import com.baba.back.oauth.dto.SignUpWithCodeRequest;
+import com.baba.back.oauth.dto.UpdateGroupRequest;
 import com.baba.back.oauth.exception.MemberBadRequestException;
 import com.baba.back.oauth.exception.MemberNotFoundException;
 import com.baba.back.oauth.repository.MemberRepository;
@@ -646,14 +647,23 @@ class MemberServiceTest {
         @Test
         void 그룹명을_변경한다() {
             // given
+            final RelationGroup relationGroup = RelationGroup.builder()
+                    .baby(아기1)
+                    .relationGroupName(groupName)
+                    .family(false)
+                    .groupColor(Color.COLOR_1)
+                    .build();
+
             given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
             given(relationRepository.findFirstByMemberAndRelationGroupFamily(any(Member.class), eq(true)))
                     .willReturn(Optional.of(관계10));
-            given(relationGroupRepository.findAllByBaby(any(Baby.class))).willReturn(List.of(관계그룹10, 관계그룹11));
+            given(relationGroupRepository.findAllByBaby(any(Baby.class))).willReturn(List.of(관계그룹10, relationGroup));
 
-            // when & then
-            assertThatCode(() -> memberService.updateGroup(memberId, groupName, 그룹_정보_변경_요청_데이터))
-                    .doesNotThrowAnyException();
+            // when
+            memberService.updateGroup(memberId, groupName, 그룹_정보_변경_요청_데이터);
+
+            // then
+            assertThat(relationGroup.getRelationGroupName()).isEqualTo(그룹_정보_변경_요청_데이터.getRelationGroup());
         }
     }
 }
