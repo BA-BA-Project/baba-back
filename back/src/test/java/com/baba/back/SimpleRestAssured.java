@@ -66,7 +66,7 @@ public class SimpleRestAssured {
         return given;
     }
 
-    private static RequestSpecification given() {
+    public static RequestSpecification given() {
         return RestAssured.given().log().all();
     }
 

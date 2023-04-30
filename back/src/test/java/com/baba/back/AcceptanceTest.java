@@ -143,7 +143,7 @@ public class AcceptanceTest {
 
     protected ExtractableResponse<Response> 성장앨범_생성_요청(String accessToken, String babyId, LocalDate now) {
         return thenExtract(
-                RestAssured.given()
+                SimpleRestAssured.given()
                         .headers(Map.of("Authorization", "Bearer " + accessToken))
                         .multiPart("photo", "test_file.jpg", "Something".getBytes(), MediaType.IMAGE_PNG_VALUE)
                         .multiPart("date", now.toString())
@@ -232,7 +232,7 @@ public class AcceptanceTest {
                                                            UpdateContentPhotoRequest request) throws IOException {
         final MultipartFile photo = request.photo();
         return thenExtract(
-                RestAssured.given()
+                SimpleRestAssured.given()
                         .headers(Map.of("Authorization", "Bearer " + accessToken))
                         .multiPart("photo", photo.getOriginalFilename(), photo.getBytes(),
                                 photo.getContentType())
