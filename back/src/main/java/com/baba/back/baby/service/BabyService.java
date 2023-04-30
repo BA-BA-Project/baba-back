@@ -17,6 +17,7 @@ import com.baba.back.baby.dto.InviteCodeRequest;
 import com.baba.back.baby.dto.SearchInviteCodeResponse;
 import com.baba.back.baby.exception.BabyBadRequestException;
 import com.baba.back.baby.exception.BabyNotFoundException;
+import com.baba.back.baby.exception.InvitationCodeBadRequestException;
 import com.baba.back.baby.exception.RelationBadRequestException;
 import com.baba.back.baby.exception.RelationGroupNotFoundException;
 import com.baba.back.baby.repository.BabyRepository;
@@ -261,8 +262,19 @@ public class BabyService {
         final Invitations invitations = getInvitations(request.getInviteCode());
         final InvitationCode invitationCode = invitations.getUnExpiredInvitationCode(LocalDateTime.now(clock));
 
+        validateInvitationCode(invitations.values());
         validateRelations(invitations.values(), member);
         saveRelations(invitations.values(), invitationCode.getRelationName(), member);
+    }
+
+    private void validateInvitationCode(List<Invitation> invitations) {
+        invitations.forEach(invitation -> {
+            final RelationGroup relationGroup = invitation.getRelationGroup();
+
+            if (relationGroup.isFamily()) {
+                throw new InvitationCodeBadRequestException("가족 관계의 멤버는 회원가입으로만 등록할 수 있습니다.");
+            }
+        });
     }
 
     private Invitations getInvitations(String code) {

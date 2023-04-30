@@ -7,6 +7,7 @@ import static com.baba.back.SimpleRestAssured.post;
 import static com.baba.back.SimpleRestAssured.put;
 import static com.baba.back.SimpleRestAssured.thenExtract;
 import static com.baba.back.fixture.RequestFixture.그룹_추가_요청_데이터1;
+import static com.baba.back.fixture.RequestFixture.그룹_추가_요청_데이터2;
 import static com.baba.back.fixture.RequestFixture.마이_프로필_변경_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.멤버_가입_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.소셜_토큰_요청_데이터;
@@ -80,9 +81,14 @@ public class AcceptanceTest {
                 new SignUpWithCodeRequest(code, "박재희", "PROFILE_W_1"));
     }
 
-    protected ExtractableResponse<Response> 그룹_추가_요청(String accessToken) {
+    protected ExtractableResponse<Response> 외가_그룹_추가_요청(String accessToken) {
         return post(String.format("/%s/%s/groups", BASE_PATH, MEMBER_BASE_PATH),
                 Map.of("Authorization", "Bearer " + accessToken), 그룹_추가_요청_데이터1);
+    }
+
+    protected ExtractableResponse<Response> 가족_그룹_추가_요청(String accessToken) {
+        return post(String.format("/%s/%s/groups", BASE_PATH, MEMBER_BASE_PATH),
+                Map.of("Authorization", "Bearer " + accessToken), 그룹_추가_요청_데이터2);
     }
 
     protected ExtractableResponse<Response> 초대장_조회_요청(String code) {

@@ -37,7 +37,7 @@ class BabyAcceptanceTest extends AcceptanceTest {
         void 자신의_아기가_없다면_아기를_추가한다() {
             // given
             final String accessToken = toObject(아기_등록_회원가입_요청(), MemberSignUpResponse.class).accessToken();
-            그룹_추가_요청(accessToken);
+            외가_그룹_추가_요청(accessToken);
             final String inviteCode = toObject(외가_초대_코드_생성_요청(accessToken),
                     CreateInviteCodeResponse.class).inviteCode();
             final String token = toObject(초대코드로_회원가입_요청(memberId, inviteCode),
@@ -184,7 +184,7 @@ class BabyAcceptanceTest extends AcceptanceTest {
             final String accessToken = toObject(signUpResponse, MemberSignUpResponse.class).accessToken();
             final String babyId = getBabyId(signUpResponse);
 
-            그룹_추가_요청(accessToken);
+            외가_그룹_추가_요청(accessToken);
             final String inviteCode = toObject(외가_초대_코드_생성_요청(accessToken),
                     CreateInviteCodeResponse.class).inviteCode();
 
@@ -200,11 +200,30 @@ class BabyAcceptanceTest extends AcceptanceTest {
         }
 
         @Test
+        void 가족_관계의_멤버가_추가한다면_400를_던진다() {
+            // given
+            final ExtractableResponse<Response> signUpResponse = 아기_등록_회원가입_요청();
+            final String accessToken = toObject(signUpResponse, MemberSignUpResponse.class).accessToken();
+
+            가족_그룹_추가_요청(accessToken);
+            final String inviteCode = toObject(가족_초대_코드_생성_요청(accessToken),
+                    CreateInviteCodeResponse.class).inviteCode();
+
+            final String accessToken2 = toObject(아기_등록_회원가입_요청(), MemberSignUpResponse.class).accessToken();
+
+            // when
+            final ExtractableResponse<Response> response = 초대코드로_아기_추가_요청(accessToken2, inviteCode);
+
+            // then
+            assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        }
+
+        @Test
         void 이미_관계가_존재하면_400을_던진다() {
             // given
             final String accessToken = toObject(아기_등록_회원가입_요청(), MemberSignUpResponse.class).accessToken();
 
-            그룹_추가_요청(accessToken);
+            외가_그룹_추가_요청(accessToken);
             final ExtractableResponse<Response> 외가_초대_코드_생성_응답 = 외가_초대_코드_생성_요청(accessToken);
             final String inviteCode = toObject(외가_초대_코드_생성_응답, CreateInviteCodeResponse.class).inviteCode();
 
@@ -218,6 +237,8 @@ class BabyAcceptanceTest extends AcceptanceTest {
             assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         }
     }
+
+
 
     @TestConfiguration
     static class TestConfig {

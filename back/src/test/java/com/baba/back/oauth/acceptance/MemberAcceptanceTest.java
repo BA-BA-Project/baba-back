@@ -204,7 +204,7 @@ class MemberAcceptanceTest extends AcceptanceTest {
         final String accessToken = toObject(아기_등록_회원가입_응답, MemberSignUpResponse.class).accessToken();
 
         // when
-        final ExtractableResponse<Response> response = 그룹_추가_요청(accessToken);
+        final ExtractableResponse<Response> response = 외가_그룹_추가_요청(accessToken);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -215,10 +215,10 @@ class MemberAcceptanceTest extends AcceptanceTest {
         // given
         final ExtractableResponse<Response> 아기_등록_회원가입_응답 = 아기_등록_회원가입_요청(멤버_가입_요청_데이터);
         final String accessToken = toObject(아기_등록_회원가입_응답, MemberSignUpResponse.class).accessToken();
-        그룹_추가_요청(accessToken);
+        외가_그룹_추가_요청(accessToken);
 
         // when
-        final ExtractableResponse<Response> response = 그룹_추가_요청(accessToken);
+        final ExtractableResponse<Response> response = 외가_그룹_추가_요청(accessToken);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -233,7 +233,7 @@ class MemberAcceptanceTest extends AcceptanceTest {
         final ExtractableResponse<Response> 아기_등록_회원가입_응답 = 아기_등록_회원가입_요청(memberId1);
         final String accessToken = toObject(아기_등록_회원가입_응답, MemberSignUpResponse.class).accessToken();
 
-        그룹_추가_요청(accessToken);
+        외가_그룹_추가_요청(accessToken);
 
         final ExtractableResponse<Response> 가족_초대_코드_생성_응답 = 외가_초대_코드_생성_요청(accessToken);
         final String code = toObject(가족_초대_코드_생성_응답, CreateInviteCodeResponse.class).inviteCode();
@@ -284,7 +284,7 @@ class MemberAcceptanceTest extends AcceptanceTest {
         final ExtractableResponse<Response> 아기_등록_회원가입_응답 = 아기_등록_회원가입_요청(memberId1);
         final String accessToken = toObject(아기_등록_회원가입_응답, MemberSignUpResponse.class).accessToken();
 
-        그룹_추가_요청(accessToken);
+        외가_그룹_추가_요청(accessToken);
 
         final ExtractableResponse<Response> 가족_초대_코드_생성_응답 = 외가_초대_코드_생성_요청(accessToken);
         final String code = toObject(가족_초대_코드_생성_응답, CreateInviteCodeResponse.class).inviteCode();
@@ -350,7 +350,7 @@ class MemberAcceptanceTest extends AcceptanceTest {
             final ExtractableResponse<Response> 아기_등록_회원가입_응답 = 아기_등록_회원가입_요청(memberId1);
             final String accessToken = toObject(아기_등록_회원가입_응답, MemberSignUpResponse.class).accessToken();
 
-            그룹_추가_요청(accessToken);
+            외가_그룹_추가_요청(accessToken);
 
             final ExtractableResponse<Response> 외가_초대_코드_생성_응답 = 외가_초대_코드_생성_요청(accessToken);
             final String code = toObject(외가_초대_코드_생성_응답, CreateInviteCodeResponse.class).inviteCode();
