@@ -18,6 +18,7 @@ import static com.baba.back.fixture.DomainFixture.아기1;
 import static com.baba.back.fixture.DomainFixture.아기2;
 import static com.baba.back.fixture.DomainFixture.초대10;
 import static com.baba.back.fixture.DomainFixture.초대20;
+import static com.baba.back.fixture.RequestFixture.그룹_멤버_정보_변경_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.그룹_정보_변경_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.그룹_추가_요청_데이터1;
 import static com.baba.back.fixture.RequestFixture.그룹_추가_요청_데이터2;
@@ -662,6 +663,55 @@ class MemberServiceTest {
 
             // then
             assertThat(relationGroup.getRelationGroupName()).isEqualTo(그룹_정보_변경_요청_데이터.getRelationGroup());
+        }
+    }
+
+    @Nested
+    class 그룹_멤버_정보_변경_시_ {
+
+        final String memberId = 멤버1.getId();
+        final String groupMemberId = 멤버3.getId();
+        final String groupName = "외가";
+
+        @Test
+        void 요청받은_멤버가_그룹에_속하지_않는다면_예외를_던진다() {
+            // given
+            given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
+            given(memberRepository.findById(groupMemberId)).willReturn(Optional.of(멤버3));
+            given(relationRepository.findFirstByMemberAndRelationGroupFamily(any(Member.class), eq(true)))
+                    .willReturn(Optional.of(관계10));
+            given(relationGroupRepository.findAllByBaby(any(Baby.class))).willReturn(List.of(관계그룹10, 관계그룹11));
+            given(relationRepository.findByMemberAndRelationGroup(any(Member.class), any(RelationGroup.class)))
+                    .willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(
+                    () -> memberService.updateGroupMember(memberId, groupMemberId, groupName, 그룹_멤버_정보_변경_요청_데이터))
+                    .isInstanceOf(RelationNotFoundException.class);
+        }
+
+        @Test
+        void 그룹_멤버의_관계명을_변경한다() {
+            // given
+            final Relation relation = Relation.builder()
+                    .member(멤버3)
+                    .relationGroup(관계그룹11)
+                    .relationName("이모")
+                    .build();
+
+            given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
+            given(memberRepository.findById(groupMemberId)).willReturn(Optional.of(멤버3));
+            given(relationRepository.findFirstByMemberAndRelationGroupFamily(any(Member.class), eq(true)))
+                    .willReturn(Optional.of(관계10));
+            given(relationGroupRepository.findAllByBaby(any(Baby.class))).willReturn(List.of(관계그룹10, 관계그룹11));
+            given(relationRepository.findByMemberAndRelationGroup(any(Member.class), any(RelationGroup.class)))
+                    .willReturn(Optional.of(relation));
+
+            // when
+            memberService.updateGroupMember(memberId, groupMemberId, groupName, 그룹_멤버_정보_변경_요청_데이터);
+
+            // then
+            assertThat(relation.getRelationName()).isEqualTo(그룹_멤버_정보_변경_요청_데이터.getRelationName());
         }
     }
 }
