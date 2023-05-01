@@ -287,8 +287,8 @@ class MemberAcceptanceTest extends AcceptanceTest {
 
         외가_그룹_추가_요청(accessToken);
 
-        final ExtractableResponse<Response> 가족_초대_코드_생성_응답 = 외가_초대_코드_생성_요청(accessToken);
-        final String code = toObject(가족_초대_코드_생성_응답, CreateInviteCodeResponse.class).inviteCode();
+        final ExtractableResponse<Response> 외가_초대_코드_생성_응답 = 외가_초대_코드_생성_요청(accessToken);
+        final String code = toObject(외가_초대_코드_생성_응답, CreateInviteCodeResponse.class).inviteCode();
 
         초대코드로_회원가입_요청(memberId2, code);
 
@@ -325,6 +325,27 @@ class MemberAcceptanceTest extends AcceptanceTest {
 
         // when
         final ExtractableResponse<Response> response = 그룹_정보_변경_요청(accessToken);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    @Test
+    void 그룹_멤버_정보_변경_요청_시_그룹명이_변경된다() {
+        // given
+        final String invitedMemberId = "memberId";
+
+        final ExtractableResponse<Response> 아기_등록_회원가입_응답 = 아기_등록_회원가입_요청(멤버_가입_요청_데이터);
+        final String accessToken = toObject(아기_등록_회원가입_응답, MemberSignUpResponse.class).accessToken();
+        외가_그룹_추가_요청(accessToken);
+
+        final ExtractableResponse<Response> 외가_초대_코드_생성_응답 = 외가_초대_코드_생성_요청(accessToken);
+        final String code = toObject(외가_초대_코드_생성_응답, CreateInviteCodeResponse.class).inviteCode();
+
+        초대코드로_회원가입_요청(invitedMemberId, code);
+
+        // when
+        final ExtractableResponse<Response> response = 그룹_멤버_정보_변경_요청(accessToken, invitedMemberId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());

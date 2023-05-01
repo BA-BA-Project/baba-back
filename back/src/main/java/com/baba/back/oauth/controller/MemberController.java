@@ -9,6 +9,7 @@ import com.baba.back.oauth.dto.MemberUpdateRequest;
 import com.baba.back.oauth.dto.MyProfileResponse;
 import com.baba.back.oauth.dto.SignUpWithBabyResponse;
 import com.baba.back.oauth.dto.SignUpWithCodeRequest;
+import com.baba.back.oauth.dto.UpdateGroupMemberRequest;
 import com.baba.back.oauth.dto.UpdateGroupRequest;
 import com.baba.back.oauth.service.MemberService;
 import com.baba.back.oauth.support.Login;
@@ -135,6 +136,20 @@ public class MemberController {
                                             @RequestParam("groupName") String groupName,
                                             @RequestBody @Valid UpdateGroupRequest request) {
         memberService.updateGroup(memberId, groupName, request);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "그룹 멤버 정보 변경 요청")
+    @OkResponse
+    @UnAuthorizedResponse
+    @NotFoundResponse
+    @IntervalServerErrorResponse
+    @PatchMapping("/members/groups/{groupMemberId}")
+    public ResponseEntity<Void> updateGroupMember(@Login String memberId,
+                                                  @PathVariable String groupMemberId,
+                                                  @RequestParam("groupName") String groupName,
+                                                  @RequestBody @Valid UpdateGroupMemberRequest request) {
+        memberService.updateGroupMember(memberId, groupMemberId, groupName, request);
         return ResponseEntity.ok().build();
     }
 }
