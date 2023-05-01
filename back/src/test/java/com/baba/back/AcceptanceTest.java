@@ -6,6 +6,7 @@ import static com.baba.back.SimpleRestAssured.patch;
 import static com.baba.back.SimpleRestAssured.post;
 import static com.baba.back.SimpleRestAssured.put;
 import static com.baba.back.SimpleRestAssured.thenExtract;
+import static com.baba.back.fixture.RequestFixture.그룹_정보_변경_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.그룹_추가_요청_데이터1;
 import static com.baba.back.fixture.RequestFixture.그룹_추가_요청_데이터2;
 import static com.baba.back.fixture.RequestFixture.마이_프로필_변경_요청_데이터;
@@ -89,6 +90,11 @@ public class AcceptanceTest {
     protected ExtractableResponse<Response> 가족_그룹_추가_요청(String accessToken) {
         return post(String.format("/%s/%s/groups", BASE_PATH, MEMBER_BASE_PATH),
                 Map.of("Authorization", "Bearer " + accessToken), 그룹_추가_요청_데이터2);
+    }
+
+    protected ExtractableResponse<Response> 그룹_정보_변경_요청(String accessToken) {
+        return put(String.format("/%s/%s/groups?groupName=%s", BASE_PATH, MEMBER_BASE_PATH, "외가"),
+                Map.of("Authorization", "Bearer " + accessToken), 그룹_정보_변경_요청_데이터);
     }
 
     protected ExtractableResponse<Response> 초대장_조회_요청(String code) {

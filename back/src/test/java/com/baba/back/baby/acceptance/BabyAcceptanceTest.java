@@ -28,49 +28,6 @@ import org.springframework.http.HttpStatus;
 
 class BabyAcceptanceTest extends AcceptanceTest {
 
-    @Nested
-    class 아기_추가_요청_시_ {
-
-        final String memberId = "memberId";
-
-        @Test
-        void 자신의_아기가_없다면_아기를_추가한다() {
-            // given
-            final String accessToken = toObject(아기_등록_회원가입_요청(), MemberSignUpResponse.class).accessToken();
-            외가_그룹_추가_요청(accessToken);
-            final String inviteCode = toObject(외가_초대_코드_생성_요청(accessToken),
-                    CreateInviteCodeResponse.class).inviteCode();
-            final String token = toObject(초대코드로_회원가입_요청(memberId, inviteCode),
-                    MemberSignUpResponse.class).accessToken();
-
-            // when
-            final ExtractableResponse<Response> response = 아기_추가_요청(token);
-            final String babyId = getBabyId(response);
-
-            // then
-            assertAll(
-                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
-                    () -> assertThat(babyId).isNotBlank()
-            );
-        }
-
-        @Test
-        void 자신의_아기가_있어도_아기를_추가한다() {
-            // given
-            final String accessToken = toObject(아기_등록_회원가입_요청(), MemberSignUpResponse.class).accessToken();
-
-            // when
-            final ExtractableResponse<Response> response = 아기_추가_요청(accessToken);
-            final String babyId = getBabyId(response);
-
-            // then
-            assertAll(
-                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
-                    () -> assertThat(babyId).isNotBlank()
-            );
-        }
-    }
-
     // TODO: 2023/03/09 아기 초대 API 생성 후 다른 아기 추가하여 테스트 진행한다.
     @Test
     void 아기_리스트_요청_시_등록된_아기가_조회된다() {
@@ -174,6 +131,57 @@ class BabyAcceptanceTest extends AcceptanceTest {
 
     }
 
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        public Picker<Color> picker() {
+            return colors -> Color.COLOR_1;
+        }
+    }
+
+    @Nested
+    class 아기_추가_요청_시_ {
+
+        final String memberId = "memberId";
+
+        @Test
+        void 자신의_아기가_없다면_아기를_추가한다() {
+            // given
+            final String accessToken = toObject(아기_등록_회원가입_요청(), MemberSignUpResponse.class).accessToken();
+            외가_그룹_추가_요청(accessToken);
+            final String inviteCode = toObject(외가_초대_코드_생성_요청(accessToken),
+                    CreateInviteCodeResponse.class).inviteCode();
+            final String token = toObject(초대코드로_회원가입_요청(memberId, inviteCode),
+                    MemberSignUpResponse.class).accessToken();
+
+            // when
+            final ExtractableResponse<Response> response = 아기_추가_요청(token);
+            final String babyId = getBabyId(response);
+
+            // then
+            assertAll(
+                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                    () -> assertThat(babyId).isNotBlank()
+            );
+        }
+
+        @Test
+        void 자신의_아기가_있어도_아기를_추가한다() {
+            // given
+            final String accessToken = toObject(아기_등록_회원가입_요청(), MemberSignUpResponse.class).accessToken();
+
+            // when
+            final ExtractableResponse<Response> response = 아기_추가_요청(accessToken);
+            final String babyId = getBabyId(response);
+
+            // then
+            assertAll(
+                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                    () -> assertThat(babyId).isNotBlank()
+            );
+        }
+    }
+
     @Nested
     class 초대코드로_아기_추가_요청_시_ {
 
@@ -235,16 +243,6 @@ class BabyAcceptanceTest extends AcceptanceTest {
 
             // then
             assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        }
-    }
-
-
-
-    @TestConfiguration
-    static class TestConfig {
-        @Bean
-        public Picker<Color> picker() {
-            return colors -> Color.COLOR_1;
         }
     }
 }

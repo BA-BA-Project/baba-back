@@ -28,6 +28,7 @@ import com.baba.back.oauth.dto.MemberUpdateRequest;
 import com.baba.back.oauth.dto.MyProfileResponse;
 import com.baba.back.oauth.dto.SignUpWithBabyResponse;
 import com.baba.back.oauth.dto.SignUpWithCodeRequest;
+import com.baba.back.oauth.dto.UpdateGroupRequest;
 import com.baba.back.oauth.exception.MemberBadRequestException;
 import com.baba.back.oauth.exception.MemberNotFoundException;
 import com.baba.back.oauth.repository.MemberRepository;
@@ -370,5 +371,31 @@ public class MemberService {
         final List<GroupMemberResponse> groupMembers = getGroupMembersByRelationGroup(relationGroup);
 
         return new GroupResponse(relationGroup.getRelationGroupName(), groupMembers);
+    }
+
+    public void updateGroup(String memberId, String groupName, UpdateGroupRequest request) {
+        final Member member = getFirstMember(memberId);
+        final Baby firstBaby = findFirstBaby(member);
+
+        final List<RelationGroup> relationGroups = findGroupByGroupName(groupName, firstBaby);
+
+        updateGroupNames(relationGroups, request.getRelationGroup());
+    }
+
+    private List<RelationGroup> findGroupByGroupName(String groupName, Baby firstBaby) {
+        final List<RelationGroup> relationGroups = getRelationGroupsByBaby(firstBaby);
+        final List<RelationGroup> groupsByName = relationGroups.stream()
+                .filter(relationGroup -> relationGroup.hasEqualGroupName(groupName))
+                .toList();
+
+        if (groupsByName.isEmpty()) {
+            throw new RelationGroupNotFoundException("{" + groupName + "} 그룹이 존재하지 않습니다.");
+        }
+
+        return groupsByName;
+    }
+
+    void updateGroupNames(List<RelationGroup> relationGroups, String newGroupName) {
+        relationGroups.forEach(relationGroup -> relationGroup.updateRelationGroupName(newGroupName));
     }
 }

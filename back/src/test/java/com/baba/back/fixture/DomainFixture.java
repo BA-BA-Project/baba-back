@@ -60,7 +60,8 @@ public class DomainFixture {
             .introduction("안녕하세요")
             .iconName(IconName.PROFILE_G_1.toString())
             .iconColor(Color.COLOR_1)
-            .build();;
+            .build();
+
     public static final Token 토큰1 = Token.builder()
             .member(멤버1)
             .value("토큰1")
@@ -149,6 +150,15 @@ public class DomainFixture {
             .owner(멤버1)
             .relation(관계10.getRelationName())
             .build();
+    public static final Content 수정용_컨텐츠10 = Content.builder()
+            .title("제목1")
+            .contentDate(nowDate)
+            .now(nowDate)
+            .cardStyle(CardStyle.CARD_BASIC_1.toString())
+            .baby(아기1)
+            .owner(멤버1)
+            .relation(관계10.getRelationName())
+            .build();
     public static final Relation 관계11 = Relation.builder()
             .member(멤버2)
             .relationName("엄마")
@@ -169,7 +179,6 @@ public class DomainFixture {
             .invitationCode(초대코드정보1)
             .relationGroup(관계그룹11)
             .build();
-
     public static final Baby 아기2 = Baby.builder()
             .id("baby2")
             .name("아기2")
@@ -211,18 +220,15 @@ public class DomainFixture {
             .content(컨텐츠20)
             .text("댓글!")
             .build();
-
     public static final Comment 댓글23 = Comment.builder()
             .owner(멤버1)
             .content(컨텐츠20)
             .text("댓글!")
             .build();
-
     public static final Tag 태그20 = Tag.builder()
             .tagMember(멤버3)
             .comment(댓글23)
             .build();
-
     public static final Like 좋아요20 = Like.builder()
             .member(멤버1)
             .content(컨텐츠20)
@@ -261,12 +267,10 @@ public class DomainFixture {
             .relationName("친척 형")
             .relationGroup(관계그룹22)
             .build();
-
     public static final Invitation 초대21 = Invitation.builder()
             .invitationCode(초대코드정보2)
             .relationGroup(관계그룹22)
             .build();
-
     public static final Baby 아기3 = Baby.builder()
             .id("baby3")
             .name("아기3")
@@ -300,15 +304,5 @@ public class DomainFixture {
             .member(멤버1)
             .relationName("외삼촌")
             .relationGroup(관계그룹40)
-            .build();
-
-    public static final Content 수정용_컨텐츠10 = Content.builder()
-            .title("제목1")
-            .contentDate(nowDate)
-            .now(nowDate)
-            .cardStyle(CardStyle.CARD_BASIC_1.toString())
-            .baby(아기1)
-            .owner(멤버1)
-            .relation(관계10.getRelationName())
             .build();
 }
