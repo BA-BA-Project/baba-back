@@ -400,7 +400,8 @@ public class MemberService {
         relationGroups.forEach(relationGroup -> relationGroup.updateRelationGroupName(newGroupName));
     }
 
-    public void updateGroupMember(String memberId, String groupMemberId, String groupName, UpdateGroupMemberRequest request) {
+    public void updateGroupMember(String memberId, String groupMemberId, String groupName,
+                                  UpdateGroupMemberRequest request) {
         final Member member = getFirstMember(memberId);
         final Member groupMember = getFirstMember(groupMemberId);
         final Baby firstBaby = findFirstBaby(member);
