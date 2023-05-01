@@ -93,7 +93,7 @@ public class AcceptanceTest {
     }
 
     protected ExtractableResponse<Response> 그룹_정보_변경_요청(String accessToken) {
-        return put(String.format("/%s/%s/groups?groupName=%s", BASE_PATH, MEMBER_BASE_PATH, "외가"),
+        return patch(String.format("/%s/%s/groups?groupName=%s", BASE_PATH, MEMBER_BASE_PATH, "외가"),
                 Map.of("Authorization", "Bearer " + accessToken), 그룹_정보_변경_요청_데이터);
     }
 
