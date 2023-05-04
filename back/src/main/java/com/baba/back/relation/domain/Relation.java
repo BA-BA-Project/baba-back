@@ -67,6 +67,10 @@ public class Relation extends BaseEntity {
         return this.relationGroup.equals(relationGroup);
     }
 
+    public boolean hasMember(Member member) {
+        return this.member.equals(member);
+    }
+
     public void updateRelationName(String relationName) {
         this.relationName = new Name(relationName);
     }

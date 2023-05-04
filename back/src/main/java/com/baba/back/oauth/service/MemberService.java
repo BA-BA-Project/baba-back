@@ -400,28 +400,32 @@ public class MemberService {
         relationGroups.forEach(relationGroup -> relationGroup.updateRelationGroupName(newGroupName));
     }
 
-    public void updateGroupMember(String memberId, String groupMemberId, String groupName,
-                                  UpdateGroupMemberRequest request) {
+    public void updateGroupMember(String memberId, String groupMemberId, UpdateGroupMemberRequest request) {
         final Member member = getFirstMember(memberId);
         final Member groupMember = getFirstMember(groupMemberId);
         final Baby firstBaby = findFirstBaby(member);
 
-        final List<RelationGroup> relationGroups = findGroupByGroupName(groupName, firstBaby);
+        final List<RelationGroup> relationGroups = getRelationGroupsByBaby(firstBaby);
+        final List<Relation> relationsByMember = getRelationsByMember(relationGroups, groupMember);
 
-        updateRelationNames(relationGroups, groupMember, request.getRelationName());
+        updateRelationNames(relationsByMember, request.getRelationName());
     }
 
-    private void updateRelationNames(List<RelationGroup> relationGroups, Member member, String relationName) {
-        relationGroups.forEach(relationGroup -> {
-            final Relation relation = getRelationByMemberAndRelationGroup(member, relationGroup);
+    private List<Relation> getRelationsByMember(List<RelationGroup> relationsGroups, Member groupMember) {
+        final List<Relation> relations = getRelationsByRelationGroups(relationsGroups);
+        
+        final List<Relation> relationsByMember = relations.stream()
+                .filter(relation -> relation.hasMember(groupMember))
+                .toList();
 
-            relation.updateRelationName(relationName);
-        });
+        if (relationsByMember.isEmpty()) {
+            throw new RelationNotFoundException("{" + groupMember.getId() + "}는 그룹의 멤버가 아닙니다.");
+        }
+
+        return relationsByMember;
     }
 
-    private Relation getRelationByMemberAndRelationGroup(Member member, RelationGroup relationGroup) {
-        return relationRepository.findByMemberAndRelationGroup(member, relationGroup)
-                .orElseThrow(() -> new RelationNotFoundException(
-                        "{" + member.getId() + "}는 {" + relationGroup.getRelationGroupName() + "} 그룹의 멤버가 아닙니다."));
+    private void updateRelationNames(List<Relation> relations, String relationName) {
+        relations.forEach(relation -> relation.updateRelationName(relationName));
     }
 }
