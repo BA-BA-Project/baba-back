@@ -710,4 +710,34 @@ class MemberServiceTest {
             assertThat(relation.getRelationName()).isEqualTo(그룹_멤버_정보_변경_요청_데이터.getRelationName());
         }
     }
+
+    @Nested
+    class 그룹_멤버_삭제_시_ {
+
+        final String memberId = 멤버1.getId();
+        final String groupMemberId = 멤버3.getId();
+
+        @Test
+        void 그룹_멤버와_아기의_관계를_삭제한다() {
+            // given
+            final Relation relation = Relation.builder()
+                    .member(멤버3)
+                    .relationGroup(관계그룹11)
+                    .relationName("이모")
+                    .build();
+
+            given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
+            given(memberRepository.findById(groupMemberId)).willReturn(Optional.of(멤버3));
+            given(relationRepository.findFirstByMemberAndRelationGroupFamily(any(Member.class), eq(true)))
+                    .willReturn(Optional.of(관계10));
+            given(relationGroupRepository.findAllByBaby(any(Baby.class))).willReturn(List.of(관계그룹10, 관계그룹11));
+            given(relationRepository.findAllByRelationGroupIn(anyList())).willReturn(List.of(관계10, 관계11, relation));
+
+            // when
+            memberService.deleteGroupMember(memberId, groupMemberId);
+
+            // then
+            then(relationRepository).should(times(1)).deleteAllInBatch(List.of(relation));
+        }
+    }
 }
