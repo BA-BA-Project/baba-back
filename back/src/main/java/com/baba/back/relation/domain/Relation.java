@@ -66,4 +66,8 @@ public class Relation extends BaseEntity {
     public boolean hasSameRelationGroup(RelationGroup relationGroup) {
         return this.relationGroup.equals(relationGroup);
     }
+
+    public void updateRelationName(String relationName) {
+        this.relationName = new Name(relationName);
+    }
 }

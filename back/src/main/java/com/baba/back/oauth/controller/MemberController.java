@@ -9,6 +9,7 @@ import com.baba.back.oauth.dto.MemberUpdateRequest;
 import com.baba.back.oauth.dto.MyProfileResponse;
 import com.baba.back.oauth.dto.SignUpWithBabyResponse;
 import com.baba.back.oauth.dto.SignUpWithCodeRequest;
+import com.baba.back.oauth.dto.UpdateGroupMemberRequest;
 import com.baba.back.oauth.dto.UpdateGroupRequest;
 import com.baba.back.oauth.service.MemberService;
 import com.baba.back.oauth.support.Login;
@@ -27,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -129,11 +131,25 @@ public class MemberController {
     @UnAuthorizedResponse
     @NotFoundResponse
     @IntervalServerErrorResponse
-    @PutMapping("/members/groups")
+    @PatchMapping("/members/groups")
     public ResponseEntity<Void> updateGroup(@Login String memberId,
                                             @RequestParam("groupName") String groupName,
                                             @RequestBody @Valid UpdateGroupRequest request) {
         memberService.updateGroup(memberId, groupName, request);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "그룹 멤버 정보 변경 요청")
+    @OkResponse
+    @UnAuthorizedResponse
+    @NotFoundResponse
+    @IntervalServerErrorResponse
+    @PatchMapping("/members/groups/{groupMemberId}")
+    public ResponseEntity<Void> updateGroupMember(@Login String memberId,
+                                                  @PathVariable String groupMemberId,
+                                                  @RequestParam("groupName") String groupName,
+                                                  @RequestBody @Valid UpdateGroupMemberRequest request) {
+        memberService.updateGroupMember(memberId, groupMemberId, groupName, request);
         return ResponseEntity.ok().build();
     }
 }

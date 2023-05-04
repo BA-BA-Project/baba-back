@@ -28,6 +28,7 @@ import com.baba.back.oauth.dto.MemberUpdateRequest;
 import com.baba.back.oauth.dto.MyProfileResponse;
 import com.baba.back.oauth.dto.SignUpWithBabyResponse;
 import com.baba.back.oauth.dto.SignUpWithCodeRequest;
+import com.baba.back.oauth.dto.UpdateGroupMemberRequest;
 import com.baba.back.oauth.dto.UpdateGroupRequest;
 import com.baba.back.oauth.exception.MemberBadRequestException;
 import com.baba.back.oauth.exception.MemberNotFoundException;
@@ -397,5 +398,30 @@ public class MemberService {
 
     void updateGroupNames(List<RelationGroup> relationGroups, String newGroupName) {
         relationGroups.forEach(relationGroup -> relationGroup.updateRelationGroupName(newGroupName));
+    }
+
+    public void updateGroupMember(String memberId, String groupMemberId, String groupName,
+                                  UpdateGroupMemberRequest request) {
+        final Member member = getFirstMember(memberId);
+        final Member groupMember = getFirstMember(groupMemberId);
+        final Baby firstBaby = findFirstBaby(member);
+
+        final List<RelationGroup> relationGroups = findGroupByGroupName(groupName, firstBaby);
+
+        updateRelationNames(relationGroups, groupMember, request.getRelationName());
+    }
+
+    private void updateRelationNames(List<RelationGroup> relationGroups, Member member, String relationName) {
+        relationGroups.forEach(relationGroup -> {
+            final Relation relation = getRelationByMemberAndRelationGroup(member, relationGroup);
+
+            relation.updateRelationName(relationName);
+        });
+    }
+
+    private Relation getRelationByMemberAndRelationGroup(Member member, RelationGroup relationGroup) {
+        return relationRepository.findByMemberAndRelationGroup(member, relationGroup)
+                .orElseThrow(() -> new RelationNotFoundException(
+                        "{" + member.getId() + "}는 {" + relationGroup.getRelationGroupName() + "} 그룹의 멤버가 아닙니다."));
     }
 }
