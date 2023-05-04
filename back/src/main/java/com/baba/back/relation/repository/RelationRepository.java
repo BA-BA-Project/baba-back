@@ -26,6 +26,4 @@ public interface RelationRepository extends JpaRepository<Relation, Long> {
     List<Relation> findAllByRelationGroup(RelationGroup relationGroup);
 
     List<Relation> findAllByRelationGroupIn(List<RelationGroup> relationGroups);
-
-    Optional<Relation> findByMemberAndRelationGroup(Member member, RelationGroup relationGroup);
 }
