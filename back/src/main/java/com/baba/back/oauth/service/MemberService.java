@@ -45,7 +45,9 @@ import jakarta.transaction.Transactional;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -253,7 +255,7 @@ public class MemberService {
 
         final List<RelationGroup> relationGroups = getRelationGroupsByBaby(firstBaby);
         final List<Relation> relations = getRelationsByRelationGroups(relationGroups);
-        final List<GroupResponseWithFamily> groups = getMyGroups(relations);
+        final List<GroupResponseWithFamily> groups = getMyGroups(relations, relationGroups);
 
         return new MyProfileResponse(groups);
     }
@@ -274,17 +276,17 @@ public class MemberService {
         return relationRepository.findAllByRelationGroupIn(relationGroups);
     }
 
-    private List<GroupResponseWithFamily> getMyGroups(List<Relation> relations) {
-        return relations.stream()
-                .collect(Collectors.groupingBy(Relation::getRelationGroup))
-                .entrySet()
-                .stream()
-                .map(entry -> {
-                    final RelationGroup relationGroup = entry.getKey();
-                    final List<Relation> relationsByGroup = entry.getValue();
+    private List<GroupResponseWithFamily> getMyGroups(List<Relation> relations, List<RelationGroup> relationGroups) {
+        final Map<RelationGroup, List<Relation>> relationsByGroup = relations.stream()
+                .collect(Collectors.groupingBy(Relation::getRelationGroup));
+
+        return relationGroups.stream()
+                .map(relationGroup -> {
+                    final List<Relation> relationsOfGroup = relationsByGroup.getOrDefault(relationGroup,
+                            Collections.emptyList());
 
                     return new GroupResponseWithFamily(relationGroup.getRelationGroupName(), relationGroup.isFamily(),
-                            getGroupMembers(relationsByGroup));
+                            getGroupMembers(relationsOfGroup));
                 })
                 .toList();
     }
