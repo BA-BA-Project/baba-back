@@ -103,6 +103,11 @@ public class AcceptanceTest {
                 Map.of("Authorization", "Bearer " + accessToken), 그룹_멤버_정보_변경_요청_데이터);
     }
 
+    protected ExtractableResponse<Response> 그룹_멤버_삭제_요청(String accessToken, String memberId) {
+        return delete(String.format("/%s/%s/groups/%s", BASE_PATH, MEMBER_BASE_PATH, memberId),
+                Map.of("Authorization", "Bearer " + accessToken));
+    }
+
     protected ExtractableResponse<Response> 초대장_조회_요청(String code) {
         return get(String.format("/%s/%s/invitation?code=%s", BASE_PATH, BABY_BASE_PATH, code));
     }
