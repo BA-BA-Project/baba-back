@@ -147,9 +147,8 @@ public class MemberController {
     @PatchMapping("/members/groups/{groupMemberId}")
     public ResponseEntity<Void> updateGroupMember(@Login String memberId,
                                                   @PathVariable String groupMemberId,
-                                                  @RequestParam("groupName") String groupName,
                                                   @RequestBody @Valid UpdateGroupMemberRequest request) {
-        memberService.updateGroupMember(memberId, groupMemberId, groupName, request);
+        memberService.updateGroupMember(memberId, groupMemberId, request);
         return ResponseEntity.ok().build();
     }
 }

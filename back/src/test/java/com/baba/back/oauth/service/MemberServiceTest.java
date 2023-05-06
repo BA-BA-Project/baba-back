@@ -671,7 +671,6 @@ class MemberServiceTest {
 
         final String memberId = 멤버1.getId();
         final String groupMemberId = 멤버3.getId();
-        final String groupName = "외가";
 
         @Test
         void 요청받은_멤버가_그룹에_속하지_않는다면_예외를_던진다() {
@@ -681,12 +680,10 @@ class MemberServiceTest {
             given(relationRepository.findFirstByMemberAndRelationGroupFamily(any(Member.class), eq(true)))
                     .willReturn(Optional.of(관계10));
             given(relationGroupRepository.findAllByBaby(any(Baby.class))).willReturn(List.of(관계그룹10, 관계그룹11));
-            given(relationRepository.findByMemberAndRelationGroup(any(Member.class), any(RelationGroup.class)))
-                    .willReturn(Optional.empty());
+            given(relationRepository.findAllByRelationGroupIn(anyList())).willReturn(List.of(관계10, 관계11));
 
             // when & then
-            assertThatThrownBy(
-                    () -> memberService.updateGroupMember(memberId, groupMemberId, groupName, 그룹_멤버_정보_변경_요청_데이터))
+            assertThatThrownBy(() -> memberService.updateGroupMember(memberId, groupMemberId, 그룹_멤버_정보_변경_요청_데이터))
                     .isInstanceOf(RelationNotFoundException.class);
         }
 
@@ -704,11 +701,10 @@ class MemberServiceTest {
             given(relationRepository.findFirstByMemberAndRelationGroupFamily(any(Member.class), eq(true)))
                     .willReturn(Optional.of(관계10));
             given(relationGroupRepository.findAllByBaby(any(Baby.class))).willReturn(List.of(관계그룹10, 관계그룹11));
-            given(relationRepository.findByMemberAndRelationGroup(any(Member.class), any(RelationGroup.class)))
-                    .willReturn(Optional.of(relation));
+            given(relationRepository.findAllByRelationGroupIn(anyList())).willReturn(List.of(관계10, 관계11, relation));
 
             // when
-            memberService.updateGroupMember(memberId, groupMemberId, groupName, 그룹_멤버_정보_변경_요청_데이터);
+            memberService.updateGroupMember(memberId, groupMemberId, 그룹_멤버_정보_변경_요청_데이터);
 
             // then
             assertThat(relation.getRelationName()).isEqualTo(그룹_멤버_정보_변경_요청_데이터.getRelationName());
