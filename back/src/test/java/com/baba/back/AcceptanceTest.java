@@ -254,6 +254,13 @@ public class AcceptanceTest {
         );
     }
 
+    protected ExtractableResponse<Response> 성장_앨범_모두_보기_요청(String accessToken, String babyId) {
+        return get(String.format("/%s/%s/%s/%s/all",
+                        BASE_PATH, BABY_BASE_PATH, babyId, CONTENT_BASE_PATH),
+                Map.of("Authorization", "Bearer " + accessToken)
+        );
+    }
+
     protected Long getContentId(ExtractableResponse<Response> response) {
         final String location = getLocation(response);
         final String id = location.split("/")[4];
