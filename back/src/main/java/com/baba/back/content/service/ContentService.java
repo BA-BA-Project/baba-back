@@ -4,6 +4,7 @@ import com.baba.back.baby.domain.Baby;
 import com.baba.back.baby.exception.BabyNotFoundException;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.common.FileHandler;
+import com.baba.back.common.Generated;
 import com.baba.back.content.domain.Like;
 import com.baba.back.content.domain.comment.Comment;
 import com.baba.back.content.domain.comment.Tag;
@@ -375,5 +376,30 @@ public class ContentService {
         final ImageFile imageFile = new ImageFile(request.photo());
         final String imageSource = fileHandler.upload(imageFile);
         content.updateURL(imageSource);
+    }
+
+    public ContentsResponse getAllContents(String memberId, String babyId) {
+        final Member member = findMember(memberId);
+        final Baby baby = findBaby(babyId);
+        findRelation(member, baby);
+
+        List<Content> contents = contentRepository.findAllByBaby(baby);
+
+        return new ContentsResponse(
+                contents.stream()
+                        .map(
+                                content -> new ContentResponse(
+                                        content.getId(),
+                                        content.getOwnerName(),
+                                        content.getRelationName(),
+                                        content.getContentDate(),
+                                        content.getTitle(),
+                                        likeRepository.existsByContentAndMember(content, member),
+                                        content.getImageSource(),
+                                        content.getCardStyle()
+                                ))
+                        .sorted()
+                        .toList()
+        );
     }
 }

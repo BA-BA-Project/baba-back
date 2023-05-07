@@ -438,6 +438,7 @@ public class MemberService {
         final Baby firstBaby = findFirstBaby(member);
 
         final List<RelationGroup> relationGroups = getRelationGroupsByBaby(firstBaby);
+
         return getRelationsByMember(relationGroups, groupMember);
     }
 }

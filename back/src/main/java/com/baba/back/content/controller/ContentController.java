@@ -85,6 +85,17 @@ public class ContentController {
         return ResponseEntity.ok(contentService.getContents(memberId, babyId, year, month));
     }
 
+    @Operation(summary = "성장 앨범 모두 조회 요청")
+    @OkResponse
+    @UnAuthorizedResponse
+    @NotFoundResponse
+    @IntervalServerErrorResponse
+    @GetMapping("/baby/{babyId}/album/all")
+    public ResponseEntity<ContentsResponse> getAllContents(@Login String memberId,
+                                                        @PathVariable("babyId") String babyId) {
+        return ResponseEntity.ok(contentService.getAllContents(memberId, babyId));
+    }
+
     @Operation(summary = "성장 앨범 댓글 보기 조회 요청")
     @OkResponse
     @UnAuthorizedResponse
@@ -126,7 +137,7 @@ public class ContentController {
                 .build();
     }
 
-    @Operation(summary = "성장 앨범 댓글 추가 요청")
+    @Operation(summary = "성장 앨범 제목 카드 수정 요청")
     @OkResponse
     @BadRequestResponse
     @UnAuthorizedResponse
