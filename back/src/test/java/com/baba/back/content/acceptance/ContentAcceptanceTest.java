@@ -366,6 +366,38 @@ public class ContentAcceptanceTest extends AcceptanceTest {
 
     }
 
+    @Test
+    void 아기의_모든_성장_앨범을_조회한다() throws MalformedURLException {
+        // given
+        final ExtractableResponse<Response> signUpResponse = 아기_등록_회원가입_요청();
+        final String accessToken = toObject(signUpResponse, MemberSignUpResponse.class).accessToken();
+        final String babyId = getBabyId(signUpResponse);
+        given(amazonS3.getUrl(any(String.class), any(String.class))).willReturn(new URL(VALID_URL));
+        성장앨범_생성_요청(accessToken, babyId, nowDate);
+        성장앨범_생성_요청(accessToken, babyId, nowDate.minusDays(1));
+        성장앨범_생성_요청(accessToken, babyId, nowDate.minusDays(2));
+        성장앨범_생성_요청(accessToken, babyId, nowDate.minusDays(3));
+        성장앨범_생성_요청(accessToken, babyId, nowDate.minusDays(10));
+
+        // when
+        final ExtractableResponse<Response> response = 성장_앨범_모두_보기_요청(accessToken, babyId);
+
+        // then
+        final List<ContentResponse> album = toObject(response, ContentsResponse.class).album();
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(album).hasSize(5),
+                () -> assertThat(album.stream().map(ContentResponse::date).toList())
+                        .containsExactly(
+                                nowDate.minusDays(10),
+                                nowDate.minusDays(3),
+                                nowDate.minusDays(2),
+                                nowDate.minusDays(1),
+                                nowDate
+                        )
+        );
+    }
+
     // TODO: 2023/03/26 멤버 초대 API 구현되면 테스트 작성
     @Test
     void 원하는_년_월의_내가_올린_성장_앨범과_다른_사람이_올린_성장_앨범을_조회한다() {
