@@ -391,6 +391,36 @@ class MemberAcceptanceTest extends AcceptanceTest {
         assertThat(notFamilyGroup2.members()).isEmpty();
     }
 
+    @Test
+    void 그룹_삭제_시_그룹_및_아기와_그룹_멤버간의_관계가_삭제된다() {
+        // given
+        final String memberId = "memberId";
+
+        final ExtractableResponse<Response> 아기_등록_회원가입_응답 = 아기_등록_회원가입_요청(멤버_가입_요청_데이터);
+        final String accessToken = toObject(아기_등록_회원가입_응답, MemberSignUpResponse.class).accessToken();
+        외가_그룹_추가_요청(accessToken);
+
+        final ExtractableResponse<Response> 외가_초대_코드_생성_응답 = 외가_초대_코드_생성_요청(accessToken);
+        final String code = toObject(외가_초대_코드_생성_응답, CreateInviteCodeResponse.class).inviteCode();
+
+        초대코드로_회원가입_요청(memberId, code);
+
+        final ExtractableResponse<Response> 마이_그룹별_조회_응답 = 마이_그룹별_조회_요청(accessToken);
+        final List<GroupResponseWithFamily> groups = toObject(마이_그룹별_조회_응답, MyProfileResponse.class).groups();
+
+        assertThat(groups).hasSize(2);
+
+        // when
+        final ExtractableResponse<Response> response = 외가_그룹_삭제_요청(accessToken);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        // then
+        final ExtractableResponse<Response> 마이_그룹별_조회_응답2 = 마이_그룹별_조회_요청(accessToken);
+        final List<GroupResponseWithFamily> groups2 = toObject(마이_그룹별_조회_응답2, MyProfileResponse.class).groups();
+
+        assertThat(groups2).hasSize(1);
+    }
+
     @TestConfiguration
     static class TestConfig {
         @Bean

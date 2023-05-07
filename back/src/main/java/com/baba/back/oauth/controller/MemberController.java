@@ -163,4 +163,15 @@ public class MemberController {
         memberService.deleteGroupMember(memberId, groupMemberId);
         return ResponseEntity.ok().build();
     }
+
+    @Operation(summary = "그룹 삭제 요청")
+    @OkResponse
+    @UnAuthorizedResponse
+    @NotFoundResponse
+    @IntervalServerErrorResponse
+    @DeleteMapping("/members/groups")
+    public ResponseEntity<Void> deleteGroup(@Login String memberId, @RequestParam("groupName") String groupName) {
+        memberService.deleteGroup(memberId, groupName);
+        return ResponseEntity.ok().build();
+    }
 }
