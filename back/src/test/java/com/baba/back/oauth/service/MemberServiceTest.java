@@ -740,4 +740,33 @@ class MemberServiceTest {
             then(relationRepository).should(times(1)).deleteAllInBatch(List.of(relation));
         }
     }
+
+    @Nested
+    class 그룹_삭제_시_ {
+
+        final String memberId = 멤버1.getId();
+        final String groupName = "외가";
+
+        @Test
+        void 그룹을_삭제한다() {
+            // given
+            final RelationGroup relationGroup = RelationGroup.builder()
+                    .baby(아기1)
+                    .relationGroupName(groupName)
+                    .family(false)
+                    .groupColor(Color.COLOR_1)
+                    .build();
+
+            given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
+            given(relationRepository.findFirstByMemberAndRelationGroupFamily(any(Member.class), eq(true)))
+                    .willReturn(Optional.of(관계10));
+            given(relationGroupRepository.findAllByBaby(any(Baby.class))).willReturn(List.of(관계그룹10, relationGroup));
+
+            // when
+            memberService.deleteGroup(memberId, groupName);
+
+            // then
+            then(relationGroupRepository).should(times(1)).deleteAllInBatch(List.of(relationGroup));
+        }
+    }
 }

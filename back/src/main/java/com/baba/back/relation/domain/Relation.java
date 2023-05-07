@@ -16,6 +16,8 @@ import jakarta.persistence.ManyToOne;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -34,6 +36,7 @@ public class Relation extends BaseEntity {
     private Name relationName;
 
     @ManyToOne(fetch = FetchType.EAGER)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private RelationGroup relationGroup;
 
     @Builder

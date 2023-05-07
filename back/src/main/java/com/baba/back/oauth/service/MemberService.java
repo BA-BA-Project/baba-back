@@ -408,20 +408,6 @@ public class MemberService {
         updateRelationNames(relations, request.getRelationName());
     }
 
-    private List<Relation> getRelationsByMember(List<RelationGroup> relationsGroups, Member groupMember) {
-        final List<Relation> relations = getRelationsByRelationGroups(relationsGroups);
-
-        final List<Relation> relationsByMember = relations.stream()
-                .filter(relation -> relation.hasMember(groupMember))
-                .toList();
-
-        if (relationsByMember.isEmpty()) {
-            throw new RelationNotFoundException("{" + groupMember.getId() + "}는 그룹의 멤버가 아닙니다.");
-        }
-
-        return relationsByMember;
-    }
-
     private void updateRelationNames(List<Relation> relations, String relationName) {
         relations.forEach(relation -> relation.updateRelationName(relationName));
     }
@@ -440,5 +426,36 @@ public class MemberService {
         final List<RelationGroup> relationGroups = getRelationGroupsByBaby(firstBaby);
 
         return getRelationsByMember(relationGroups, groupMember);
+    }
+
+    private List<Relation> getRelationsByMember(List<RelationGroup> relationsGroups, Member groupMember) {
+        final List<Relation> relations = getRelationsByRelationGroups(relationsGroups);
+
+        final List<Relation> relationsByMember = relations.stream()
+                .filter(relation -> relation.hasMember(groupMember))
+                .toList();
+
+        if (relationsByMember.isEmpty()) {
+            throw new RelationNotFoundException("{" + groupMember.getId() + "}는 그룹의 멤버가 아닙니다.");
+        }
+
+        return relationsByMember;
+    }
+
+    public void deleteGroup(String memberId, String groupName) {
+        final List<RelationGroup> relationGroups = getMyRelationGroupsByGroup(memberId, groupName);
+
+        relationGroupRepository.deleteAllInBatch(relationGroups);
+    }
+
+    private List<RelationGroup> getMyRelationGroupsByGroup(String memberId, String groupName) {
+        final Member member = getFirstMember(memberId);
+        final Baby firstBaby = findFirstBaby(member);
+
+        final List<RelationGroup> relationGroups = getRelationGroupsByBaby(firstBaby);
+
+        return relationGroups.stream()
+                .filter(relationGroup -> relationGroup.hasEqualGroupName(groupName))
+                .toList();
     }
 }
