@@ -92,7 +92,7 @@ public class ContentController {
     @IntervalServerErrorResponse
     @GetMapping("/baby/{babyId}/album/all")
     public ResponseEntity<ContentsResponse> getAllContents(@Login String memberId,
-                                                        @PathVariable("babyId") String babyId) {
+                                                           @PathVariable("babyId") String babyId) {
         return ResponseEntity.ok(contentService.getAllContents(memberId, babyId));
     }
 
