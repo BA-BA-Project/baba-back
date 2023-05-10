@@ -176,6 +176,11 @@ public class AcceptanceTest {
         );
     }
 
+    protected ExtractableResponse<Response> 성장앨범_삭제_요청(String accessToken, String babyId, Long contentId) {
+        return delete(String.format("/%s/%s/%s/%s/%s", BASE_PATH, BABY_BASE_PATH, babyId, CONTENT_BASE_PATH, contentId),
+                Map.of("Authorization", "Bearer " + accessToken));
+    }
+
     protected ExtractableResponse<Response> 좋아요_요청(String accessToken, String babyId, Long contentId) {
         return post(String.format("/%s/%s/%s/%s/%s/like",
                         BASE_PATH, BABY_BASE_PATH, babyId, CONTENT_BASE_PATH, contentId.toString()),
