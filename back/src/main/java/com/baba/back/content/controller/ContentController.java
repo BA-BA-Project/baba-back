@@ -187,4 +187,21 @@ public class ContentController {
 
         return ResponseEntity.ok().build();
     }
+
+    @Operation(summary = "성장 앨범 사진 삭제 요청")
+    @OkResponse
+    @BadRequestResponse
+    @UnAuthorizedResponse
+    @NotFoundResponse
+    @IntervalServerErrorResponse
+    @DeleteMapping("/baby/{babyId}/album/{contentId}")
+    public ResponseEntity<Void> deleteContent(@Login String memberId,
+                                            @PathVariable("babyId") String babyId,
+                                            @PathVariable("contentId") Long contentId
+    ) {
+
+        contentService.deleteContent(memberId, babyId, contentId);
+
+        return ResponseEntity.ok().build();
+    }
 }

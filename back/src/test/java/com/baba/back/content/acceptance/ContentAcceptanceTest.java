@@ -33,6 +33,7 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -395,6 +396,28 @@ public class ContentAcceptanceTest extends AcceptanceTest {
                                 nowDate.minusDays(1),
                                 nowDate
                         )
+        );
+    }
+
+    @Test
+    void 아기의_성장_앨범을_삭제한다() throws MalformedURLException {
+        // given
+        final ExtractableResponse<Response> signUpResponse = 아기_등록_회원가입_요청();
+        final String accessToken = toObject(signUpResponse, MemberSignUpResponse.class).accessToken();
+        final String babyId = getBabyId(signUpResponse);
+        given(amazonS3.getUrl(any(String.class), any(String.class))).willReturn(new URL(VALID_URL));
+        final ExtractableResponse<Response> createContentResponse = 성장앨범_생성_요청(accessToken, babyId, nowDate);
+        final Long contentId = getContentId(createContentResponse);
+
+        // when
+        final ExtractableResponse<Response> response = 성장앨범_삭제_요청(accessToken, babyId, contentId);
+        final ExtractableResponse<Response> likeResponse = 성장_앨범_좋아요_보기_요청(accessToken, babyId, contentId);
+        final ExtractableResponse<Response> commentResponse = 성장앨범_댓글_보기_요청(accessToken, babyId, contentId);
+        // then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(likeResponse.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value()),
+                () -> assertThat(commentResponse.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value())
         );
     }
 

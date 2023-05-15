@@ -401,4 +401,17 @@ public class ContentService {
                         .toList()
         );
     }
+
+    public void deleteContent(String memberId, String babyId, Long contentId) {
+        final Content content = findContent(contentId);
+        final Baby baby = findBaby(babyId);
+        validateContentBaby(baby, content);
+
+        final Member member = findMember(memberId);
+        findRelation(member, baby);
+
+        validateContentOwner(content, member);
+
+        contentRepository.delete(content);
+    }
 }
