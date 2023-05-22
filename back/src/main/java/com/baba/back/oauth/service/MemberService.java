@@ -314,12 +314,12 @@ public class MemberService {
         final FamilyGroupResponse familyGroupResponse = getFamilyGroup(familyRelationGroup);
 
         if (memberRelationGroup.isFamily()) {
-            return new BabyProfileResponse(familyGroupResponse, null);
+            return new BabyProfileResponse(baby.getBirthday(), familyGroupResponse, null);
         }
 
         final GroupResponse groupResponse = getGroupResponse(memberRelationGroup);
 
-        return new BabyProfileResponse(familyGroupResponse, groupResponse);
+        return new BabyProfileResponse(baby.getBirthday(), familyGroupResponse, groupResponse);
     }
 
     private Baby getBaby(String babyId) {
