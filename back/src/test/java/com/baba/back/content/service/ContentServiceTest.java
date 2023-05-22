@@ -323,8 +323,8 @@ class ContentServiceTest {
         given(babyRepository.findById(아기1.getId())).willReturn(Optional.of(아기1));
         given(relationRepository.findByMemberAndBaby(멤버1, 아기1)).willReturn(Optional.of(관계10));
         given(contentRepository.findByBabyYearAndMonth(아기1, year, month)).willReturn(List.of(컨텐츠10, 컨텐츠11));
-        given(likeRepository.existsByContentAndMember(컨텐츠10, 멤버1)).willReturn(true);
-        given(likeRepository.existsByContentAndMember(컨텐츠11, 멤버1)).willReturn(false);
+        given(likeRepository.findByContentAndMember(컨텐츠10, 멤버1)).willReturn(Optional.of(좋아요10));
+        given(likeRepository.findByContentAndMember(컨텐츠11, 멤버1)).willReturn(Optional.empty());
 
         // when
         final ContentsResponse response = contentService.getContents(멤버1.getId(), 아기1.getId(), year, month);

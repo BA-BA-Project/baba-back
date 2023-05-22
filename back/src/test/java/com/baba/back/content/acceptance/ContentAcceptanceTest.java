@@ -33,7 +33,6 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -400,7 +399,44 @@ public class ContentAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    void 아기의_성장_앨범을_삭제한다() throws MalformedURLException {
+    void 아기의_모든_성장_앨범을_조회시_좋아요_수정이_반영된다() throws MalformedURLException {
+        // given
+        final ExtractableResponse<Response> signUpResponse = 아기_등록_회원가입_요청();
+        final String accessToken = toObject(signUpResponse, MemberSignUpResponse.class).accessToken();
+        final String babyId = getBabyId(signUpResponse);
+        given(amazonS3.getUrl(any(String.class), any(String.class))).willReturn(new URL(VALID_URL));
+        성장앨범_생성_요청(accessToken, babyId, nowDate);
+        성장앨범_생성_요청(accessToken, babyId, nowDate.minusDays(1));
+        성장앨범_생성_요청(accessToken, babyId, nowDate.minusDays(2));
+        final Long contentId1 = getContentId(성장앨범_생성_요청(accessToken, babyId, nowDate.minusDays(3)));
+        final Long contentId2 = getContentId(성장앨범_생성_요청(accessToken, babyId, nowDate.minusDays(10)));
+
+        // when
+        final ExtractableResponse<Response> response = 성장_앨범_모두_보기_요청(accessToken, babyId);
+        좋아요_요청(accessToken, babyId, contentId1);
+        좋아요_요청(accessToken, babyId, contentId1);
+        좋아요_요청(accessToken, babyId, contentId2);
+        final ExtractableResponse<Response> response2 = 성장_앨범_모두_보기_요청(accessToken, babyId);
+
+        // then
+        final List<ContentResponse> album1 = toObject(response, ContentsResponse.class).album();
+        final List<ContentResponse> album2 = toObject(response2, ContentsResponse.class).album();
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(album1).hasSize(5),
+                () -> assertThat(album1.stream().map(ContentResponse::like).toList())
+                        .containsExactly(
+                                false, false, false, false, false
+                        ),
+                () -> assertThat(album2.stream().map(ContentResponse::like).toList())
+                        .containsExactly(
+                                true, false, false, false, false
+                        )
+        );
+    }
+
+    @Test
+    void 아기의현_성장_앨범을_삭제한다() throws MalformedURLException {
         // given
         final ExtractableResponse<Response> signUpResponse = 아기_등록_회원가입_요청();
         final String accessToken = toObject(signUpResponse, MemberSignUpResponse.class).accessToken();
@@ -421,7 +457,26 @@ public class ContentAcceptanceTest extends AcceptanceTest {
         );
     }
 
-    // TODO: 2023/03/26 멤버 초대 API 구현되면 테스트 작성
+    @Test
+    void 아기의_성장_앨범을_조회한다() throws MalformedURLException {
+        // given
+        final ExtractableResponse<Response> signUpResponse = 아기_등록_회원가입_요청();
+        final String accessToken = toObject(signUpResponse, MemberSignUpResponse.class).accessToken();
+        final String babyId = getBabyId(signUpResponse);
+        given(amazonS3.getUrl(any(String.class), any(String.class))).willReturn(new URL(VALID_URL));
+        final Long contentId = getContentId(성장앨범_생성_요청(accessToken, babyId, nowDate));
+
+        // when
+        final ExtractableResponse<Response> response = 성장_앨범_조회_요청(accessToken, babyId, contentId);
+
+        // then
+        final ContentResponse contentResponse = toObject(response, ContentResponse.class);
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(contentResponse.like()).isEqualTo(false)
+        );
+    }
+
     @Test
     void 원하는_년_월의_내가_올린_성장_앨범과_다른_사람이_올린_성장_앨범을_조회한다() {
     }
