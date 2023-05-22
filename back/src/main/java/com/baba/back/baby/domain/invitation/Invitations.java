@@ -2,6 +2,7 @@ package com.baba.back.baby.domain.invitation;
 
 import com.baba.back.baby.exception.InvitationCodeBadRequestException;
 import com.baba.back.baby.exception.InvitationsBadRequestException;
+import com.baba.back.common.Generated;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,5 +40,11 @@ public record Invitations(List<Invitation> values) {
                 .filter(invitationCode -> !invitationCode.isExpired(now))
                 .findAny()
                 .orElseThrow(() -> new InvitationCodeBadRequestException("초대 코드가 만료되었습니다."));
+    }
+
+
+    @Generated
+    public String getRelationGroupName() {
+        return this.values.get(0).getRelationGroup().getRelationGroupName();
     }
 }
