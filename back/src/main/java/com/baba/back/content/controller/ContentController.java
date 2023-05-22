@@ -1,6 +1,7 @@
 package com.baba.back.content.controller;
 
 import com.baba.back.content.dto.CommentsResponse;
+import com.baba.back.content.dto.ContentResponse;
 import com.baba.back.content.dto.ContentUpdateTitleAndCardStyleRequest;
 import com.baba.back.content.dto.ContentsResponse;
 import com.baba.back.content.dto.CreateCommentRequest;
@@ -94,6 +95,18 @@ public class ContentController {
     public ResponseEntity<ContentsResponse> getAllContents(@Login String memberId,
                                                            @PathVariable("babyId") String babyId) {
         return ResponseEntity.ok(contentService.getAllContents(memberId, babyId));
+    }
+
+    @Operation(summary = "성장 앨범 한개 조회 요청")
+    @OkResponse
+    @UnAuthorizedResponse
+    @NotFoundResponse
+    @IntervalServerErrorResponse
+    @GetMapping("/baby/{babyId}/album/{contentId}")
+    public ResponseEntity<ContentResponse> getContent(@Login String memberId,
+                                                      @PathVariable("babyId") String babyId,
+                                                      @PathVariable("contentId") Long contentId) {
+        return ResponseEntity.ok(contentService.getContent(memberId, babyId, contentId));
     }
 
     @Operation(summary = "성장 앨범 댓글 보기 조회 요청")
@@ -196,8 +209,8 @@ public class ContentController {
     @IntervalServerErrorResponse
     @DeleteMapping("/baby/{babyId}/album/{contentId}")
     public ResponseEntity<Void> deleteContent(@Login String memberId,
-                                            @PathVariable("babyId") String babyId,
-                                            @PathVariable("contentId") Long contentId
+                                              @PathVariable("babyId") String babyId,
+                                              @PathVariable("contentId") Long contentId
     ) {
 
         contentService.deleteContent(memberId, babyId, contentId);

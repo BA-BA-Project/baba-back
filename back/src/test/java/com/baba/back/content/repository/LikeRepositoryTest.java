@@ -54,8 +54,9 @@ class LikeRepositoryTest {
         likeRepository.save(new Like(savedMember, savedContent));
 
         // when
-        final boolean result = likeRepository.existsByContentAndMember(savedContent, savedMember);
-
+        final boolean result = likeRepository.findByContentAndMember(savedContent, savedMember)
+                .stream()
+                .anyMatch(like -> !like.isDeleted());
         // then
         assertThat(result).isTrue();
     }
@@ -68,7 +69,9 @@ class LikeRepositoryTest {
         final Content savedContent = contentRepository.save(컨텐츠10);
 
         // when
-        final boolean result = likeRepository.existsByContentAndMember(savedContent, savedMember);
+        final boolean result = likeRepository.findByContentAndMember(savedContent, savedMember)
+                .stream()
+                .anyMatch(like -> !like.isDeleted());
 
         // then
         assertThat(result).isFalse();

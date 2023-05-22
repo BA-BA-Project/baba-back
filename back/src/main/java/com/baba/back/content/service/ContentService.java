@@ -167,7 +167,7 @@ public class ContentService {
                                         content.getRelationName(),
                                         content.getContentDate(),
                                         content.getTitle(),
-                                        likeRepository.existsByContentAndMember(content, member),
+                                        isLike(member, content),
                                         content.getImageSource(),
                                         content.getCardStyle()
                                 ))
@@ -383,7 +383,6 @@ public class ContentService {
         findRelation(member, baby);
 
         List<Content> contents = contentRepository.findAllByBaby(baby);
-
         return new ContentsResponse(
                 contents.stream()
                         .map(
@@ -393,7 +392,7 @@ public class ContentService {
                                         content.getRelationName(),
                                         content.getContentDate(),
                                         content.getTitle(),
-                                        likeRepository.existsByContentAndMember(content, member),
+                                        isLike(member, content),
                                         content.getImageSource(),
                                         content.getCardStyle()
                                 ))
@@ -413,5 +412,28 @@ public class ContentService {
         validateContentOwner(content, member);
 
         contentRepository.delete(content);
+    }
+
+    public ContentResponse getContent(String memberId, String babyId, Long contentId) {
+        final Member member = findMember(memberId);
+        final Baby baby = findBaby(babyId);
+        findRelation(member, baby);
+        final Content content = findContent(contentId);
+
+        return new ContentResponse(
+                content.getId(),
+                content.getOwnerName(),
+                content.getRelationName(),
+                content.getContentDate(),
+                content.getTitle(),
+                isLike(member, content),
+                content.getImageSource(),
+                content.getCardStyle()
+        );
+    }
+
+    private boolean isLike(Member member, Content content) {
+        return likeRepository.findByContentAndMember(content, member).stream()
+                .anyMatch(like -> !like.isDeleted());
     }
 }

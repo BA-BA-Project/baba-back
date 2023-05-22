@@ -11,8 +11,6 @@ import org.springframework.data.jpa.repository.Query;
 public interface LikeRepository extends JpaRepository<Like, Long> {
     Optional<Like> findByContentAndMember(Content content, Member member);
 
-    boolean existsByContentAndMember(Content content, Member member);
-
     @Query("select l from Like l where l.content = :content and l.deleted = false")
     List<Like> findAllByContent(Content content);
 }
