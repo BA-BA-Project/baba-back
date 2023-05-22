@@ -22,6 +22,7 @@ import com.baba.back.baby.exception.RelationBadRequestException;
 import com.baba.back.baby.exception.RelationGroupNotFoundException;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.baby.repository.InvitationRepository;
+import com.baba.back.common.Generated;
 import com.baba.back.oauth.domain.Picker;
 import com.baba.back.oauth.domain.member.Color;
 import com.baba.back.oauth.domain.member.Member;
@@ -40,7 +41,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import lombok.Generated;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -248,7 +248,7 @@ public class BabyService {
         return new SearchInviteCodeResponse(
                 getInviteCodeBabyResponses(invitations),
                 invitationCode.getRelationName(),
-                getInvitationRelationGroup(invitations));
+                invitations.getRelationGroupName());
     }
 
     private List<InviteCodeBabyResponse> getInviteCodeBabyResponses(Invitations invitations) {
@@ -260,14 +260,6 @@ public class BabyService {
                     return new InviteCodeBabyResponse(baby.getName());
                 })
                 .toList();
-    }
-
-    private String getInvitationRelationGroup(Invitations invitations) {
-        return invitations.values().stream()
-                .map(Invitation::getRelationGroup)
-                .findFirst()
-                .orElseThrow(() -> new RelationGroupNotFoundException("초대코드에 해당하는 관계그룹이 존재하지 않습니다."))
-                .getRelationGroupName();
     }
 
     public void addBabyWithCode(InviteCodeRequest request, String memberId) {
@@ -330,9 +322,4 @@ public class BabyService {
 
         relationRepository.delete(relation);
     }
-
-
-    // TODO: 자신의 아기인 경우
-
-    // TODO: 다른 아기인 경우
 }
