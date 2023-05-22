@@ -38,6 +38,7 @@ public class InvitationCode {
         return this.relationName.getValue();
     }
 
+    // 삭제 시 오류 발생
     public LocalDateTime getExpiration() {
         return this.expiration.getValue();
     }

@@ -16,12 +16,14 @@ import com.baba.back.swagger.NotFoundResponse;
 import com.baba.back.swagger.OkResponse;
 import com.baba.back.swagger.UnAuthorizedResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -107,5 +109,18 @@ public class BabyController {
                                                 @Login String memberId) {
         babyService.addBabyWithCode(request, memberId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @Operation(summary = "아기 삭제 요청")
+    @ApiResponse(responseCode = "204", description = "NO CONTENT")
+    @BadRequestResponse
+    @UnAuthorizedResponse
+    @NotFoundResponse
+    @IntervalServerErrorResponse
+    @DeleteMapping("/baby/{babyId}")
+    public ResponseEntity<Void> deleteBaby(@PathVariable String babyId,
+                                                @Login String memberId) {
+        babyService.deleteBaby(memberId, babyId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

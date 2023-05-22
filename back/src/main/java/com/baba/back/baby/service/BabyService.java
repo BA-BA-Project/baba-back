@@ -22,6 +22,7 @@ import com.baba.back.baby.exception.RelationBadRequestException;
 import com.baba.back.baby.exception.RelationGroupNotFoundException;
 import com.baba.back.baby.repository.BabyRepository;
 import com.baba.back.baby.repository.InvitationRepository;
+import com.baba.back.common.Generated;
 import com.baba.back.oauth.domain.Picker;
 import com.baba.back.oauth.domain.member.Color;
 import com.baba.back.oauth.domain.member.Member;
@@ -245,15 +246,20 @@ public class BabyService {
         final InvitationCode invitationCode = invitations.getUnExpiredInvitationCode(LocalDateTime.now(clock));
 
         return new SearchInviteCodeResponse(
-                invitations.values().stream()
-                        .map(invitation -> {
-                            final RelationGroup relationGroup = invitation.getRelationGroup();
-                            final Baby baby = relationGroup.getBaby();
+                getInviteCodeBabyResponses(invitations),
+                invitationCode.getRelationName(),
+                invitations.getRelationGroupName());
+    }
 
-                            return new InviteCodeBabyResponse(baby.getName());
-                        })
-                        .toList(),
-                invitationCode.getRelationName());
+    private List<InviteCodeBabyResponse> getInviteCodeBabyResponses(Invitations invitations) {
+        return invitations.values().stream()
+                .map(invitation -> {
+                    final RelationGroup relationGroup = invitation.getRelationGroup();
+                    final Baby baby = relationGroup.getBaby();
+
+                    return new InviteCodeBabyResponse(baby.getName());
+                })
+                .toList();
     }
 
     public void addBabyWithCode(InviteCodeRequest request, String memberId) {
@@ -301,5 +307,19 @@ public class BabyService {
                 .member(member)
                 .build())
         );
+    }
+
+    @Generated
+    public void deleteBaby(String memberId, String babyId) {
+        final Member member = findMember(memberId);
+        final Baby baby = findBaby(babyId);
+        final Relation relation = findRelation(member, baby);
+
+        if(relation.isFamily()) {
+            babyRepository.delete(baby);
+            return;
+        }
+
+        relationRepository.delete(relation);
     }
 }
