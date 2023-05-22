@@ -163,6 +163,11 @@ public class AcceptanceTest {
                 Map.of("Authorization", "Bearer " + accessToken), 아기_이름_변경_요청_데이터);
     }
 
+    protected ExtractableResponse<Response> 아기_삭제_요청(String accessToken, String babyId) {
+        return delete(String.format("/%s/%s/%s", BASE_PATH, BABY_BASE_PATH, babyId),
+                Map.of("Authorization", "Bearer " + accessToken));
+    }
+
     protected ExtractableResponse<Response> 성장앨범_생성_요청(String accessToken, String babyId, LocalDate now) {
         return thenExtract(
                 SimpleRestAssured.given()

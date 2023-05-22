@@ -40,6 +40,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import lombok.Generated;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -245,15 +246,28 @@ public class BabyService {
         final InvitationCode invitationCode = invitations.getUnExpiredInvitationCode(LocalDateTime.now(clock));
 
         return new SearchInviteCodeResponse(
-                invitations.values().stream()
-                        .map(invitation -> {
-                            final RelationGroup relationGroup = invitation.getRelationGroup();
-                            final Baby baby = relationGroup.getBaby();
+                getInviteCodeBabyResponses(invitations),
+                invitationCode.getRelationName(),
+                getInvitationRelationGroup(invitations));
+    }
 
-                            return new InviteCodeBabyResponse(baby.getName());
-                        })
-                        .toList(),
-                invitationCode.getRelationName());
+    private List<InviteCodeBabyResponse> getInviteCodeBabyResponses(Invitations invitations) {
+        return invitations.values().stream()
+                .map(invitation -> {
+                    final RelationGroup relationGroup = invitation.getRelationGroup();
+                    final Baby baby = relationGroup.getBaby();
+
+                    return new InviteCodeBabyResponse(baby.getName());
+                })
+                .toList();
+    }
+
+    private String getInvitationRelationGroup(Invitations invitations) {
+        return invitations.values().stream()
+                .map(Invitation::getRelationGroup)
+                .findFirst()
+                .orElseThrow(() -> new RelationGroupNotFoundException("초대코드에 해당하는 관계그룹이 존재하지 않습니다."))
+                .getRelationGroupName();
     }
 
     public void addBabyWithCode(InviteCodeRequest request, String memberId) {
@@ -302,4 +316,23 @@ public class BabyService {
                 .build())
         );
     }
+
+    @Generated
+    public void deleteBaby(String memberId, String babyId) {
+        final Member member = findMember(memberId);
+        final Baby baby = findBaby(babyId);
+        final Relation relation = findRelation(member, baby);
+
+        if(relation.isFamily()) {
+            babyRepository.delete(baby);
+            return;
+        }
+
+        relationRepository.delete(relation);
+    }
+
+
+    // TODO: 자신의 아기인 경우
+
+    // TODO: 다른 아기인 경우
 }
