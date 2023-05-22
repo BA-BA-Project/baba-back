@@ -1,32 +1,47 @@
 package com.baba.back.baby.acceptance;
 
 import static com.baba.back.SimpleRestAssured.toObject;
+import static com.baba.back.content.acceptance.ContentAcceptanceTest.VALID_URL;
 import static com.baba.back.fixture.DomainFixture.nowDate;
 import static com.baba.back.fixture.DomainFixture.아기1;
 import static com.baba.back.fixture.DomainFixture.아기2;
+import static com.baba.back.fixture.RequestFixture.멤버_가입_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.초대코드_생성_요청_데이터2;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 
+import com.amazonaws.services.s3.AmazonS3;
 import com.baba.back.AcceptanceTest;
 import com.baba.back.baby.dto.BabiesResponse;
 import com.baba.back.baby.dto.BabyResponse;
 import com.baba.back.baby.dto.CreateInviteCodeResponse;
 import com.baba.back.baby.dto.InviteCodeBabyResponse;
 import com.baba.back.baby.dto.SearchInviteCodeResponse;
+import com.baba.back.content.dto.ContentResponse;
+import com.baba.back.content.dto.ContentsResponse;
 import com.baba.back.oauth.domain.Picker;
 import com.baba.back.oauth.domain.member.Color;
+import com.baba.back.oauth.dto.GroupResponseWithFamily;
 import com.baba.back.oauth.dto.MemberSignUpResponse;
+import com.baba.back.oauth.dto.MyProfileResponse;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 
 class BabyAcceptanceTest extends AcceptanceTest {
+
+    @MockBean
+    private AmazonS3 amazonS3;
 
     // TODO: 2023/03/09 아기 초대 API 생성 후 다른 아기 추가하여 테스트 진행한다.
     @Test
@@ -245,4 +260,67 @@ class BabyAcceptanceTest extends AcceptanceTest {
             assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         }
     }
+
+    @Nested
+    class 아기_삭제_요청_시_ {
+
+        @Test
+        void 자신의_아기라면_아기를_삭제한다() throws MalformedURLException {
+            // given
+            final ExtractableResponse<Response> 아기_등록_회원가입_응답 = 아기_등록_회원가입_요청();
+            final String accessToken = toObject(아기_등록_회원가입_응답, MemberSignUpResponse.class).accessToken();
+            final String babyId = getBabyId(아기_등록_회원가입_응답);
+            given(amazonS3.getUrl(any(String.class), any(String.class))).willReturn(new URL(VALID_URL));
+            성장앨범_생성_요청(accessToken, babyId, nowDate);
+
+            // when
+            final ExtractableResponse<Response> response = 아기_삭제_요청(accessToken, babyId);
+
+            // then
+            assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        }
+
+        @Test
+        void 다른_아기라면_관계만_삭제한다() {
+            // given
+            final String invitedMemberId = "memberId";
+
+            final ExtractableResponse<Response> 아기_등록_회원가입_응답 = 아기_등록_회원가입_요청(멤버_가입_요청_데이터);
+            final String accessToken = toObject(아기_등록_회원가입_응답, MemberSignUpResponse.class).accessToken();
+            final String babyId = getBabyId(아기_등록_회원가입_응답);
+            외가_그룹_추가_요청(accessToken);
+
+            final ExtractableResponse<Response> 외가_초대_코드_생성_응답 = 외가_초대_코드_생성_요청(accessToken);
+            final String code = toObject(외가_초대_코드_생성_응답, CreateInviteCodeResponse.class).inviteCode();
+
+            final ExtractableResponse<Response> 초대코드로_회원가입_응답 = 초대코드로_회원가입_요청(invitedMemberId, code);
+            final String accessToken2 = toObject(초대코드로_회원가입_응답, MemberSignUpResponse.class).accessToken();
+
+            final ExtractableResponse<Response> 마이_그룹별_조회_응답 = 마이_그룹별_조회_요청(accessToken);
+            final List<GroupResponseWithFamily> groups = toObject(마이_그룹별_조회_응답, MyProfileResponse.class).groups();
+
+            final GroupResponseWithFamily notFamilyGroup = groups.stream()
+                    .filter(group -> !group.family())
+                    .findAny()
+                    .orElseThrow();
+
+            assertThat(notFamilyGroup.members()).isNotEmpty();
+
+            // when
+            final ExtractableResponse<Response> response = 아기_삭제_요청(accessToken2, babyId);
+            assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+            // then
+            final ExtractableResponse<Response> 마이_그룹별_조회_응답2 = 마이_그룹별_조회_요청(accessToken);
+            final List<GroupResponseWithFamily> groups2 = toObject(마이_그룹별_조회_응답2, MyProfileResponse.class).groups();
+
+            final GroupResponseWithFamily notFamilyGroup2 = groups2.stream()
+                    .filter(group -> !group.family())
+                    .findAny()
+                    .orElseThrow();
+
+            assertThat(notFamilyGroup2.members()).isEmpty();
+        }
+    }
+
 }
