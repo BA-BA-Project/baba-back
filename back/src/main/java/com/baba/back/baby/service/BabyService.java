@@ -14,6 +14,7 @@ import com.baba.back.baby.dto.CreateInviteCodeRequest;
 import com.baba.back.baby.dto.CreateInviteCodeResponse;
 import com.baba.back.baby.dto.InviteCodeBabyResponse;
 import com.baba.back.baby.dto.InviteCodeRequest;
+import com.baba.back.baby.dto.IsMyBabyResponse;
 import com.baba.back.baby.dto.SearchInviteCodeResponse;
 import com.baba.back.baby.exception.BabyBadRequestException;
 import com.baba.back.baby.exception.BabyNotFoundException;
@@ -150,12 +151,12 @@ public class BabyService {
 
     private BabiesResponse getBabiesResponse(List<RelationGroup> myFamilyGroups,
                                              List<RelationGroup> othersFamilyGroups) {
-        return new BabiesResponse(getBabyResponse(myFamilyGroups), getBabyResponse(othersFamilyGroups));
+        return new BabiesResponse(getBabyResponse(myFamilyGroups, true), getBabyResponse(othersFamilyGroups, false));
     }
 
-    private List<BabyResponse> getBabyResponse(List<RelationGroup> groups) {
+    private List<IsMyBabyResponse> getBabyResponse(List<RelationGroup> groups, boolean isMyBaby) {
         return groups.stream()
-                .map(group -> new BabyResponse(group.getBabyId(), group.getGroupColor(), group.getBabyName()))
+                .map(group -> new IsMyBabyResponse(group.getBabyId(), group.getGroupColor(), group.getBabyName(), isMyBaby))
                 .sorted()
                 .toList();
     }
