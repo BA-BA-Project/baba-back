@@ -29,6 +29,7 @@ import static com.baba.back.fixture.RequestFixture.초대코드로_아기_추가
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -48,6 +49,7 @@ import com.baba.back.baby.dto.BabyResponse;
 import com.baba.back.baby.dto.CreateBabyRequest;
 import com.baba.back.baby.dto.CreateInviteCodeResponse;
 import com.baba.back.baby.dto.InviteCodeBabyResponse;
+import com.baba.back.baby.dto.IsMyBabyResponse;
 import com.baba.back.baby.dto.SearchInviteCodeResponse;
 import com.baba.back.baby.exception.BabyBadRequestException;
 import com.baba.back.baby.exception.BabyNotFoundException;
@@ -137,12 +139,12 @@ class BabyServiceTest {
         // then
         assertAll(
                 () -> assertThat(babies.myBaby()).containsExactly(
-                        new BabyResponse(아기1.getId(), 관계그룹10.getGroupColor(), 아기1.getName()),
-                        new BabyResponse(아기2.getId(), 관계그룹20.getGroupColor(), 아기2.getName())
+                        new IsMyBabyResponse(아기1.getId(), 관계그룹10.getGroupColor(), 아기1.getName(), true),
+                        new IsMyBabyResponse(아기2.getId(), 관계그룹20.getGroupColor(), 아기2.getName(), true)
                 ),
                 () -> assertThat(babies.others()).containsExactly(
-                        new BabyResponse(아기3.getId(), 관계그룹30.getGroupColor(), 아기3.getName()),
-                        new BabyResponse(아기4.getId(), 관계그룹40.getGroupColor(), 아기4.getName())
+                        new IsMyBabyResponse(아기3.getId(), 관계그룹30.getGroupColor(), 아기3.getName(), false),
+                        new IsMyBabyResponse(아기4.getId(), 관계그룹40.getGroupColor(), 아기4.getName(), false)
                 )
         );
     }

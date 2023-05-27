@@ -18,6 +18,7 @@ import com.baba.back.baby.dto.BabiesResponse;
 import com.baba.back.baby.dto.BabyResponse;
 import com.baba.back.baby.dto.CreateInviteCodeResponse;
 import com.baba.back.baby.dto.InviteCodeBabyResponse;
+import com.baba.back.baby.dto.IsMyBabyResponse;
 import com.baba.back.baby.dto.SearchInviteCodeResponse;
 import com.baba.back.content.dto.ContentResponse;
 import com.baba.back.content.dto.ContentsResponse;
@@ -61,8 +62,8 @@ class BabyAcceptanceTest extends AcceptanceTest {
                         .isEqualTo(
                                 new BabiesResponse(
                                         List.of(
-                                                new BabyResponse(아기1.getId(), Color.COLOR_1.getValue(), 아기1.getName()),
-                                                new BabyResponse(아기2.getId(), Color.COLOR_1.getValue(), 아기2.getName())
+                                                new IsMyBabyResponse(아기1.getId(), Color.COLOR_1.getValue(), 아기1.getName(), true),
+                                                new IsMyBabyResponse(아기2.getId(), Color.COLOR_1.getValue(), 아기2.getName(), true)
                                         ),
                                         List.of()
                                 )
