@@ -634,9 +634,9 @@ class MemberServiceTest {
         void 요청_받은_그룹명에_해당하는_그룹이_없으면_예외를_던진다() {
             // given
             given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
-            given(relationRepository.findFirstByMemberAndRelationGroupFamily(any(Member.class), eq(true)))
-                    .willReturn(Optional.of(관계10));
-            given(relationGroupRepository.findAllByBaby(any(Baby.class))).willReturn(List.of(관계그룹10));
+            given(relationRepository.findAllByMemberAndRelationGroupFamily(any(Member.class), eq(true)))
+                    .willReturn(List.of(관계10));
+            given(relationGroupRepository.findAllByBabyIn(anyList())).willReturn(List.of(관계그룹10));
 
             // when & then
             assertThatThrownBy(() -> memberService.updateGroup(memberId, groupName, 그룹_정보_변경_요청_데이터))
@@ -654,9 +654,9 @@ class MemberServiceTest {
                     .build();
 
             given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
-            given(relationRepository.findFirstByMemberAndRelationGroupFamily(any(Member.class), eq(true)))
-                    .willReturn(Optional.of(관계10));
-            given(relationGroupRepository.findAllByBaby(any(Baby.class))).willReturn(List.of(관계그룹10, relationGroup));
+            given(relationRepository.findAllByMemberAndRelationGroupFamily(any(Member.class), eq(true)))
+                    .willReturn(List.of(관계10));
+            given(relationGroupRepository.findAllByBabyIn(anyList())).willReturn(List.of(관계그룹10, relationGroup));
 
             // when
             memberService.updateGroup(memberId, groupName, 그룹_정보_변경_요청_데이터);
@@ -677,9 +677,9 @@ class MemberServiceTest {
             // given
             given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
             given(memberRepository.findById(groupMemberId)).willReturn(Optional.of(멤버3));
-            given(relationRepository.findFirstByMemberAndRelationGroupFamily(any(Member.class), eq(true)))
-                    .willReturn(Optional.of(관계10));
-            given(relationGroupRepository.findAllByBaby(any(Baby.class))).willReturn(List.of(관계그룹10, 관계그룹11));
+            given(relationRepository.findAllByMemberAndRelationGroupFamily(any(Member.class), eq(true)))
+                    .willReturn(List.of(관계10));
+            given(relationGroupRepository.findAllByBabyIn(anyList())).willReturn(List.of(관계그룹10, 관계그룹11));
             given(relationRepository.findAllByRelationGroupIn(anyList())).willReturn(List.of(관계10, 관계11));
 
             // when & then
@@ -698,9 +698,9 @@ class MemberServiceTest {
 
             given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
             given(memberRepository.findById(groupMemberId)).willReturn(Optional.of(멤버3));
-            given(relationRepository.findFirstByMemberAndRelationGroupFamily(any(Member.class), eq(true)))
-                    .willReturn(Optional.of(관계10));
-            given(relationGroupRepository.findAllByBaby(any(Baby.class))).willReturn(List.of(관계그룹10, 관계그룹11));
+            given(relationRepository.findAllByMemberAndRelationGroupFamily(any(Member.class), eq(true)))
+                    .willReturn(List.of(관계10));
+            given(relationGroupRepository.findAllByBabyIn(anyList())).willReturn(List.of(관계그룹10, 관계그룹11));
             given(relationRepository.findAllByRelationGroupIn(anyList())).willReturn(List.of(관계10, 관계11, relation));
 
             // when
@@ -728,9 +728,9 @@ class MemberServiceTest {
 
             given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
             given(memberRepository.findById(groupMemberId)).willReturn(Optional.of(멤버3));
-            given(relationRepository.findFirstByMemberAndRelationGroupFamily(any(Member.class), eq(true)))
-                    .willReturn(Optional.of(관계10));
-            given(relationGroupRepository.findAllByBaby(any(Baby.class))).willReturn(List.of(관계그룹10, 관계그룹11));
+            given(relationRepository.findAllByMemberAndRelationGroupFamily(any(Member.class), eq(true)))
+                    .willReturn(List.of(관계10));
+            given(relationGroupRepository.findAllByBabyIn(anyList())).willReturn(List.of(관계그룹10, 관계그룹11));
             given(relationRepository.findAllByRelationGroupIn(anyList())).willReturn(List.of(관계10, 관계11, relation));
 
             // when
@@ -758,9 +758,9 @@ class MemberServiceTest {
                     .build();
 
             given(memberRepository.findById(memberId)).willReturn(Optional.of(멤버1));
-            given(relationRepository.findFirstByMemberAndRelationGroupFamily(any(Member.class), eq(true)))
-                    .willReturn(Optional.of(관계10));
-            given(relationGroupRepository.findAllByBaby(any(Baby.class))).willReturn(List.of(관계그룹10, relationGroup));
+            given(relationRepository.findAllByMemberAndRelationGroupFamily(any(Member.class), eq(true)))
+                    .willReturn(List.of(관계10));
+            given(relationGroupRepository.findAllByBabyIn(anyList())).willReturn(List.of(관계그룹10, relationGroup));
 
             // when
             memberService.deleteGroup(memberId, groupName);

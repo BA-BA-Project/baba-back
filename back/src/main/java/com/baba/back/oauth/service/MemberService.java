@@ -378,15 +378,26 @@ public class MemberService {
 
     public void updateGroup(String memberId, String groupName, UpdateGroupRequest request) {
         final Member member = getFirstMember(memberId);
-        final Baby firstBaby = findFirstBaby(member);
-
-        final List<RelationGroup> relationGroups = findGroupByGroupName(groupName, firstBaby);
+        final List<Baby> babies = findBabies(member);
+        final List<RelationGroup> relationGroups = findGroupByGroupName(groupName, babies);
 
         updateGroupNames(relationGroups, request.getRelationGroup());
     }
 
-    private List<RelationGroup> findGroupByGroupName(String groupName, Baby firstBaby) {
-        final List<RelationGroup> relationGroups = getRelationGroupsByBaby(firstBaby);
+    private List<Baby> findBabies(Member member) {
+        final List<Relation> relations = relationRepository.findAllByMemberAndRelationGroupFamily(member, true);
+
+        return relations.stream()
+                .map(relation -> {
+                    final RelationGroup relationGroup = relation.getRelationGroup();
+
+                    return relationGroup.getBaby();
+                })
+                .toList();
+    }
+
+    private List<RelationGroup> findGroupByGroupName(String groupName, List<Baby> babies) {
+        final List<RelationGroup> relationGroups = getRelationGroupsByBabies(babies);
         final List<RelationGroup> groupsByName = relationGroups.stream()
                 .filter(relationGroup -> relationGroup.hasEqualGroupName(groupName))
                 .toList();
@@ -421,9 +432,8 @@ public class MemberService {
     private List<Relation> getGroupMemberRelations(String memberId, String groupMemberId) {
         final Member member = getFirstMember(memberId);
         final Member groupMember = getFirstMember(groupMemberId);
-        final Baby firstBaby = findFirstBaby(member);
-
-        final List<RelationGroup> relationGroups = getRelationGroupsByBaby(firstBaby);
+        final List<Baby> babies = findBabies(member);
+        final List<RelationGroup> relationGroups = getRelationGroupsByBabies(babies);
 
         return getRelationsByMember(relationGroups, groupMember);
     }
@@ -450,9 +460,8 @@ public class MemberService {
 
     private List<RelationGroup> getMyRelationGroupsByGroup(String memberId, String groupName) {
         final Member member = getFirstMember(memberId);
-        final Baby firstBaby = findFirstBaby(member);
-
-        final List<RelationGroup> relationGroups = getRelationGroupsByBaby(firstBaby);
+        final List<Baby> babies = findBabies(member);
+        final List<RelationGroup> relationGroups = getRelationGroupsByBabies(babies);
 
         return relationGroups.stream()
                 .filter(relationGroup -> relationGroup.hasEqualGroupName(groupName))
