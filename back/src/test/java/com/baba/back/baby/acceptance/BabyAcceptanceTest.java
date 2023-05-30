@@ -16,7 +16,6 @@ import static org.mockito.BDDMockito.given;
 import com.amazonaws.services.s3.AmazonS3;
 import com.baba.back.AcceptanceTest;
 import com.baba.back.baby.dto.BabiesResponse;
-import com.baba.back.baby.dto.BabyResponse;
 import com.baba.back.baby.dto.CreateInviteCodeResponse;
 import com.baba.back.baby.dto.InviteCodeBabyResponse;
 import com.baba.back.baby.dto.IsMyBabyResponse;
@@ -61,8 +60,10 @@ class BabyAcceptanceTest extends AcceptanceTest {
                         .isEqualTo(
                                 new BabiesResponse(
                                         List.of(
-                                                new IsMyBabyResponse(아기1.getId(), Color.COLOR_1.getValue(), 아기1.getName(), true),
-                                                new IsMyBabyResponse(아기2.getId(), Color.COLOR_1.getValue(), 아기2.getName(), true)
+                                                new IsMyBabyResponse(아기1.getId(), Color.COLOR_1.getValue(),
+                                                        아기1.getName(), true),
+                                                new IsMyBabyResponse(아기2.getId(), Color.COLOR_1.getValue(),
+                                                        아기2.getName(), true)
                                         ),
                                         List.of()
                                 )
@@ -82,6 +83,39 @@ class BabyAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    @Test
+    void 초대_코드_조회_요청_시_저장된_초대_코드_정보를_응답한다() {
+        // given
+        final String accessToken = toObject(아기_등록_회원가입_요청(), MemberSignUpResponse.class).accessToken();
+        final String code = toObject(가족_초대_코드_생성_요청(accessToken), CreateInviteCodeResponse.class).inviteCode();
+
+        // when
+        final ExtractableResponse<Response> response = 초대장_조회_요청(code);
+
+        // then
+        final SearchInviteCodeResponse codeResponse = toObject(response, SearchInviteCodeResponse.class);
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(codeResponse.relationName()).isEqualTo(초대코드_생성_요청_데이터2.getRelationName()),
+                () -> assertThat(codeResponse.babies().stream().map(InviteCodeBabyResponse::babyName).toList())
+                        .containsExactly(아기1.getName(), 아기2.getName())
+        );
+    }
+
+    // TODO: 2023/03/20 관계그룹 생성 로직 추가 이후 다른 그룹의 초대 코드 조회 테스트를 추가한다.
+    @Test
+    void 초대_코드_조회_요청_시_가족_그룹_이외의_초대_코드도_조회할_수_있다() {
+
+    }
+
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        public Picker<Color> picker() {
+            return colors -> Color.COLOR_1;
+        }
     }
 
     @Nested
@@ -135,39 +169,6 @@ class BabyAcceptanceTest extends AcceptanceTest {
                     () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
                     () -> assertThat(toObject(response, CreateInviteCodeResponse.class).inviteCode()).isNotBlank()
             );
-        }
-    }
-
-    @Test
-    void 초대_코드_조회_요청_시_저장된_초대_코드_정보를_응답한다() {
-        // given
-        final String accessToken = toObject(아기_등록_회원가입_요청(), MemberSignUpResponse.class).accessToken();
-        final String code = toObject(가족_초대_코드_생성_요청(accessToken), CreateInviteCodeResponse.class).inviteCode();
-
-        // when
-        final ExtractableResponse<Response> response = 초대장_조회_요청(code);
-
-        // then
-        final SearchInviteCodeResponse codeResponse = toObject(response, SearchInviteCodeResponse.class);
-        assertAll(
-                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(codeResponse.relationName()).isEqualTo(초대코드_생성_요청_데이터2.getRelationName()),
-                () -> assertThat(codeResponse.babies().stream().map(InviteCodeBabyResponse::babyName).toList())
-                        .containsExactly(아기1.getName(), 아기2.getName())
-        );
-    }
-
-    // TODO: 2023/03/20 관계그룹 생성 로직 추가 이후 다른 그룹의 초대 코드 조회 테스트를 추가한다.
-    @Test
-    void 초대_코드_조회_요청_시_가족_그룹_이외의_초대_코드도_조회할_수_있다() {
-
-    }
-
-    @TestConfiguration
-    static class TestConfig {
-        @Bean
-        public Picker<Color> picker() {
-            return colors -> Color.COLOR_1;
         }
     }
 
