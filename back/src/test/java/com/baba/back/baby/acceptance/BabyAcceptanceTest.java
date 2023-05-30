@@ -7,6 +7,7 @@ import static com.baba.back.fixture.DomainFixture.아기1;
 import static com.baba.back.fixture.DomainFixture.아기2;
 import static com.baba.back.fixture.RequestFixture.멤버_가입_요청_데이터;
 import static com.baba.back.fixture.RequestFixture.초대코드_생성_요청_데이터2;
+import static com.baba.back.fixture.RequestFixture.초대코드_생성_요청_데이터3;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
@@ -20,8 +21,6 @@ import com.baba.back.baby.dto.CreateInviteCodeResponse;
 import com.baba.back.baby.dto.InviteCodeBabyResponse;
 import com.baba.back.baby.dto.IsMyBabyResponse;
 import com.baba.back.baby.dto.SearchInviteCodeResponse;
-import com.baba.back.content.dto.ContentResponse;
-import com.baba.back.content.dto.ContentsResponse;
 import com.baba.back.oauth.domain.Picker;
 import com.baba.back.oauth.domain.member.Color;
 import com.baba.back.oauth.dto.GroupResponseWithFamily;
@@ -85,41 +84,58 @@ class BabyAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
-    @Test
-    void 초대_코드_생성_요청_시_초대_코드를_생성한다() {
-        // given
-        final String accessToken = toObject(아기_등록_회원가입_요청(), MemberSignUpResponse.class).accessToken();
+    @Nested
+    class 초대_코드_생성_요청_시_ {
 
-        // when
-        final ExtractableResponse<Response> response = 가족_초대_코드_생성_요청(accessToken);
+        @Test
+        void 초대_코드를_생성한다() {
+            // given
+            final String accessToken = toObject(아기_등록_회원가입_요청(), MemberSignUpResponse.class).accessToken();
 
-        // then
-        assertAll(
-                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
-                () -> assertThat(toObject(response, CreateInviteCodeResponse.class).inviteCode()).isNotBlank()
-        );
-    }
+            // when
+            final ExtractableResponse<Response> response = 가족_초대_코드_생성_요청(accessToken);
 
-    @Test
-    void 초대코드_생성_요청시_소속그룹과_관계명이_동일한_초대코드가_이미_존재하면_초대코드를_업데이트_한다() {
-        // given
-        final String accessToken = toObject(아기_등록_회원가입_요청(), MemberSignUpResponse.class).accessToken();
-        가족_초대_코드_생성_요청(accessToken);
+            // then
+            assertAll(
+                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                    () -> assertThat(toObject(response, CreateInviteCodeResponse.class).inviteCode()).isNotBlank()
+            );
+        }
 
-        // when
-        final ExtractableResponse<Response> response = 가족_초대_코드_생성_요청(accessToken);
+        @Test
+        void 그룹_정보를_변경한_후에도_초대_코드를_생성할_수_있다() {
+            // given
+            final String accessToken = toObject(아기_등록_회원가입_요청(), MemberSignUpResponse.class).accessToken();
+            외가_그룹_추가_요청(accessToken);
+            그룹_정보_변경_요청(accessToken);
 
-        // then
-        assertAll(
-                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
-                () -> assertThat(toObject(response, CreateInviteCodeResponse.class).inviteCode()).isNotBlank()
-        );
-    }
+            // when
+//            마이_그룹별_조회_요청(accessToken);
+            final ExtractableResponse<Response> response = 초대_코드_생성_요청(accessToken, 초대코드_생성_요청_데이터3);
 
-    // TODO: 2023/03/16 관계그룹 생성 로직 추가 이후 다른 그룹의 초대 코드 생성 테스트를 추가한다.
-    @Test
-    void 초대_코드_생성_요청_시_가족_그룹_이외의_초대_코드도_생성할수_있다() {
+            // then
+            assertAll(
+                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                    () -> assertThat(toObject(response, CreateInviteCodeResponse.class).inviteCode()).isNotBlank()
+            );
+        }
 
+
+        @Test
+        void 소속그룹과_관계명이_동일한_초대코드가_이미_존재하면_초대코드를_업데이트_한다() {
+            // given
+            final String accessToken = toObject(아기_등록_회원가입_요청(), MemberSignUpResponse.class).accessToken();
+            가족_초대_코드_생성_요청(accessToken);
+
+            // when
+            final ExtractableResponse<Response> response = 가족_초대_코드_생성_요청(accessToken);
+
+            // then
+            assertAll(
+                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                    () -> assertThat(toObject(response, CreateInviteCodeResponse.class).inviteCode()).isNotBlank()
+            );
+        }
     }
 
     @Test
