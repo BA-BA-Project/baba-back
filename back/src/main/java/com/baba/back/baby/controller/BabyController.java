@@ -119,7 +119,7 @@ public class BabyController {
     @IntervalServerErrorResponse
     @DeleteMapping("/baby/{babyId}")
     public ResponseEntity<Void> deleteBaby(@PathVariable String babyId,
-                                                @Login String memberId) {
+                                           @Login String memberId) {
         babyService.deleteBaby(memberId, babyId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

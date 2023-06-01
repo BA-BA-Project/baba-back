@@ -70,7 +70,7 @@ public class AcceptanceTest {
         return 아기_등록_회원가입_요청(UUID.randomUUID().toString(), request);
     }
 
-    protected ExtractableResponse<Response> 아기_등록_회원가입_요청(String memberId, MemberSignUpRequest request) {
+    protected ExtractableResponse<Response> /**/아기_등록_회원가입_요청(String memberId, MemberSignUpRequest request) {
         final String signToken = signTokenProvider.createToken(memberId);
         return post(String.format("/%s/%s/%s", BASE_PATH, MEMBER_BASE_PATH, BABY_BASE_PATH),
                 Map.of("Authorization", "Bearer " + signToken), request);
@@ -218,7 +218,7 @@ public class AcceptanceTest {
         return 초대_코드_생성_요청(accessToken, 초대코드_생성_요청_데이터1);
     }
 
-    private ExtractableResponse<Response> 초대_코드_생성_요청(String accessToken, CreateInviteCodeRequest request) {
+    public ExtractableResponse<Response> 초대_코드_생성_요청(String accessToken, CreateInviteCodeRequest request) {
         return post(String.format("/%s/%s/invite-code", BASE_PATH, BABY_BASE_PATH),
                 Map.of("Authorization", "Bearer " + accessToken), request);
     }

@@ -8,7 +8,6 @@ import com.baba.back.baby.domain.invitation.Invitation;
 import com.baba.back.baby.domain.invitation.InvitationCode;
 import com.baba.back.baby.domain.invitation.Invitations;
 import com.baba.back.baby.dto.BabiesResponse;
-import com.baba.back.baby.dto.BabyResponse;
 import com.baba.back.baby.dto.CreateBabyRequest;
 import com.baba.back.baby.dto.CreateInviteCodeRequest;
 import com.baba.back.baby.dto.CreateInviteCodeResponse;
@@ -156,7 +155,8 @@ public class BabyService {
 
     private List<IsMyBabyResponse> getBabyResponse(List<RelationGroup> groups, boolean isMyBaby) {
         return groups.stream()
-                .map(group -> new IsMyBabyResponse(group.getBabyId(), group.getGroupColor(), group.getBabyName(), isMyBaby))
+                .map(group -> new IsMyBabyResponse(group.getBabyId(), group.getGroupColor(), group.getBabyName(),
+                        isMyBaby))
                 .sorted()
                 .toList();
     }
@@ -316,7 +316,7 @@ public class BabyService {
         final Baby baby = findBaby(babyId);
         final Relation relation = findRelation(member, baby);
 
-        if(relation.isFamily()) {
+        if (relation.isFamily()) {
             babyRepository.delete(baby);
             return;
         }
