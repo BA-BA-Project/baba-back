@@ -1,0 +1,118 @@
+# Global Configuration
+spring:
+  profiles:
+    active: local
+  servlet:
+    multipart:
+      maxFileSize: 1MB
+
+springdoc:
+  swagger-ui:
+    path: "/swagger"
+server:
+  servlet:
+    context-path: "/api"
+
+security:
+  jwt:
+    token:
+      access:
+        secret-key: ${JWT_ACCESS_SECRET_KEY}
+        expire-length: ${JWT_ACCESS_EXPIRE_LENGTH}
+      refresh:
+        secret-key: ${JWT_REFRESH_SECRET_KEY}
+        expire-length: ${JWT_REFRESH_EXPIRE_LENGTH}
+      sign:
+        secret-key: ${JWT_SIGN_SECRET_KEY}
+        expire-length: ${JWT_SIGN_EXPIRE_LENGTH}
+
+cloud:
+  aws:
+    credentials:
+      accessKey: ${AWS_ACCESS_KEY}
+      secretKey: ${AWS_SECRET_ACCESS_KEY}
+    s3:
+      bucket: ${S3_IMAGES_BUCKET_NAME}
+    region:
+      static: ap-northeast-2
+
+---
+
+# Local Configuration
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+    username: sa
+    password: password
+    driver-class-name: org.h2.Driver
+  h2:
+    console:
+      enabled: true
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    hibernate:
+      ddl-auto: create-drop
+
+---
+
+# Dev Configuration
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:mysql://${DATABASE_HOST}:3306/${DATABASE_NAME_DEV}?serverTimezone=Asia/Seoul&character_set_server=utf8mb4
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  sql:
+    init:
+      mode: never
+  jpa:
+    generate-ddl: true
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+
+server:
+  port: 8081
+  forward-headers-strategy: framework
+
+---
+
+# Prd Configuration
+spring:
+  config:
+    activate:
+      on-profile: prd
+  datasource:
+    url: jdbc:mysql://${DATABASE_HOST}:3306/${DATABASE_NAME_PRD}?serverTimezone=Asia/Seoul&character_set_server=utf8mb4
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  sql:
+    init:
+      mode: never
+  jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
+
+springdoc:
+  swagger-ui:
+    enabled: false
+
+server:
+  port: 8080
