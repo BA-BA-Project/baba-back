@@ -507,7 +507,8 @@ class MemberAcceptanceTest extends AcceptanceTest {
             final String invitedMemberBabyId = getBabyId(아기_추가_응답);
 
             // when
-            final ExtractableResponse<Response> response = 다른_아기_프로필_조회_요청(invitedMemberAccessToken, invitedMemberBabyId);
+            final ExtractableResponse<Response> response = 다른_아기_프로필_조회_요청(invitedMemberAccessToken,
+                    invitedMemberBabyId);
             final BabyProfileResponse babyProfileResponse = toObject(response, BabyProfileResponse.class);
 
             // then

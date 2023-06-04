@@ -515,7 +515,8 @@ class MemberServiceTest {
                     .willReturn(Optional.of(관계그룹10));
 
             given(relationRepository.findFirstByRelationGroup(any(RelationGroup.class))).willReturn(Optional.of(관계10));
-            given(relationRepository.findAllByMemberAndRelationGroupFamily(any(Member.class), eq(true))).willReturn(List.of(관계10, 관계20));
+            given(relationRepository.findAllByMemberAndRelationGroupFamily(any(Member.class), eq(true))).willReturn(
+                    List.of(관계10, 관계20));
             given(relationRepository.findAllByRelationGroup(any(RelationGroup.class))).willReturn(List.of(관계10, 관계11));
 
             // when
@@ -570,7 +571,8 @@ class MemberServiceTest {
 
             given(relationRepository.findFirstByRelationGroup(any(RelationGroup.class))).willReturn(
                     Optional.of(관계10));
-            given(relationRepository.findAllByMemberAndRelationGroupFamily(any(Member.class), eq(true))).willReturn(List.of(관계10, 관계20));
+            given(relationRepository.findAllByMemberAndRelationGroupFamily(any(Member.class), eq(true))).willReturn(
+                    List.of(관계10, 관계20));
             given(relationRepository.findAllByRelationGroup(any(RelationGroup.class))).willReturn(
                     List.of(관계10, 관계11), List.of(관계12));
 

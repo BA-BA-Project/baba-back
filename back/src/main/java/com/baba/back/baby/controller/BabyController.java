@@ -16,7 +16,6 @@ import com.baba.back.swagger.NotFoundResponse;
 import com.baba.back.swagger.OkResponse;
 import com.baba.back.swagger.UnAuthorizedResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import java.net.URI;
