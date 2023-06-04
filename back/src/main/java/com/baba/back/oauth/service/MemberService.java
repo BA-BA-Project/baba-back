@@ -353,7 +353,7 @@ public class MemberService {
 
     private List<BabyResponse> getBabies(RelationGroup relationGroup) {
         final Member familyMember = getFirstMember(relationGroup);
-        final List<Relation> relations = relationRepository.findAllByMember(familyMember);
+        final List<Relation> relations = relationRepository.findAllByMemberAndRelationGroupFamily(familyMember, true);
 
         return relations.stream()
                 .map(relation -> {

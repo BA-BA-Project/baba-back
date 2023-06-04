@@ -485,5 +485,39 @@ class MemberAcceptanceTest extends AcceptanceTest {
                     () -> assertThat(babyProfileResponse.myGroup().members()).hasSize(1)
             );
         }
+
+        @Test
+        void 자신의_아기를_추가해도_조회하는_아기가_자신의_아기는_아니라면_가족_그룹의_정보와_자신의_소속_그룹의_정보를_조회한다() {
+            // given
+            final String memberId1 = "memberId1";
+            final String memberId2 = "memberId2";
+
+            final ExtractableResponse<Response> 아기_등록_회원가입_응답 = 아기_등록_회원가입_요청(memberId1);
+            final String accessToken = toObject(아기_등록_회원가입_응답, MemberSignUpResponse.class).accessToken();
+
+            외가_그룹_추가_요청(accessToken);
+
+            final ExtractableResponse<Response> 외가_초대_코드_생성_응답 = 외가_초대_코드_생성_요청(accessToken);
+            final String code = toObject(외가_초대_코드_생성_응답, CreateInviteCodeResponse.class).inviteCode();
+
+            final ExtractableResponse<Response> 초대코드로_회원가입_응답 = 초대코드로_회원가입_요청(memberId2, code);
+            final String invitedMemberAccessToken = toObject(초대코드로_회원가입_응답, MemberSignUpResponse.class).accessToken();
+
+            final ExtractableResponse<Response> 아기_추가_응답 = 아기_추가_요청(invitedMemberAccessToken);
+            final String invitedMemberBabyId = getBabyId(아기_추가_응답);
+
+            // when
+            final ExtractableResponse<Response> response = 다른_아기_프로필_조회_요청(invitedMemberAccessToken,
+                    invitedMemberBabyId);
+            final BabyProfileResponse babyProfileResponse = toObject(response, BabyProfileResponse.class);
+
+            // then
+            assertAll(
+                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                    () -> assertThat(babyProfileResponse.familyGroup().members()).hasSize(1),
+                    () -> assertThat(babyProfileResponse.familyGroup().babies()).hasSize(1),
+                    () -> assertThat(babyProfileResponse.myGroup()).isNull()
+            );
+        }
     }
 }
