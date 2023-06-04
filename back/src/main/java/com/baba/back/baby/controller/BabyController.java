@@ -112,7 +112,7 @@ public class BabyController {
     }
 
     @Operation(summary = "아기 삭제 요청")
-    @ApiResponse(responseCode = "204", description = "NO CONTENT")
+    @OkResponse
     @BadRequestResponse
     @UnAuthorizedResponse
     @NotFoundResponse
