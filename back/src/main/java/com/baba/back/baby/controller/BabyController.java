@@ -121,6 +121,6 @@ public class BabyController {
     public ResponseEntity<Void> deleteBaby(@PathVariable String babyId,
                                            @Login String memberId) {
         babyService.deleteBaby(memberId, babyId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity.ok().build();
     }
 }
