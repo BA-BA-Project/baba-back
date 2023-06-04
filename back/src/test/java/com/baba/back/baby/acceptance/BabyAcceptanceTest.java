@@ -295,7 +295,7 @@ class BabyAcceptanceTest extends AcceptanceTest {
             final ExtractableResponse<Response> response = 아기_삭제_요청(accessToken, babyId);
 
             // then
-            assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+            assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         }
 
         @Test
@@ -326,7 +326,7 @@ class BabyAcceptanceTest extends AcceptanceTest {
 
             // when
             final ExtractableResponse<Response> response = 아기_삭제_요청(accessToken2, babyId);
-            assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+            assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
             // then
             final ExtractableResponse<Response> 마이_그룹별_조회_응답2 = 마이_그룹별_조회_요청(accessToken);

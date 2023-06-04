@@ -112,7 +112,7 @@ public class BabyController {
     }
 
     @Operation(summary = "아기 삭제 요청")
-    @ApiResponse(responseCode = "204", description = "NO CONTENT")
+    @OkResponse
     @BadRequestResponse
     @UnAuthorizedResponse
     @NotFoundResponse
@@ -121,6 +121,6 @@ public class BabyController {
     public ResponseEntity<Void> deleteBaby(@PathVariable String babyId,
                                            @Login String memberId) {
         babyService.deleteBaby(memberId, babyId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity.ok().build();
     }
 }
