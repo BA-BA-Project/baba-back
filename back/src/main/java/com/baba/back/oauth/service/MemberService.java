@@ -244,7 +244,7 @@ public class MemberService {
                 RelationGroup.builder()
                         .baby(baby)
                         .relationGroupName(request.getRelationGroup())
-                        .groupColor(Color.from(request.getIconColor()))
+                        .groupColor(Color.from(request.getGroupColor()))
                         .family(false)
                         .build()));
     }
