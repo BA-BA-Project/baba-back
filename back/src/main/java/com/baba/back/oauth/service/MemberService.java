@@ -381,7 +381,7 @@ public class MemberService {
         final List<Baby> babies = findBabies(member);
         final List<RelationGroup> relationGroups = findGroupByGroupName(groupName, babies);
 
-        updateGroupNames(relationGroups, request.getRelationGroup());
+        updateGroupNames(relationGroups, request);
     }
 
     private List<Baby> findBabies(Member member) {
@@ -409,8 +409,11 @@ public class MemberService {
         return groupsByName;
     }
 
-    void updateGroupNames(List<RelationGroup> relationGroups, String newGroupName) {
-        relationGroups.forEach(relationGroup -> relationGroup.updateRelationGroupName(newGroupName));
+    void updateGroupNames(List<RelationGroup> relationGroups, UpdateGroupRequest request) {
+        relationGroups.forEach(relationGroup -> {
+            relationGroup.updateRelationGroupName(request.getRelationGroup());
+            relationGroup.updateRelationGroupColor(Color.from(request.getGroupColor()));
+        });
     }
 
     public void updateGroupMember(String memberId, String groupMemberId, UpdateGroupMemberRequest request) {

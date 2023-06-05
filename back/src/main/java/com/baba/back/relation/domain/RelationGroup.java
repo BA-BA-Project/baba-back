@@ -72,6 +72,10 @@ public class RelationGroup extends BaseEntity {
         this.relationGroupName = new Name(relationGroupName);
     }
 
+    public void updateRelationGroupColor(Color groupColor) {
+        this.groupColor = groupColor;
+    }
+
     public boolean canShare(RelationGroup other) {
 
         final boolean isSameBaby = this.baby.equals(other.baby);

@@ -12,6 +12,4 @@ public class UpdateGroupMemberRequest {
 
     @NotNull
     private String relationName;
-
-
 }
