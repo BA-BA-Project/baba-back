@@ -286,12 +286,12 @@ public class MemberService {
                             Collections.emptyList());
 
                     return new GroupResponseWithFamily(relationGroup.getRelationGroupName(), relationGroup.isFamily(),
-                            getGroupMembers(relationsOfGroup));
+                            getGroupMembers(relationsOfGroup, relationGroup.getGroupColor()));
                 })
                 .toList();
     }
 
-    private List<GroupMemberResponse> getGroupMembers(List<Relation> relations) {
+    private List<GroupMemberResponse> getGroupMembers(List<Relation> relations, String groupColor) {
         return relations.stream()
                 .map(relation -> {
                     final Member member = relation.getMember();
@@ -300,7 +300,7 @@ public class MemberService {
                             member.getName(),
                             relation.getRelationName(),
                             member.getIconName(),
-                            member.getIconColor());
+                            groupColor);
                 }).toList();
     }
 
@@ -348,7 +348,7 @@ public class MemberService {
 
     private List<GroupMemberResponse> getGroupMembersByRelationGroup(RelationGroup relationGroup) {
         final List<Relation> relations = relationRepository.findAllByRelationGroup(relationGroup);
-        return getGroupMembers(relations);
+        return getGroupMembers(relations, relationGroup.getGroupColor());
     }
 
     private List<BabyResponse> getBabies(RelationGroup relationGroup) {
