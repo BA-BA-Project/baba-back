@@ -270,7 +270,7 @@ public class ContentService {
                                             owner.getName(),
                                             relation.getRelationName(),
                                             owner.getIconName(),
-                                            owner.getIconColor(),
+                                            relation.getRelationGroupColor(),
                                             findTagMemberName(comment),
                                             comment.getText(),
                                             comment.getCreatedAt());
