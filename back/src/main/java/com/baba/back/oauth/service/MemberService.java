@@ -244,7 +244,7 @@ public class MemberService {
                 RelationGroup.builder()
                         .baby(baby)
                         .relationGroupName(request.getRelationGroup())
-                        .groupColor(Color.from(request.getIconColor()))
+                        .groupColor(Color.from(request.getGroupColor()))
                         .family(false)
                         .build()));
     }
@@ -286,12 +286,12 @@ public class MemberService {
                             Collections.emptyList());
 
                     return new GroupResponseWithFamily(relationGroup.getRelationGroupName(), relationGroup.isFamily(),
-                            getGroupMembers(relationsOfGroup));
+                            getGroupMembers(relationsOfGroup, relationGroup.getGroupColor()));
                 })
                 .toList();
     }
 
-    private List<GroupMemberResponse> getGroupMembers(List<Relation> relations) {
+    private List<GroupMemberResponse> getGroupMembers(List<Relation> relations, String groupColor) {
         return relations.stream()
                 .map(relation -> {
                     final Member member = relation.getMember();
@@ -300,7 +300,7 @@ public class MemberService {
                             member.getName(),
                             relation.getRelationName(),
                             member.getIconName(),
-                            member.getIconColor());
+                            groupColor);
                 }).toList();
     }
 
@@ -348,7 +348,7 @@ public class MemberService {
 
     private List<GroupMemberResponse> getGroupMembersByRelationGroup(RelationGroup relationGroup) {
         final List<Relation> relations = relationRepository.findAllByRelationGroup(relationGroup);
-        return getGroupMembers(relations);
+        return getGroupMembers(relations, relationGroup.getGroupColor());
     }
 
     private List<BabyResponse> getBabies(RelationGroup relationGroup) {
@@ -381,7 +381,7 @@ public class MemberService {
         final List<Baby> babies = findBabies(member);
         final List<RelationGroup> relationGroups = findGroupByGroupName(groupName, babies);
 
-        updateGroupNames(relationGroups, request.getRelationGroup());
+        updateGroupNames(relationGroups, request);
     }
 
     private List<Baby> findBabies(Member member) {
@@ -409,8 +409,11 @@ public class MemberService {
         return groupsByName;
     }
 
-    void updateGroupNames(List<RelationGroup> relationGroups, String newGroupName) {
-        relationGroups.forEach(relationGroup -> relationGroup.updateRelationGroupName(newGroupName));
+    void updateGroupNames(List<RelationGroup> relationGroups, UpdateGroupRequest request) {
+        relationGroups.forEach(relationGroup -> {
+            relationGroup.updateRelationGroupName(request.getRelationGroup());
+            relationGroup.updateRelationGroupColor(Color.from(request.getGroupColor()));
+        });
     }
 
     public void updateGroupMember(String memberId, String groupMemberId, UpdateGroupMemberRequest request) {

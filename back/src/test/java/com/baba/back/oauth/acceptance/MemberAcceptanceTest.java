@@ -321,7 +321,7 @@ class MemberAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    void 그룹_정보_변경_요청_시_그룹명이_변경된다() {
+    void 그룹_정보_변경_요청_시_그룹명과_그룹_컬러가_변경된다() {
         // given
         final ExtractableResponse<Response> 아기_등록_회원가입_응답 = 아기_등록_회원가입_요청(멤버_가입_요청_데이터);
         final String accessToken = toObject(아기_등록_회원가입_응답, MemberSignUpResponse.class).accessToken();
