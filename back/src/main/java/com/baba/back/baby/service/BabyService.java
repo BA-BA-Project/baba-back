@@ -68,11 +68,11 @@ public class BabyService {
      */
     public String createBaby(String memberId, CreateBabyRequest request) {
         final Member member = findMember(memberId);
-        final List<Relation> relations = relationRepository.findAllByMemberAndRelationGroupFamily(member, true);
         final Baby baby = saveBaby(request);
+        final List<Relation> relations = relationRepository.findAllByMemberAndRelationGroupFamily(member, true);
 
         if (relations.isEmpty()) {
-            final RelationGroup relationGroup = saveRelationGroup(baby, "가족", Color.from(picker));
+            final RelationGroup relationGroup = saveRelationGroup(baby, "가족", Color.from(picker), true);
             saveRelation(member, request.getRelationName(), relationGroup);
 
             return baby.getId();
@@ -85,7 +85,7 @@ public class BabyService {
 
         relationsByBaby.forEach(relation -> {
             final RelationGroup relationGroup = saveRelationGroup(baby, relation.getRelationGroupName(),
-                    Color.from(relation.getRelationGroupColor()));
+                    Color.from(relation.getRelationGroupColor()), relation.isFamily());
             saveRelation(relation.getMember(), relation.getRelationName(), relationGroup);
         });
 
@@ -96,12 +96,12 @@ public class BabyService {
         return babyRepository.save(request.toEntity(idConstructor.createId(), LocalDate.now(clock)));
     }
 
-    private RelationGroup saveRelationGroup(Baby baby, String relationGroupName, Color color) {
+    private RelationGroup saveRelationGroup(Baby baby, String relationGroupName, Color color, boolean isFamily) {
         return relationGroupRepository.save(RelationGroup.builder()
                 .baby(baby)
                 .relationGroupName(relationGroupName)
                 .groupColor(color)
-                .family(true)
+                .family(isFamily)
                 .build());
     }
 

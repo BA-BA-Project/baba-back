@@ -225,99 +225,103 @@ class MemberAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
-    @Test
-    void 마이_그룹별_조회_요청_시_자신의_아기가_없으면_404을_던진다() {
-        // given
-        final String memberId1 = "memberId1";
-        final String memberId2 = "memberId2";
+    @Nested
+    class 마이_그룹별_조회_요청_시_ {
 
-        final ExtractableResponse<Response> 아기_등록_회원가입_응답 = 아기_등록_회원가입_요청(memberId1);
-        final String accessToken = toObject(아기_등록_회원가입_응답, MemberSignUpResponse.class).accessToken();
+        @Test
+        void 자신의_아기가_없으면_404를_던진다() {
+            // given
+            final String memberId1 = "memberId1";
+            final String memberId2 = "memberId2";
 
-        외가_그룹_추가_요청(accessToken);
+            final ExtractableResponse<Response> 아기_등록_회원가입_응답 = 아기_등록_회원가입_요청(memberId1);
+            final String accessToken = toObject(아기_등록_회원가입_응답, MemberSignUpResponse.class).accessToken();
 
-        final ExtractableResponse<Response> 가족_초대_코드_생성_응답 = 외가_초대_코드_생성_요청(accessToken);
-        final String code = toObject(가족_초대_코드_생성_응답, CreateInviteCodeResponse.class).inviteCode();
+            외가_그룹_추가_요청(accessToken);
 
-        final ExtractableResponse<Response> 초대코드로_회원가입_응답 = 초대코드로_회원가입_요청(memberId2, code);
-        final String invitedMemberAccessToken = toObject(초대코드로_회원가입_응답, MemberSignUpResponse.class).accessToken();
+            final ExtractableResponse<Response> 가족_초대_코드_생성_응답 = 외가_초대_코드_생성_요청(accessToken);
+            final String code = toObject(가족_초대_코드_생성_응답, CreateInviteCodeResponse.class).inviteCode();
 
-        // when
-        final ExtractableResponse<Response> response = 마이_그룹별_조회_요청(invitedMemberAccessToken);
+            final ExtractableResponse<Response> 초대코드로_회원가입_응답 = 초대코드로_회원가입_요청(memberId2, code);
+            final String invitedMemberAccessToken = toObject(초대코드로_회원가입_응답, MemberSignUpResponse.class).accessToken();
 
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+            // when
+            final ExtractableResponse<Response> response = 마이_그룹별_조회_요청(invitedMemberAccessToken);
+
+            // then
+            assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        }
+
+        @Test
+        void 가족_그룹의_멤버들을_조회한다() {
+            // given
+            final String memberId1 = "memberId1";
+            final String memberId2 = "memberId2";
+
+            final ExtractableResponse<Response> 아기_등록_회원가입_응답 = 아기_등록_회원가입_요청(memberId1);
+            final String accessToken = toObject(아기_등록_회원가입_응답, MemberSignUpResponse.class).accessToken();
+
+            final ExtractableResponse<Response> 가족_초대_코드_생성_응답 = 가족_초대_코드_생성_요청(accessToken);
+            final String code = toObject(가족_초대_코드_생성_응답, CreateInviteCodeResponse.class).inviteCode();
+
+            초대코드로_회원가입_요청(memberId2, code);
+
+            // when
+            final ExtractableResponse<Response> response = 마이_그룹별_조회_요청(accessToken);
+            final List<GroupResponseWithFamily> groups = toObject(response, MyProfileResponse.class).groups();
+
+            // then
+            assertAll(
+                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                    () -> assertThat(groups).hasSize(1),
+                    () -> assertThat(groups.get(0).members().stream().map(GroupMemberResponse::memberId).toList())
+                            .containsExactly(memberId1, memberId2)
+            );
+        }
+
+        @Test
+        void 가족_그룹과_다른_그룹의_멤버들을_조회한다() {
+            // given
+            final String memberId1 = "memberId1";
+            final String memberId2 = "memberId2";
+
+            final ExtractableResponse<Response> 아기_등록_회원가입_응답 = 아기_등록_회원가입_요청(memberId1);
+            final String accessToken = toObject(아기_등록_회원가입_응답, MemberSignUpResponse.class).accessToken();
+
+            외가_그룹_추가_요청(accessToken);
+
+            final ExtractableResponse<Response> 외가_초대_코드_생성_응답 = 외가_초대_코드_생성_요청(accessToken);
+            final String code = toObject(외가_초대_코드_생성_응답, CreateInviteCodeResponse.class).inviteCode();
+
+            초대코드로_회원가입_요청(memberId2, code);
+
+            // when
+            final ExtractableResponse<Response> response = 마이_그룹별_조회_요청(accessToken);
+            final List<GroupResponseWithFamily> groups = toObject(response, MyProfileResponse.class).groups();
+
+            final GroupResponseWithFamily familyGroup = groups.stream()
+                    .filter(GroupResponseWithFamily::family)
+                    .findAny()
+                    .orElseThrow();
+            final GroupResponseWithFamily notFamilyGroup = groups.stream()
+                    .filter(group -> !group.family())
+                    .findAny()
+                    .orElseThrow();
+
+            // then
+            assertAll(
+                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                    () -> assertThat(groups).hasSize(2),
+                    () -> assertThat(familyGroup.members().stream().map(GroupMemberResponse::memberId).toList())
+                            .containsExactly(memberId1),
+                    () -> assertThat(notFamilyGroup.members().stream().map(GroupMemberResponse::memberId).toList())
+                            .containsExactly(memberId2)
+            );
+        }
     }
 
     @Test
-    void 마이_그룹별_조회_요청_시_가족_그룹의_멤버들을_조회한다() {
-        // given
-        final String memberId1 = "memberId1";
-        final String memberId2 = "memberId2";
-
-        final ExtractableResponse<Response> 아기_등록_회원가입_응답 = 아기_등록_회원가입_요청(memberId1);
-        final String accessToken = toObject(아기_등록_회원가입_응답, MemberSignUpResponse.class).accessToken();
-
-        final ExtractableResponse<Response> 가족_초대_코드_생성_응답 = 가족_초대_코드_생성_요청(accessToken);
-        final String code = toObject(가족_초대_코드_생성_응답, CreateInviteCodeResponse.class).inviteCode();
-
-        초대코드로_회원가입_요청(memberId2, code);
-
-        // when
-        final ExtractableResponse<Response> response = 마이_그룹별_조회_요청(accessToken);
-        final List<GroupResponseWithFamily> groups = toObject(response, MyProfileResponse.class).groups();
-
-        // then
-        assertAll(
-                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(groups).hasSize(1),
-                () -> assertThat(groups.get(0).members().stream().map(GroupMemberResponse::memberId).toList())
-                        .containsExactly(memberId1, memberId2)
-        );
-    }
-
-    @Test
-    void 마이_그룹별_조회_요청_시_가족_그룹과_다른_그룹의_멤버들을_조회한다() {
-        // given
-        final String memberId1 = "memberId1";
-        final String memberId2 = "memberId2";
-
-        final ExtractableResponse<Response> 아기_등록_회원가입_응답 = 아기_등록_회원가입_요청(memberId1);
-        final String accessToken = toObject(아기_등록_회원가입_응답, MemberSignUpResponse.class).accessToken();
-
-        외가_그룹_추가_요청(accessToken);
-
-        final ExtractableResponse<Response> 외가_초대_코드_생성_응답 = 외가_초대_코드_생성_요청(accessToken);
-        final String code = toObject(외가_초대_코드_생성_응답, CreateInviteCodeResponse.class).inviteCode();
-
-        초대코드로_회원가입_요청(memberId2, code);
-
-        // when
-        final ExtractableResponse<Response> response = 마이_그룹별_조회_요청(accessToken);
-        final List<GroupResponseWithFamily> groups = toObject(response, MyProfileResponse.class).groups();
-
-        final GroupResponseWithFamily familyGroup = groups.stream()
-                .filter(GroupResponseWithFamily::family)
-                .findAny()
-                .orElseThrow();
-        final GroupResponseWithFamily notFamilyGroup = groups.stream()
-                .filter(group -> !group.family())
-                .findAny()
-                .orElseThrow();
-
-        // then
-        assertAll(
-                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(groups).hasSize(2),
-                () -> assertThat(familyGroup.members().stream().map(GroupMemberResponse::memberId).toList())
-                        .containsExactly(memberId1),
-                () -> assertThat(notFamilyGroup.members().stream().map(GroupMemberResponse::memberId).toList())
-                        .containsExactly(memberId2)
-        );
-    }
-
-    @Test
-    void 그룹_정보_변경_요청_시_그룹명이_변경된다() {
+    void 그룹_정보_변경_요청_시_그룹명과_그룹_컬러가_변경된다() {
         // given
         final ExtractableResponse<Response> 아기_등록_회원가입_응답 = 아기_등록_회원가입_요청(멤버_가입_요청_데이터);
         final String accessToken = toObject(아기_등록_회원가입_응답, MemberSignUpResponse.class).accessToken();

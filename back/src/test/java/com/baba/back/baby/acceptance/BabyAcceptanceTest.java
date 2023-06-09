@@ -43,32 +43,71 @@ class BabyAcceptanceTest extends AcceptanceTest {
     private AmazonS3 amazonS3;
 
     // TODO: 2023/03/09 아기 초대 API 생성 후 다른 아기 추가하여 테스트 진행한다.
-    @Test
-    void 아기_리스트_요청_시_등록된_아기가_조회된다() {
-        // given
-        final String accessToken = toObject(아기_등록_회원가입_요청(), MemberSignUpResponse.class).accessToken();
 
-        // when
-        final ExtractableResponse<Response> response = 아기_리스트_조회_요청(accessToken);
+    @Nested
+    class 아기_리스트_요청_시_ {
 
-        // then
-        assertAll(
-                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(toObject(response, BabiesResponse.class))
-                        .usingRecursiveComparison()
-                        .ignoringFields("myBaby.babyId", "others.babyId")
-                        .isEqualTo(
-                                new BabiesResponse(
-                                        List.of(
-                                                new IsMyBabyResponse(아기1.getId(), Color.COLOR_1.getValue(),
-                                                        아기1.getName(), true),
-                                                new IsMyBabyResponse(아기2.getId(), Color.COLOR_1.getValue(),
-                                                        아기2.getName(), true)
-                                        ),
-                                        List.of()
-                                )
-                        )
-        );
+        @Test
+        void 등록된_아기가_조회된다() {
+            // given
+            final String accessToken = toObject(아기_등록_회원가입_요청(), MemberSignUpResponse.class).accessToken();
+
+            // when
+            final ExtractableResponse<Response> response = 아기_리스트_조회_요청(accessToken);
+
+            // then
+            assertAll(
+                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                    () -> assertThat(toObject(response, BabiesResponse.class))
+                            .usingRecursiveComparison()
+                            .ignoringFields("myBaby.babyId", "others.babyId")
+                            .isEqualTo(
+                                    new BabiesResponse(
+                                            List.of(
+                                                    new IsMyBabyResponse(아기1.getId(), Color.COLOR_1.getValue(),
+                                                            아기1.getName(), true),
+                                                    new IsMyBabyResponse(아기2.getId(), Color.COLOR_1.getValue(),
+                                                            아기2.getName(), true)
+                                            ),
+                                            List.of()
+                                    )
+                            )
+            );
+        }
+
+        @Test
+        void 다른_사람의_아기도_조회할_수_있다() {
+            // given
+            final String memberId1 = "memberId1";
+            final String memberId2 = "memberId2";
+
+            final ExtractableResponse<Response> 아기_등록_회원가입_응답 = 아기_등록_회원가입_요청(memberId1);
+            final String accessToken = toObject(아기_등록_회원가입_응답, MemberSignUpResponse.class).accessToken();
+
+            외가_그룹_추가_요청(accessToken);
+
+            final ExtractableResponse<Response> 외가_초대_코드_생성_응답 = 외가_초대_코드_생성_요청(accessToken);
+            final String code = toObject(외가_초대_코드_생성_응답, CreateInviteCodeResponse.class).inviteCode();
+
+            final ExtractableResponse<Response> 초대코드로_회원가입_응답 = 초대코드로_회원가입_요청(memberId2, code);
+            final String invitedMemberAccessToken = toObject(초대코드로_회원가입_응답, MemberSignUpResponse.class).accessToken();
+
+            final ExtractableResponse<Response> 아기_추가_응답 = 아기_추가_요청(accessToken);
+            final String babyId = getBabyId(아기_추가_응답);
+
+            다른_아기_프로필_조회_요청(accessToken, babyId);
+
+            // when
+            final ExtractableResponse<Response> response = 아기_리스트_조회_요청(invitedMemberAccessToken);
+            final BabiesResponse babiesResponse = toObject(response, BabiesResponse.class);
+
+            // then
+            assertAll(
+                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                    () -> assertThat(babiesResponse.myBaby()).isEmpty(),
+                    () -> assertThat(babiesResponse.others()).hasSize(3)
+            );
+        }
     }
 
     @Test
