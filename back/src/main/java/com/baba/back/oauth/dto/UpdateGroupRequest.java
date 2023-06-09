@@ -12,4 +12,7 @@ public class UpdateGroupRequest {
 
     @NotNull
     private String relationGroup;
+
+    @NotNull
+    private String groupColor;
 }

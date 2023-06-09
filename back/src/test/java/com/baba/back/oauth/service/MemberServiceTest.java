@@ -664,7 +664,10 @@ class MemberServiceTest {
             memberService.updateGroup(memberId, groupName, 그룹_정보_변경_요청_데이터);
 
             // then
-            assertThat(relationGroup.getRelationGroupName()).isEqualTo(그룹_정보_변경_요청_데이터.getRelationGroup());
+            assertAll(
+                    () -> assertThat(relationGroup.getRelationGroupName()).isEqualTo(그룹_정보_변경_요청_데이터.getRelationGroup()),
+                    () -> assertThat(relationGroup.getGroupColor()).isEqualTo(그룹_정보_변경_요청_데이터.getGroupColor())
+            );
         }
     }
 

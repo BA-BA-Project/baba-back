@@ -1,5 +1,6 @@
 package com.baba.back.oauth.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateGroupRequest {
+
+    @NotNull
     private String relationGroup;
-    private String iconColor;
+
+    @NotNull
+    private String groupColor;
 }
